@@ -12,6 +12,8 @@ define (require) ->
   Background = require 'cs!modules/elements/Background'
   PostFX = require 'cs!modules/elements/PostFX'
 
+  Circles = require 'cs!modules/elements/Circles'
+
   class App
     constructor: () ->
       @time = Date.now() * 0.0001
@@ -29,6 +31,38 @@ define (require) ->
       @renderer.setClearColor( 0xe1d8c7, 1)
       #@renderer.setClearColor( 0x000000, 0)
 
+      circles = new Circles(@scene, 25, "lorem23")
+      @scene.add(circles)
+
+      @createElements()
+
+      container.appendChild( @renderer.domElement )
+
+      window.addEventListener('resize', @onWindowResize, false)
+
+      @postfx = new PostFX(@scene, @camera, @renderer)
+      new Background(@scene)
+
+      @animate()
+
+    createElements: () ->
+      material = new THREE.MeshBasicMaterial({color: 0xebddc8, transparent: true, depthWrite: false, depthTest: false})
+      material.blending = THREE.MultiplyBlending
+
+      object = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 50, 1, 1 ), material )
+      object.position.set( 20, 0, 350 )
+      object.rotation.set(0, 0.8, 0.7)
+      @scene.add( object )
+
+      material2 = new THREE.MeshBasicMaterial({color: 0x6f9787, transparent: true, depthWrite: false, depthTest: false})
+      material2.blending = THREE.MultiplyBlending
+
+      object = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 50, 1, 1 ), material2 )
+      object.position.set( 20, 40, 350 )
+      object.rotation.set(0, -1, -0.6)
+      @scene.add( object )
+
+    __createElementsBackup: () ->
       #material = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide } )
       #material = new THREE.MeshBasicMaterial({color: 0xaf1925, transparent: true})
       material = new THREE.MeshBasicMaterial({color: 0xd7888e, transparent: true})
@@ -60,16 +94,6 @@ define (require) ->
       object.position.set( -20, 0, 0 );
       object.rotation.set(0, 0, Math.PI / 4)
       @scene.add( object )
-
-      container.appendChild( @renderer.domElement )
-
-      window.addEventListener('resize', @onWindowResize, false)
-
-      @postfx = new PostFX(@scene, @camera, @renderer)
-      new Background(@scene)
-
-      @animate()
-
 
     onWindowResize: () =>
       SCREEN_WIDTH = window.innerWidth

@@ -3,9 +3,11 @@ define (require) ->
 
   class Background
     constructor: (@scene) ->
-      backgroundTexture = THREE.ImageUtils.loadTexture('src/images/background.jpg')
-      bgMat = new THREE.MeshBasicMaterial({map: backgroundTexture})
-      bg = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600, 0), bgMat)
+      texture = THREE.ImageUtils.loadTexture('src/images/background.jpg')
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+      texture.repeat.set( 2, 2 )
+      bgMat = new THREE.MeshBasicMaterial({map: texture})
+      bg = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600, 4, 4), bgMat)
       bg.material.depthTest = false
       bg.material.depthWrite = false
       bg.position.set(0, 0, -10)

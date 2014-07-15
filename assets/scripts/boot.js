@@ -38197,13 +38197,15 @@ define("threejs", (function (global) {
     THREE = require('threejs');
     return Background = (function() {
       function Background(scene) {
-        var backgroundTexture, bg, bgMat;
+        var bg, bgMat, texture;
         this.scene = scene;
-        backgroundTexture = THREE.ImageUtils.loadTexture('src/images/background.jpg');
+        texture = THREE.ImageUtils.loadTexture('src/images/background.jpg');
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(2, 2);
         bgMat = new THREE.MeshBasicMaterial({
-          map: backgroundTexture
+          map: texture
         });
-        bg = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600, 0), bgMat);
+        bg = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600, 4, 4), bgMat);
         bg.material.depthTest = false;
         bg.material.depthWrite = false;
         bg.position.set(0, 0, -10);
@@ -38930,20 +38932,359 @@ define("vendors/three.js-extras/shaders/FilmShader", function(){});
 
 }).call(this);
 
+/**
+ * Seedable random number generator functions.
+ * @version 1.0.0
+ * @license Public Domain
+ *
+ * @example
+ * var rng = new RNG('Example');
+ * rng.random(40, 50);  // =>  42
+ * rng.uniform();       // =>  0.7972798995050903
+ * rng.normal();        // => -0.6698504543216376
+ * rng.exponential();   // =>  1.0547367609131555
+ * rng.poisson(4);      // =>  2
+ * rng.gamma(4);        // =>  2.781724687386858
+ */
+
+/**
+ * @param {String} seed A string to seed the generator.
+ * @constructor
+ */
+function RC4(seed) {
+    this.s = new Array(256);
+    this.i = 0;
+    this.j = 0;
+    for (var i = 0; i < 256; i++) {
+        this.s[i] = i;
+    }
+    if (seed) {
+        this.mix(seed);
+    }
+}
+
+/**
+ * Get the underlying bytes of a string.
+ * @param {string} string
+ * @returns {Array} An array of bytes
+ */
+RC4.getStringBytes = function(string) {
+    var output = [];
+    for (var i = 0; i < string.length; i++) {
+        var c = string.charCodeAt(i);
+        var bytes = [];
+        do {
+            bytes.push(c & 0xFF);
+            c = c >> 8;
+        } while (c > 0);
+        output = output.concat(bytes.reverse());
+    }
+    return output;
+};
+
+RC4.prototype._swap = function(i, j) {
+    var tmp = this.s[i];
+    this.s[i] = this.s[j];
+    this.s[j] = tmp;
+};
+
+/**
+ * Mix additional entropy into this generator.
+ * @param {String} seed
+ */
+RC4.prototype.mix = function(seed) {
+    var input = RC4.getStringBytes(seed);
+    var j = 0;
+    for (var i = 0; i < this.s.length; i++) {
+        j += this.s[i] + input[i % input.length];
+        j %= 256;
+        this._swap(i, j);
+    }
+};
+
+/**
+ * @returns {number} The next byte of output from the generator.
+ */
+RC4.prototype.next = function() {
+    this.i = (this.i + 1) % 256;
+    this.j = (this.j + this.s[this.i]) % 256;
+    this._swap(this.i, this.j);
+    return this.s[(this.s[this.i] + this.s[this.j]) % 256];
+};
+
+/**
+ * Create a new random number generator with optional seed. If the
+ * provided seed is a function (i.e. Math.random) it will be used as
+ * the uniform number generator.
+ * @param seed An arbitrary object used to seed the generator.
+ * @constructor
+ */
+function RNG(seed) {
+    if (seed == null) {
+        seed = (Math.random() + Date.now()).toString();
+    } else if (typeof seed === "function") {
+        // Use it as a uniform number generator
+        this.uniform = seed;
+        this.nextByte = function() {
+            return ~~(this.uniform() * 256);
+        };
+        seed = null;
+    } else if (Object.prototype.toString.call(seed) !== "[object String]") {
+        seed = JSON.stringify(seed);
+    }
+    this._normal = null;
+    if (seed) {
+        this._state = new RC4(seed);
+    } else {
+        this._state = null;
+    }
+}
+
+/**
+ * @returns {number} Uniform random number between 0 and 255.
+ */
+RNG.prototype.nextByte = function() {
+    return this._state.next();
+};
+
+/**
+ * @returns {number} Uniform random number between 0 and 1.
+ */
+RNG.prototype.uniform = function() {
+    var BYTES = 7; // 56 bits to make a 53-bit double
+    var output = 0;
+    for (var i = 0; i < BYTES; i++) {
+        output *= 256;
+        output += this.nextByte();
+    }
+    return output / (Math.pow(2, BYTES * 8) - 1);
+};
+
+/**
+ * Produce a random integer within [n, m).
+ * @param {number} [n=0]
+ * @param {number} m
+ *
+ */
+RNG.prototype.random = function(n, m) {
+    if (n == null) {
+        return this.uniform();
+    } else if (m == null) {
+        m = n;
+        n = 0;
+    }
+    return n + Math.floor(this.uniform() * (m - n));
+};
+
+/**
+ * Generates numbers using this.uniform() with the Box-Muller transform.
+ * @returns {number} Normally-distributed random number of mean 0, variance 1.
+ */
+RNG.prototype.normal = function() {
+    if (this._normal !== null) {
+        var n = this._normal;
+        this._normal = null;
+        return n;
+    } else {
+        var x = this.uniform() || Math.pow(2, -53); // can't be exactly 0
+        var y = this.uniform();
+        this._normal = Math.sqrt(-2 * Math.log(x)) * Math.sin(2 * Math.PI * y);
+        return Math.sqrt(-2 * Math.log(x)) * Math.cos(2 * Math.PI * y);
+    }
+};
+
+/**
+ * Generates numbers using this.uniform().
+ * @returns {number} Number from the exponential distribution, lambda = 1.
+ */
+RNG.prototype.exponential = function() {
+    return -Math.log(this.uniform() || Math.pow(2, -53));
+};
+
+/**
+ * Generates numbers using this.uniform() and Knuth's method.
+ * @param {number} [mean=1]
+ * @returns {number} Number from the Poisson distribution.
+ */
+RNG.prototype.poisson = function(mean) {
+    var L = Math.exp(-(mean || 1));
+    var k = 0, p = 1;
+    do {
+        k++;
+        p *= this.uniform();
+    } while (p > L);
+    return k - 1;
+};
+
+/**
+ * Generates numbers using this.uniform(), this.normal(),
+ * this.exponential(), and the Marsaglia-Tsang method.
+ * @param {number} a
+ * @returns {number} Number from the gamma distribution.
+ */
+RNG.prototype.gamma = function(a) {
+    var d = (a < 1 ? 1 + a : a) - 1 / 3;
+    var c = 1 / Math.sqrt(9 * d);
+    do {
+        do {
+            var x = this.normal();
+            var v = Math.pow(c * x + 1, 3);
+        } while (v <= 0);
+        var u = this.uniform();
+        var x2 = Math.pow(x, 2);
+    } while (u >= 1 - 0.0331 * x2 * x2 &&
+             Math.log(u) >= 0.5 * x2 + d * (1 - v + Math.log(v)));
+    if (a < 1) {
+        return d * v * Math.exp(this.exponential() / -a);
+    } else {
+        return d * v;
+    }
+};
+
+/**
+ * Accepts a dice rolling notation string and returns a generator
+ * function for that distribution. The parser is quite flexible.
+ * @param {string} expr A dice-rolling, expression i.e. '2d6+10'.
+ * @param {RNG} rng An optional RNG object.
+ * @returns {Function}
+ */
+RNG.roller = function(expr, rng) {
+    var parts = expr.split(/(\d+)?d(\d+)([+-]\d+)?/).slice(1);
+    var dice = parseFloat(parts[0]) || 1;
+    var sides = parseFloat(parts[1]);
+    var mod = parseFloat(parts[2]) || 0;
+    rng = rng || new RNG();
+    return function() {
+        var total = dice + mod;
+        for (var i = 0; i < dice; i++) {
+            total += rng.random(sides);
+        }
+        return total;
+    };
+};
+
+/* Provide a pre-made generator instance. */
+RNG.$ = new RNG();
+
+define("rng", (function (global) {
+    return function () {
+        var ret, fn;
+        return ret || global.RNG;
+    };
+}(this)));
+
+
+(function() {
+  define('cs!modules/elements/Colors',['require','threejs'],function(require) {
+    var Colors, THREE, items, length;
+    THREE = require('threejs');
+    items = [new THREE.Color(0x567c6d), new THREE.Color(0xe2cb7b), new THREE.Color(0xcbad7b), new THREE.Color(0xaf1925), new THREE.Color(0xddb3b4), new THREE.Color(0x715160), new THREE.Color(0x406872)];
+    length = items.length;
+    return Colors = (function() {
+      function Colors() {}
+
+      Colors.get = function(index) {
+        index = Math.abs(parseInt(index, 10));
+        return items[index % length];
+      };
+
+      return Colors;
+
+    })();
+  });
+
+}).call(this);
+
+
+(function() {
+  define('cs!modules/elements/Circles',['require','threejs','rng','cs!modules/elements/Colors'],function(require) {
+    var Circles, Colors, RNG, THREE;
+    THREE = require('threejs');
+    RNG = require('rng');
+    Colors = require('cs!modules/elements/Colors');
+    return Circles = (function() {
+      function Circles(scene, numItems, seed, radius, circleRadius) {
+        var i, _i, _ref;
+        this.scene = scene;
+        this.numItems = numItems;
+        this.seed = seed;
+        this.radius = radius != null ? radius : 70;
+        this.circleRadius = circleRadius != null ? circleRadius : 30;
+        this.rng = new RNG(this.seed);
+        this.rngOutline = new RNG(this.seed);
+        this.object = new THREE.Object3D();
+        this.blackMaterial = new THREE.MeshBasicMaterial({
+          color: 0x444444,
+          transparent: true,
+          depthWrite: false,
+          depthTest: false
+        });
+        this.blackMaterial.blending = THREE.MultiplyBlending;
+        for (i = _i = 0, _ref = this.numItems; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+          this.createCircle();
+        }
+        this.scene.add(this.object);
+      }
+
+      Circles.prototype.createCircle = function() {
+        var color, material, numSegments, object, size, x, y;
+        color = Colors.get(this.rng.random(0, 1000));
+        color.addScalar(0.1);
+        material = new THREE.MeshBasicMaterial({
+          color: color,
+          transparent: true,
+          depthWrite: false,
+          depthTest: false
+        });
+        material.blending = THREE.MultiplyBlending;
+        size = this.rng.exponential() * this.circleRadius;
+        x = this.rng.exponential() * this.radius;
+        if (this.rng.random(-1, 1) < 0) {
+          x *= -1;
+        }
+        y = this.rng.exponential() * this.radius;
+        if (this.rng.random(-1, 1) < 0) {
+          y *= -1;
+        }
+        numSegments = parseInt(size / 1.5, 10) + 4;
+        object = new THREE.Mesh(new THREE.CircleGeometry(size, numSegments, 0, Math.PI * 2), material);
+        object.position.set(x, y, 0);
+        this.object.add(object);
+        if (size > 4 && this.rngOutline.exponential() > 1.2) {
+          return this.drawOutline(x, y, size);
+        }
+      };
+
+      Circles.prototype.drawOutline = function(x, y, size) {
+        var borderRadius, object;
+        borderRadius = this.rngOutline.exponential();
+        object = new THREE.Mesh(new THREE.RingGeometry(size - 1, size + borderRadius, 50, 1, 0, Math.PI * 2), this.blackMaterial);
+        object.position.set(x, y, 0);
+        return this.object.add(object);
+      };
+
+      return Circles;
+
+    })();
+  });
+
+}).call(this);
+
 
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!modules/App',['require','threejs','cs!modules/elements/Background','cs!modules/elements/PostFX'],function(require) {
-    var App, Background, PostFX, THREE;
+  define('cs!modules/App',['require','threejs','cs!modules/elements/Background','cs!modules/elements/PostFX','cs!modules/elements/Circles'],function(require) {
+    var App, Background, Circles, PostFX, THREE;
     THREE = require('threejs');
     Background = require('cs!modules/elements/Background');
     PostFX = require('cs!modules/elements/PostFX');
+    Circles = require('cs!modules/elements/Circles');
     return App = (function() {
       function App() {
         this.animate = __bind(this.animate, this);
         this.onWindowResize = __bind(this.onWindowResize, this);
-        var container, material, material2, materialBlack, object;
+        var circles, container;
         this.time = Date.now() * 0.0001;
         container = document.createElement('div');
         document.body.appendChild(container);
@@ -38956,6 +39297,44 @@ define("vendors/three.js-extras/shaders/FilmShader", function(){});
         });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setClearColor(0xe1d8c7, 1);
+        circles = new Circles(this.scene, 25, "lorem23");
+        this.scene.add(circles);
+        this.createElements();
+        container.appendChild(this.renderer.domElement);
+        window.addEventListener('resize', this.onWindowResize, false);
+        this.postfx = new PostFX(this.scene, this.camera, this.renderer);
+        new Background(this.scene);
+        this.animate();
+      }
+
+      App.prototype.createElements = function() {
+        var material, material2, object;
+        material = new THREE.MeshBasicMaterial({
+          color: 0xebddc8,
+          transparent: true,
+          depthWrite: false,
+          depthTest: false
+        });
+        material.blending = THREE.MultiplyBlending;
+        object = new THREE.Mesh(new THREE.PlaneGeometry(2000, 50, 1, 1), material);
+        object.position.set(20, 0, 350);
+        object.rotation.set(0, 0.8, 0.7);
+        this.scene.add(object);
+        material2 = new THREE.MeshBasicMaterial({
+          color: 0x6f9787,
+          transparent: true,
+          depthWrite: false,
+          depthTest: false
+        });
+        material2.blending = THREE.MultiplyBlending;
+        object = new THREE.Mesh(new THREE.PlaneGeometry(2000, 50, 1, 1), material2);
+        object.position.set(20, 40, 350);
+        object.rotation.set(0, -1, -0.6);
+        return this.scene.add(object);
+      };
+
+      App.prototype.__createElementsBackup = function() {
+        var material, material2, materialBlack, object;
         material = new THREE.MeshBasicMaterial({
           color: 0xd7888e,
           transparent: true
@@ -38981,13 +39360,8 @@ define("vendors/three.js-extras/shaders/FilmShader", function(){});
         object = new THREE.Mesh(new THREE.RingGeometry(40, 50, 4, 1, 0, Math.PI * 2), material2);
         object.position.set(-20, 0, 0);
         object.rotation.set(0, 0, Math.PI / 4);
-        this.scene.add(object);
-        container.appendChild(this.renderer.domElement);
-        window.addEventListener('resize', this.onWindowResize, false);
-        this.postfx = new PostFX(this.scene, this.camera, this.renderer);
-        new Background(this.scene);
-        this.animate();
-      }
+        return this.scene.add(object);
+      };
 
       App.prototype.onWindowResize = function() {
         var SCREEN_HEIGHT, SCREEN_WIDTH;
