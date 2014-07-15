@@ -39203,13 +39203,14 @@ define("rng", (function (global) {
     RNG = require('rng');
     Colors = require('cs!modules/elements/Colors');
     return Circles = (function() {
-      function Circles(scene, numItems, seed, radius, circleRadius) {
+      function Circles(scene, numItems, seed, radius, circleRadius, circleRadiusMax) {
         var i, _i, _ref;
         this.scene = scene;
         this.numItems = numItems;
         this.seed = seed;
-        this.radius = radius != null ? radius : 70;
-        this.circleRadius = circleRadius != null ? circleRadius : 30;
+        this.radius = radius != null ? radius : 80;
+        this.circleRadius = circleRadius != null ? circleRadius : 20;
+        this.circleRadiusMax = circleRadiusMax != null ? circleRadiusMax : 30;
         this.rng = new RNG(this.seed);
         this.rngOutline = new RNG(this.seed);
         this.object = new THREE.Object3D();
@@ -39226,6 +39227,10 @@ define("rng", (function (global) {
         this.scene.add(this.object);
       }
 
+      Circles.prototype.getRandomPosition = function() {
+        return this.rng.random(-this.radius, this.radius);
+      };
+
       Circles.prototype.createCircle = function() {
         var color, material, numSegments, object, size, x, y;
         color = Colors.get(this.rng.random(0, 1000));
@@ -39237,15 +39242,9 @@ define("rng", (function (global) {
           depthTest: false
         });
         material.blending = THREE.MultiplyBlending;
-        size = this.rng.exponential() * this.circleRadius;
-        x = this.rng.exponential() * this.radius;
-        if (this.rng.random(-1, 1) < 0) {
-          x *= -1;
-        }
-        y = this.rng.exponential() * this.radius;
-        if (this.rng.random(-1, 1) < 0) {
-          y *= -1;
-        }
+        size = this.rng.random(this.circleRadius, this.circleRadiusMax);
+        x = this.getRandomPosition();
+        y = this.getRandomPosition();
         numSegments = parseInt(size / 1.5, 10) + 4;
         object = new THREE.Mesh(new THREE.CircleGeometry(size, numSegments, 0, Math.PI * 2), material);
         object.position.set(x, y, 0);
@@ -39284,7 +39283,7 @@ define("rng", (function (global) {
       function App() {
         this.animate = __bind(this.animate, this);
         this.onWindowResize = __bind(this.onWindowResize, this);
-        var circles, container;
+        var circles, circles2, container;
         this.time = Date.now() * 0.0001;
         container = document.createElement('div');
         document.body.appendChild(container);
@@ -39297,8 +39296,10 @@ define("rng", (function (global) {
         });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setClearColor(0xe1d8c7, 1);
-        circles = new Circles(this.scene, 25, "lorem23");
+        circles = new Circles(this.scene, 10, 4323, 130, 20, 50);
         this.scene.add(circles);
+        circles2 = new Circles(this.scene, 20, 51232, 180, 4, 10);
+        this.scene.add(circles2);
         this.createElements();
         container.appendChild(this.renderer.domElement);
         window.addEventListener('resize', this.onWindowResize, false);

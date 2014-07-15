@@ -6,7 +6,7 @@ define (require) ->
   Colors = require 'cs!modules/elements/Colors'
 
   class Circles
-    constructor: (@scene, @numItems, @seed, @radius = 70, @circleRadius = 30) ->
+    constructor: (@scene, @numItems, @seed, @radius = 80, @circleRadius = 20, @circleRadiusMax= 30) ->
       @rng = new RNG(@seed)
       @rngOutline = new RNG(@seed)
       @object = new THREE.Object3D()
@@ -19,17 +19,21 @@ define (require) ->
 
       @scene.add(@object)
 
+    getRandomPosition: () ->
+      return @rng.random(-@radius, @radius)
+      #x = @rng.exponential() * @radius
+      #if @rng.random(-1, 1) < 0 then x *= -1
+      #return x
+
     createCircle: () ->
       color = Colors.get(@rng.random(0, 1000))
       color.addScalar(0.1)
       material = new THREE.MeshBasicMaterial({color: color, transparent: true, depthWrite: false, depthTest: false})
       material.blending = THREE.MultiplyBlending
 
-      size = @rng.exponential() * @circleRadius
-      x = @rng.exponential() * @radius
-      if @rng.random(-1, 1) < 0 then x *= -1
-      y = @rng.exponential() * @radius
-      if @rng.random(-1, 1) < 0 then y *= -1
+      size = @rng.random(@circleRadius, @circleRadiusMax)
+      x = @getRandomPosition()
+      y = @getRandomPosition()
 
       numSegments = parseInt(size / 1.5, 10) + 4
       object = new THREE.Mesh( new THREE.CircleGeometry( size, numSegments, 0, Math.PI * 2 ), material )
