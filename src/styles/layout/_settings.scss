@@ -1,0 +1,30 @@
+// Suzy Configuration
+$susy: (
+  columns: 2,
+  gutters: 30/67,
+  math: fluid,
+  output: float,
+);
+
+$desktop_layout: (
+  columns: 12,
+  column-width: 67,
+  gutters: 30/67,
+  math: fluid,
+  output: float,
+);
+
+$desktop: 1134px;
+$grid_padding: 20px;
+
+// Reference breakpoints
+$breakpoint-iphone-portrait: 320px;
+$breakpoint-iphone-landscape: 480px;
+$breakpoint-ipad-portrait: 768px;
+$breakpoint-ipad-landscape: 1024px;
+
+@mixin desktop{
+  @include susy-breakpoint(($desktop + $grid_padding * 2), $desktop_layout, $no-query: true) {
+    @content;
+  }
+}
