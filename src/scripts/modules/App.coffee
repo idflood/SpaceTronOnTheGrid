@@ -32,10 +32,7 @@ define (require) ->
       @renderer.setClearColor( 0x000000, 1)
 
       circles = new Circles(@scene, 10, 4323, 130, 20, 50)
-      @scene.add(circles)
-
       circles2 = new Circles(@scene, 20, 51232, 180, 4, 10)
-      @scene.add(circles2)
 
       #@createElements()
 
