@@ -3,6 +3,7 @@ require.config({
     jquery: 'bower_components/jquery/dist/jquery',
     //bxslider: 'vendors/jquery.bxslider/jquery.bxslider',
     //'magnific-popup': 'vendors/Magnific-Popup/dist/jquery.magnific-popup',
+    text: "bower_components/requirejs-text/text",
     cs: "bower_components/require-cs/cs",
     "coffee-script": "bower_components/coffee-script/extras/coffee-script",
     threejs: "bower_components/three.js/three",

@@ -16,6 +16,8 @@ define (require) ->
 
   class App
     constructor: () ->
+      # Make the app accessible for the editor.
+      window.app = this
       @time = Date.now() * 0.0001
       container = document.createElement( 'div' )
       document.body.appendChild( container )

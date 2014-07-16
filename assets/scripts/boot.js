@@ -37594,6 +37594,7 @@ define("rng", (function (global) {
         this.animate = __bind(this.animate, this);
         this.onWindowResize = __bind(this.onWindowResize, this);
         var circles, circles2, container;
+        window.app = this;
         this.time = Date.now() * 0.0001;
         container = document.createElement('div');
         document.body.appendChild(container);
