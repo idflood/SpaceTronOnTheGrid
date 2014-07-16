@@ -11,8 +11,8 @@ define (require) ->
       @rngOutline = new RNG(@seed)
       @object = new THREE.Object3D()
 
-      @blackMaterial = new THREE.MeshBasicMaterial({color: 0x444444, transparent: true, depthWrite: false, depthTest: false})
-      @blackMaterial.blending = THREE.MultiplyBlending
+      @blackMaterial = new THREE.MeshBasicMaterial({color: 0x7ed2f1, transparent: true, depthWrite: false, depthTest: false})
+      @blackMaterial.blending = THREE.AdditiveBlending
 
       for i in [0..@numItems]
         @createCircle()
@@ -27,9 +27,9 @@ define (require) ->
 
     createCircle: () ->
       color = Colors.get(@rng.random(0, 1000))
-      color.addScalar(0.1)
+      color.multiplyScalar(@rng.random(0.5, 1))
       material = new THREE.MeshBasicMaterial({color: color, transparent: true, depthWrite: false, depthTest: false})
-      material.blending = THREE.MultiplyBlending
+      material.blending = THREE.AdditiveBlending
 
       size = @rng.random(@circleRadius, @circleRadiusMax)
       x = @getRandomPosition()

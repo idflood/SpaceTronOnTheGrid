@@ -2,13 +2,10 @@ define (require) ->
   THREE = require 'threejs'
 
   items = [
-    new THREE.Color(0x567c6d),
-    new THREE.Color(0xe2cb7b),
-    new THREE.Color(0xcbad7b),
-    new THREE.Color(0xaf1925),
-    new THREE.Color(0xddb3b4),
-    new THREE.Color(0x715160),
-    new THREE.Color(0x406872),
+    new THREE.Color(0xc0ddde),
+    new THREE.Color(0xc0ddde),
+    new THREE.Color(0xc0ddde),
+    new THREE.Color(0xf1c47e),
   ]
 
   length = items.length

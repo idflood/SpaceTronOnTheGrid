@@ -28,8 +28,8 @@ define (require) ->
       @renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } )
       @renderer.setSize( window.innerWidth, window.innerHeight )
 
-      @renderer.setClearColor( 0xe1d8c7, 1)
-      #@renderer.setClearColor( 0x000000, 0)
+      #@renderer.setClearColor( 0xe1d8c7, 1)
+      @renderer.setClearColor( 0x000000, 1)
 
       circles = new Circles(@scene, 10, 4323, 130, 20, 50)
       @scene.add(circles)
@@ -37,20 +37,20 @@ define (require) ->
       circles2 = new Circles(@scene, 20, 51232, 180, 4, 10)
       @scene.add(circles2)
 
-      @createElements()
+      #@createElements()
 
       container.appendChild( @renderer.domElement )
 
       window.addEventListener('resize', @onWindowResize, false)
 
       @postfx = new PostFX(@scene, @camera, @renderer)
-      new Background(@scene)
+      #new Background(@scene)
 
       @animate()
 
     createElements: () ->
       material = new THREE.MeshBasicMaterial({color: 0xebddc8, transparent: true, depthWrite: false, depthTest: false})
-      material.blending = THREE.MultiplyBlending
+      material.blending = THREE.AdditiveBlending
 
       object = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 50, 1, 1 ), material )
       object.position.set( 20, 0, 350 )
@@ -58,7 +58,7 @@ define (require) ->
       @scene.add( object )
 
       material2 = new THREE.MeshBasicMaterial({color: 0x6f9787, transparent: true, depthWrite: false, depthTest: false})
-      material2.blending = THREE.MultiplyBlending
+      material2.blending = THREE.AdditiveBlending
 
       object = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 50, 1, 1 ), material2 )
       object.position.set( 20, 40, 350 )

@@ -38450,6 +38450,124 @@ define("vendors/three.js-extras/postprocessing/MaskPass", function(){});
  * @author alteredq / http://alteredqualia.com/
  */
 
+THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
+
+	strength = ( strength !== undefined ) ? strength : 1;
+	kernelSize = ( kernelSize !== undefined ) ? kernelSize : 25;
+	sigma = ( sigma !== undefined ) ? sigma : 4.0;
+	resolution = ( resolution !== undefined ) ? resolution : 256;
+
+	// render targets
+
+	var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
+
+	this.renderTargetX = new THREE.WebGLRenderTarget( resolution, resolution, pars );
+	this.renderTargetY = new THREE.WebGLRenderTarget( resolution, resolution, pars );
+
+	// copy material
+
+	if ( THREE.CopyShader === undefined )
+		console.error( "THREE.BloomPass relies on THREE.CopyShader" );
+
+	var copyShader = THREE.CopyShader;
+
+	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
+
+	this.copyUniforms[ "opacity" ].value = strength;
+
+	this.materialCopy = new THREE.ShaderMaterial( {
+
+		uniforms: this.copyUniforms,
+		vertexShader: copyShader.vertexShader,
+		fragmentShader: copyShader.fragmentShader,
+		blending: THREE.AdditiveBlending,
+		transparent: true
+
+	} );
+
+	// convolution material
+
+	if ( THREE.ConvolutionShader === undefined )
+		console.error( "THREE.BloomPass relies on THREE.ConvolutionShader" );
+
+	var convolutionShader = THREE.ConvolutionShader;
+
+	this.convolutionUniforms = THREE.UniformsUtils.clone( convolutionShader.uniforms );
+
+	this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurx;
+	this.convolutionUniforms[ "cKernel" ].value = THREE.ConvolutionShader.buildKernel( sigma );
+
+	this.materialConvolution = new THREE.ShaderMaterial( {
+
+		uniforms: this.convolutionUniforms,
+		vertexShader:  convolutionShader.vertexShader,
+		fragmentShader: convolutionShader.fragmentShader,
+		defines: {
+			"KERNEL_SIZE_FLOAT": kernelSize.toFixed( 1 ),
+			"KERNEL_SIZE_INT": kernelSize.toFixed( 0 )
+		}
+
+	} );
+
+	this.enabled = true;
+	this.needsSwap = false;
+	this.clear = false;
+
+
+	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+	this.scene  = new THREE.Scene();
+
+	this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
+	this.scene.add( this.quad );
+
+};
+
+THREE.BloomPass.prototype = {
+
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+
+		if ( maskActive ) renderer.context.disable( renderer.context.STENCIL_TEST );
+
+		// Render quad with blured scene into texture (convolution pass 1)
+
+		this.quad.material = this.materialConvolution;
+
+		this.convolutionUniforms[ "tDiffuse" ].value = readBuffer;
+		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurX;
+
+		renderer.render( this.scene, this.camera, this.renderTargetX, true );
+
+
+		// Render quad with blured scene into texture (convolution pass 2)
+
+		this.convolutionUniforms[ "tDiffuse" ].value = this.renderTargetX;
+		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurY;
+
+		renderer.render( this.scene, this.camera, this.renderTargetY, true );
+
+		// Render original scene with superimposed blur to texture
+
+		this.quad.material = this.materialCopy;
+
+		this.copyUniforms[ "tDiffuse" ].value = this.renderTargetY;
+
+		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
+
+		renderer.render( this.scene, this.camera, readBuffer, this.clear );
+
+	}
+
+};
+
+THREE.BloomPass.blurX = new THREE.Vector2( 0.001953125, 0.0 );
+THREE.BloomPass.blurY = new THREE.Vector2( 0.0, 0.001953125 );
+
+define("vendors/three.js-extras/postprocessing/BloomPass", function(){});
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+
 THREE.ShaderPass = function ( shader, textureID ) {
 
 	this.textureID = ( textureID !== undefined ) ? textureID : "tDiffuse";
@@ -38884,19 +39002,125 @@ THREE.FilmShader = {
 
 define("vendors/three.js-extras/shaders/FilmShader", function(){});
 
+/**
+ * @author alteredq / http://alteredqualia.com/
+ *
+ * Convolution shader
+ * ported from o3d sample to WebGL / GLSL
+ * http://o3d.googlecode.com/svn/trunk/samples/convolution.html
+ */
+
+THREE.ConvolutionShader = {
+
+	defines: {
+
+		"KERNEL_SIZE_FLOAT": "25.0",
+		"KERNEL_SIZE_INT": "25",
+
+	},
+
+	uniforms: {
+
+		"tDiffuse":        { type: "t", value: null },
+		"uImageIncrement": { type: "v2", value: new THREE.Vector2( 0.001953125, 0.0 ) },
+		"cKernel":         { type: "fv1", value: [] }
+
+	},
+
+	vertexShader: [
+
+		"uniform vec2 uImageIncrement;",
+
+		"varying vec2 vUv;",
+
+		"void main() {",
+
+			"vUv = uv - ( ( KERNEL_SIZE_FLOAT - 1.0 ) / 2.0 ) * uImageIncrement;",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+		"}"
+
+	].join("\n"),
+
+	fragmentShader: [
+
+		"uniform float cKernel[ KERNEL_SIZE_INT ];",
+
+		"uniform sampler2D tDiffuse;",
+		"uniform vec2 uImageIncrement;",
+
+		"varying vec2 vUv;",
+
+		"void main() {",
+
+			"vec2 imageCoord = vUv;",
+			"vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );",
+
+			"for( int i = 0; i < KERNEL_SIZE_INT; i ++ ) {",
+
+				"sum += texture2D( tDiffuse, imageCoord ) * cKernel[ i ];",
+				"imageCoord += uImageIncrement;",
+
+			"}",
+
+			"gl_FragColor = sum;",
+
+		"}"
+
+
+	].join("\n"),
+
+	buildKernel: function ( sigma ) {
+
+		// We lop off the sqrt(2 * pi) * sigma term, since we're going to normalize anyway.
+
+		function gauss( x, sigma ) {
+
+			return Math.exp( - ( x * x ) / ( 2.0 * sigma * sigma ) );
+
+		}
+
+		var i, values, sum, halfWidth, kMaxKernelSize = 25, kernelSize = 2 * Math.ceil( sigma * 3.0 ) + 1;
+
+		if ( kernelSize > kMaxKernelSize ) kernelSize = kMaxKernelSize;
+		halfWidth = ( kernelSize - 1 ) * 0.5;
+
+		values = new Array( kernelSize );
+		sum = 0.0;
+		for ( i = 0; i < kernelSize; ++i ) {
+
+			values[ i ] = gauss( i - halfWidth, sigma );
+			sum += values[ i ];
+
+		}
+
+		// normalize the kernel
+
+		for ( i = 0; i < kernelSize; ++i ) values[ i ] /= sum;
+
+		return values;
+
+	}
+
+};
+
+define("vendors/three.js-extras/shaders/ConvolutionShader", function(){});
+
 
 (function() {
-  define('cs!modules/elements/PostFX',['require','threejs','vendors/three.js-extras/postprocessing/EffectComposer','vendors/three.js-extras/postprocessing/MaskPass','vendors/three.js-extras/postprocessing/ShaderPass','vendors/three.js-extras/postprocessing/RenderPass','vendors/three.js-extras/postprocessing/FilmPass','vendors/three.js-extras/shaders/CopyShader','vendors/three.js-extras/shaders/FXAAShader','vendors/three.js-extras/shaders/FilmShader'],function(require) {
+  define('cs!modules/elements/PostFX',['require','threejs','vendors/three.js-extras/postprocessing/EffectComposer','vendors/three.js-extras/postprocessing/MaskPass','vendors/three.js-extras/postprocessing/BloomPass','vendors/three.js-extras/postprocessing/ShaderPass','vendors/three.js-extras/postprocessing/RenderPass','vendors/three.js-extras/postprocessing/FilmPass','vendors/three.js-extras/shaders/CopyShader','vendors/three.js-extras/shaders/FXAAShader','vendors/three.js-extras/shaders/FilmShader','vendors/three.js-extras/shaders/ConvolutionShader'],function(require) {
     var PostFX, THREE;
     THREE = require('threejs');
     require('vendors/three.js-extras/postprocessing/EffectComposer');
     require('vendors/three.js-extras/postprocessing/MaskPass');
+    require('vendors/three.js-extras/postprocessing/BloomPass');
     require('vendors/three.js-extras/postprocessing/ShaderPass');
     require('vendors/three.js-extras/postprocessing/RenderPass');
     require('vendors/three.js-extras/postprocessing/FilmPass');
     require('vendors/three.js-extras/shaders/CopyShader');
     require('vendors/three.js-extras/shaders/FXAAShader');
     require('vendors/three.js-extras/shaders/FilmShader');
+    require('vendors/three.js-extras/shaders/ConvolutionShader');
     return PostFX = (function() {
       function PostFX(scene, camera, renderer) {
         var renderModel;
@@ -38907,11 +39131,13 @@ define("vendors/three.js-extras/shaders/FilmShader", function(){});
         renderModel = new THREE.RenderPass(this.scene, this.camera);
         this.effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
         this.effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
-        this.filmShader = new THREE.FilmPass(0.07, 0.0, 648, false);
+        this.bloom = new THREE.BloomPass(1.2);
+        this.filmShader = new THREE.FilmPass(0.09, 0.0, 648, false);
         this.filmShader.renderToScreen = true;
         this.composer = new THREE.EffectComposer(this.renderer);
         this.composer.addPass(renderModel);
         this.composer.addPass(this.effectFXAA);
+        this.composer.addPass(this.bloom);
         this.composer.addPass(this.filmShader);
       }
 
@@ -39178,7 +39404,7 @@ define("rng", (function (global) {
   define('cs!modules/elements/Colors',['require','threejs'],function(require) {
     var Colors, THREE, items, length;
     THREE = require('threejs');
-    items = [new THREE.Color(0x567c6d), new THREE.Color(0xe2cb7b), new THREE.Color(0xcbad7b), new THREE.Color(0xaf1925), new THREE.Color(0xddb3b4), new THREE.Color(0x715160), new THREE.Color(0x406872)];
+    items = [new THREE.Color(0xc0ddde), new THREE.Color(0xc0ddde), new THREE.Color(0xc0ddde), new THREE.Color(0xf1c47e)];
     length = items.length;
     return Colors = (function() {
       function Colors() {}
@@ -39215,12 +39441,12 @@ define("rng", (function (global) {
         this.rngOutline = new RNG(this.seed);
         this.object = new THREE.Object3D();
         this.blackMaterial = new THREE.MeshBasicMaterial({
-          color: 0x444444,
+          color: 0x7ed2f1,
           transparent: true,
           depthWrite: false,
           depthTest: false
         });
-        this.blackMaterial.blending = THREE.MultiplyBlending;
+        this.blackMaterial.blending = THREE.AdditiveBlending;
         for (i = _i = 0, _ref = this.numItems; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
           this.createCircle();
         }
@@ -39234,14 +39460,14 @@ define("rng", (function (global) {
       Circles.prototype.createCircle = function() {
         var color, material, numSegments, object, size, x, y;
         color = Colors.get(this.rng.random(0, 1000));
-        color.addScalar(0.1);
+        color.multiplyScalar(this.rng.random(0.5, 1));
         material = new THREE.MeshBasicMaterial({
           color: color,
           transparent: true,
           depthWrite: false,
           depthTest: false
         });
-        material.blending = THREE.MultiplyBlending;
+        material.blending = THREE.AdditiveBlending;
         size = this.rng.random(this.circleRadius, this.circleRadiusMax);
         x = this.getRandomPosition();
         y = this.getRandomPosition();
@@ -39295,16 +39521,14 @@ define("rng", (function (global) {
           alpha: false
         });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setClearColor(0xe1d8c7, 1);
+        this.renderer.setClearColor(0x000000, 1);
         circles = new Circles(this.scene, 10, 4323, 130, 20, 50);
         this.scene.add(circles);
         circles2 = new Circles(this.scene, 20, 51232, 180, 4, 10);
         this.scene.add(circles2);
-        this.createElements();
         container.appendChild(this.renderer.domElement);
         window.addEventListener('resize', this.onWindowResize, false);
         this.postfx = new PostFX(this.scene, this.camera, this.renderer);
-        new Background(this.scene);
         this.animate();
       }
 
@@ -39316,7 +39540,7 @@ define("rng", (function (global) {
           depthWrite: false,
           depthTest: false
         });
-        material.blending = THREE.MultiplyBlending;
+        material.blending = THREE.AdditiveBlending;
         object = new THREE.Mesh(new THREE.PlaneGeometry(2000, 50, 1, 1), material);
         object.position.set(20, 0, 350);
         object.rotation.set(0, 0.8, 0.7);
@@ -39327,7 +39551,7 @@ define("rng", (function (global) {
           depthWrite: false,
           depthTest: false
         });
-        material2.blending = THREE.MultiplyBlending;
+        material2.blending = THREE.AdditiveBlending;
         object = new THREE.Mesh(new THREE.PlaneGeometry(2000, 50, 1, 1), material2);
         object.position.set(20, 40, 350);
         object.rotation.set(0, -1, -0.6);
