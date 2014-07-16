@@ -9,6 +9,7 @@
     "require-cs": "~0.4.4",
     "coffee-script": "~1.7.1",
     "three.js": "*",
-    "rng-js": "~1.0.1"
+    "rng-js": "~1.0.1",
+    "d3": "~3.4.10"
   }
 }

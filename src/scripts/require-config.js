@@ -7,7 +7,8 @@ require.config({
     cs: "bower_components/require-cs/cs",
     "coffee-script": "bower_components/coffee-script/extras/coffee-script",
     threejs: "bower_components/three.js/three",
-    rng: "bower_components/rng-js/rng"
+    rng: "bower_components/rng-js/rng",
+    d3: "bower_components/d3/d3",
   },
   shim: {
     threejs: {
