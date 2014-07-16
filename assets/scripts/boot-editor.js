@@ -19252,12 +19252,12 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
     tpl_timeline = require('text!modules/templates/timeline.tpl.html');
     return Editor = (function() {
       function Editor() {
-        var $timeline, bar, data, formatMinutes, height, lineHeight, margin, svg, width, x, xAxis;
+        var $timeline, bar, bar_border, data, drag, dragOffset, dragmove, dragstart, dy, formatMinutes, height, key_size, keys, label_position_x, lineHeight, margin, properties, subGrp, svg, width, x, xAxis, xAxisGrid, xGrid;
         this.app = window.app;
         $timeline = $(tpl_timeline);
         $('body').append($timeline);
         margin = {
-          top: 20,
+          top: 15,
           right: 20,
           bottom: 30,
           left: 190
@@ -19265,15 +19265,55 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
         width = window.innerWidth - margin.left - margin.right;
         height = 270 - margin.top - margin.bottom;
         lineHeight = 20;
+        label_position_x = -170;
         data = [
           {
             label: "object 1",
             start: 15,
-            end: 20
+            end: 20,
+            properties: [
+              {
+                name: "opacity",
+                keys: [
+                  {
+                    time: 15,
+                    val: 0
+                  }, {
+                    time: 17,
+                    val: 0.8
+                  }
+                ]
+              }, {
+                name: "quantity",
+                keys: [
+                  {
+                    time: 15,
+                    val: 10
+                  }, {
+                    time: 20,
+                    val: 15
+                  }
+                ]
+              }
+            ]
           }, {
             label: "object 2",
             start: 60,
-            end: 142
+            end: 142,
+            properties: [
+              {
+                name: "opacity",
+                keys: [
+                  {
+                    time: 60,
+                    val: 0
+                  }, {
+                    time: 72,
+                    val: 0.3
+                  }
+                ]
+              }
+            ]
           }
         ];
         x = d3.time.scale().range([0, width]);
@@ -19292,21 +19332,71 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
           }
           return output;
         };
-        xAxis = d3.svg.axis().scale(x).orient("top").tickFormat(formatMinutes);
+        xAxis = d3.svg.axis().scale(x).orient("top").tickSize(-height, 0).tickFormat(formatMinutes);
         svg = d3.select($timeline.get(0)).append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        xAxisGrid = d3.svg.axis().scale(x).ticks(40).tickSize(-height, 0).tickFormat("").orient("top");
+        xGrid = svg.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(xAxisGrid);
         svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxis);
+        dy = 10 + margin.top;
         bar = svg.selectAll(".line-grp").data(data).enter().append('g').attr('class', 'line-grp').attr("transform", function(d, i) {
-          return "translate(0," + (i * lineHeight + margin.top + 10) + ")";
+          var numProperties, y;
+          numProperties = d.properties ? d.properties.length : 0;
+          y = dy;
+          console.log(numProperties + " / " + i);
+          dy += ((i + 1) + numProperties) * lineHeight;
+          return "translate(0," + y + ")";
         });
+        dragOffset = 0;
+        dragstart = function(d) {
+          var mouse, mouseX;
+          mouse = d3.mouse(this);
+          mouseX = mouse[0];
+          return dragOffset = x(d.start) - mouseX;
+        };
+        dragmove = function(d) {
+          var diff, dx, mouse;
+          mouse = d3.mouse(this);
+          dx = x.invert(mouse[0] + dragOffset);
+          diff = dx - d.start;
+          d.start = d.start + diff;
+          d.end = d.end + diff;
+          return d3.select(this).attr('x', x(d.start));
+        };
+        drag = d3.behavior.drag().origin(function(d) {
+          return d;
+        }).on("drag", dragmove).on("dragstart", dragstart);
+        bar_border = 1;
         bar.append("rect").attr("class", "bar").attr("y", 3).attr("height", 14).attr("x", function(d) {
-          return x(d.start);
+          return x(d.start) + bar_border;
         }).attr("width", function(d) {
-          return x(d.end - d.start);
-        });
-        bar.append("text").attr("class", "line--label").attr("x", -180).attr("y", 16).text(function(d) {
+          return x(d.end - d.start) - bar_border;
+        }).call(drag);
+        bar.append("text").attr("class", "line--label").attr("x", label_position_x).attr("y", 16).text(function(d) {
           return d.label;
         });
-        bar.append("line").attr("class", 'line--separator').attr("x1", -200).attr("x2", x(240)).attr("y1", lineHeight).attr("y2", lineHeight);
+        bar.append("line").attr("class", 'line--separator').attr("x1", -200).attr("x2", x(240 + 100)).attr("y1", lineHeight).attr("y2", lineHeight);
+        properties = bar.selectAll('.line--sub').data(function(d, i, j) {
+          return d.properties;
+        });
+        subGrp = properties.enter().append('g').attr("class", 'line--sub').attr("transform", function(d, i) {
+          var sub_height;
+          sub_height = (i + 1) * lineHeight;
+          return "translate(0," + sub_height + ")";
+        });
+        subGrp.append('text').attr("class", "line--label line--label-small").attr("x", label_position_x).attr("y", 15).text(function(d) {
+          return d.name;
+        });
+        keys = properties.selectAll('.key').data(function(d, i, j) {
+          return d.keys;
+        });
+        keys.enter().append("line").attr("class", 'line--separator-secondary').attr("x1", -200).attr("x2", x(240 + 100)).attr("y1", lineHeight).attr("y2", lineHeight);
+        key_size = 6;
+        keys.enter().append('g').attr('class', 'key').attr('transform', function(d) {
+          var dx;
+          dx = x(d.time) + 3;
+          dy = 9;
+          return "translate(" + dx + "," + dy + ")";
+        }).append('rect').attr('x', -3).attr('width', key_size).attr('height', key_size).attr('class', 'line--key').attr('transform', 'rotate(45)');
       }
 
       return Editor;

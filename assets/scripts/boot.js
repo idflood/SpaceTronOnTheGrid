@@ -37488,7 +37488,7 @@ define("rng", (function (global) {
   define('cs!modules/elements/Colors',['require','threejs'],function(require) {
     var Colors, THREE, items, length;
     THREE = require('threejs');
-    items = [new THREE.Color(0xc0ddde), new THREE.Color(0xc0ddde), new THREE.Color(0xc0ddde), new THREE.Color(0xf1c47e)];
+    items = [new THREE.Color(0xc0ddde)];
     length = items.length;
     return Colors = (function() {
       function Colors() {}

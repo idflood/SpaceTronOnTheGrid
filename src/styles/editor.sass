@@ -4,6 +4,7 @@
   left: 0
   right: 0
   height: 270px
+  border-top: 1px solid #333
   background: #111
   z-index: 9000
 
@@ -14,10 +15,20 @@
     shape-rendering: crispEdges
 
   .line--separator
+    stroke: #444
+
+  .line--separator-secondary
     stroke: #222
 
   .line--label
     font-size: 11px
+
+  .line--label-small
+    font-size: 10px
+    fill: #999
+
+  .line--key
+    fill: #999
 
   .axis
     path, line
@@ -28,9 +39,17 @@
   .x.axis
     path
       display: none
+    line
+      stroke: #444
     text
       font-size: 10px
       fill: #ccc
+
+  .x.grid
+    text
+      display: none
+    line
+      stroke: #1a1a1a
 
   .line
     fill: none
@@ -38,5 +57,5 @@
     stroke-width: 1.5px
 
   .bar
-    fill: #222
-    stroke: #444
+    fill: #333
+    stroke: #666
