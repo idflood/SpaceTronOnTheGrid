@@ -42,6 +42,25 @@ module.exports = (grunt) ->
           pragmasOnSave:
             excludeCoffeeScript: true
 
+      compileEditor:
+        options:
+          baseUrl: 'src/scripts'
+          mainConfigFile: 'src/scripts/require-config.js'
+          name: "bower_components/almond/almond"
+          out: "assets/scripts/boot-editor.js"
+          generateSourceMaps: true
+          #optimize: "uglify2"
+          optimize: "none"
+          inlineText: true
+          preserveLicenseComments: false
+          include: "boot-editor"
+          paths:
+            requireLib: "bower_components/requirejs/require"
+          exclude: ['coffee-script']
+          stubModules: ['cs']
+          pragmasOnSave:
+            excludeCoffeeScript: true
+
     watch:
       sass:
         files: ["src/styles/**"]
