@@ -1,4 +1,4 @@
-.editor__timeline
+.editor__time
   position: fixed
   bottom: 0
   left: 0
@@ -6,3 +6,37 @@
   height: 270px
   background: #111
   z-index: 9000
+
+  text
+    fill: #fff
+
+  rect, path, line
+    shape-rendering: crispEdges
+
+  .line--separator
+    stroke: #222
+
+  .line--label
+    font-size: 11px
+
+  .axis
+    path, line
+      fill: none
+      stroke: #fff
+
+
+  .x.axis
+    path
+      display: none
+    text
+      font-size: 10px
+      fill: #ccc
+
+  .line
+    fill: none
+    stroke: steelblue
+    stroke-width: 1.5px
+
+  .bar
+    fill: #222
+    stroke: #444

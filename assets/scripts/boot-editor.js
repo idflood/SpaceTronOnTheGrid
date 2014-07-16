@@ -19252,10 +19252,61 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
     tpl_timeline = require('text!modules/templates/timeline.tpl.html');
     return Editor = (function() {
       function Editor() {
-        var $timeline;
+        var $timeline, bar, data, formatMinutes, height, lineHeight, margin, svg, width, x, xAxis;
         this.app = window.app;
         $timeline = $(tpl_timeline);
         $('body').append($timeline);
+        margin = {
+          top: 20,
+          right: 20,
+          bottom: 30,
+          left: 190
+        };
+        width = window.innerWidth - margin.left - margin.right;
+        height = 270 - margin.top - margin.bottom;
+        lineHeight = 20;
+        data = [
+          {
+            label: "object 1",
+            start: 15,
+            end: 20
+          }, {
+            label: "object 2",
+            start: 60,
+            end: 142
+          }
+        ];
+        x = d3.time.scale().range([0, width]);
+        x.domain([0, 240]);
+        formatMinutes = function(d) {
+          var hours, minutes, output, seconds;
+          hours = Math.floor(d / 3600);
+          minutes = Math.floor((d - (hours * 3600)) / 60);
+          seconds = d - (minutes * 60);
+          output = seconds + "s";
+          if (minutes) {
+            output = minutes + "m " + output;
+          }
+          if (hours) {
+            output = hours + "h " + output;
+          }
+          return output;
+        };
+        xAxis = d3.svg.axis().scale(x).orient("top").tickFormat(formatMinutes);
+        svg = d3.select($timeline.get(0)).append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxis);
+        bar = svg.selectAll(".line-grp").data(data).enter().append('g').attr('class', 'line-grp').attr("transform", function(d, i) {
+          return "translate(0," + (i * lineHeight + margin.top + 10) + ")";
+        });
+        bar.append("rect").attr("class", "bar").attr("y", 3).attr("height", 14).attr("x", function(d) {
+          return x(d.start);
+        }).attr("width", function(d) {
+          return x(d.end - d.start);
+        });
+        bar.append("text").attr("class", "line--label").attr("x", -180).attr("y", 16).text(function(d) {
+          return d.label;
+        });
+        bar.append("line").attr("class", 'line--separator').attr("x1", -200).attr("x2", x(240)).attr("y1", lineHeight).attr("y2", lineHeight);
       }
 
       return Editor;
