@@ -8,6 +8,13 @@
 #
 # d3.js drag date items
 # http://codepen.io/Problematic/pen/mskwj
+#
+# Soundjs
+# http://www.createjs.com/#!/SoundJS/documentation
+# http://www.createjs.com/Docs/SoundJS/modules/SoundJS.html
+#
+# Soundjs music visualizer
+# https://github.com/CreateJS/SoundJS/blob/master/examples/MusicVisualizer.html
 define (require) ->
   $ = require 'jquery'
 
