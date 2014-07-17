@@ -19251,8 +19251,6 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
     d3 = require('d3');
     tpl_timeline = require('text!modules/templates/timeline.tpl.html');
     return Editor = (function() {
-      var formatMinutes;
-
       function Editor() {
         var $timeline, height, margin, width, xAxis, xAxisGrid, xGrid;
         this.app = window.app;
@@ -19445,7 +19443,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
         return keys.exit().remove();
       };
 
-      formatMinutes = function(d) {
+      Editor.prototype.formatMinutes = function(d) {
         var hours, minutes, output, seconds;
         hours = Math.floor(d / 3600);
         minutes = Math.floor((d - (hours * 3600)) / 60);

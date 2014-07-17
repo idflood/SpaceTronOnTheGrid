@@ -214,7 +214,7 @@ define (require) ->
 
       keys.exit().remove()
 
-    formatMinutes = (d) ->
+    formatMinutes: (d) ->
       hours = Math.floor(d / 3600)
       minutes = Math.floor((d - (hours * 3600)) / 60)
       seconds = d - (minutes * 60)
