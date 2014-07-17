@@ -19254,7 +19254,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
       function Editor() {
         var $timeline, dragTime, dragTimeMove, height, margin, self, timeGrp, timeSelection, width, xAxis, xAxisGrid, xGrid;
         this.app = window.app;
-        this.currentTime = [10];
+        this.currentTime = [0];
         $timeline = $(tpl_timeline);
         $('body').append($timeline);
         margin = {
@@ -19358,7 +19358,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
       Editor.prototype.renderTimeIndicator = function() {
         var timeSelection;
         timeSelection = this.svg.selectAll('.time-indicator');
-        return timeSelection.attr('transform', 'translate(' + this.x(this.currentTime[0]) + ', -7)');
+        return timeSelection.attr('transform', 'translate(' + (this.x(this.currentTime[0]) + 0.5) + ', -12)');
       };
 
       Editor.prototype.renderLines = function() {

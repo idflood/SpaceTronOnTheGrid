@@ -16,7 +16,7 @@ define (require) ->
   class Editor
     constructor: () ->
       @app = window.app
-      @currentTime = [10]
+      @currentTime = [0]
 
       $timeline = $(tpl_timeline)
       $('body').append($timeline)
@@ -99,8 +99,6 @@ define (require) ->
         .attr('class', 'time-indicator__handle')
         .attr('d', 'M -10 0 L 0 10 L 10 0 L -10 0')
 
-
-
       # First render
       @render()
 
@@ -112,7 +110,7 @@ define (require) ->
 
     renderTimeIndicator: () ->
       timeSelection = @svg.selectAll('.time-indicator')
-      timeSelection.attr('transform', 'translate(' + @x(@currentTime[0]) + ', -7)')
+      timeSelection.attr('transform', 'translate(' + (@x(@currentTime[0]) + 0.5) + ', -12)')
 
 
     renderLines: () ->
