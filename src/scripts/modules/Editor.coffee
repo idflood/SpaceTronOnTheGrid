@@ -16,6 +16,7 @@ define (require) ->
   class Editor
     constructor: () ->
       @app = window.app
+      @currentTime = [10]
 
       $timeline = $(tpl_timeline)
       $('body').append($timeline)
@@ -25,6 +26,7 @@ define (require) ->
       height = 270 - margin.top - margin.bottom
       @lineHeight = 20
       @label_position_x = -170
+      @dy = 10 + margin.top
 
       @data = [
         {id: 'track1', label: "object 1", start: 15, end: 20, properties: [
@@ -69,15 +71,49 @@ define (require) ->
         .attr("transform", "translate(0," + margin.top + ")")
         .call(xAxis)
 
-      @dy = 10 + margin.top
+      self = this
+      dragTimeMove = (d) ->
+        d3.event.sourceEvent.stopPropagation()
+        dx = self.x.invert(d3.event.sourceEvent.x - margin.left)
+        dx = dx.getTime()
+        dx = Math.max(0, dx)
+        self.currentTime[0] = dx
+        self.render()
+
+      dragTime = d3.behavior.drag()
+        .origin((d) -> return d;)
+        .on("drag", dragTimeMove)
+
+      timeSelection = @svg.selectAll('.time-indicator').data(@currentTime)
+
+      timeGrp = timeSelection.enter().append("g")
+        .attr('class', "time-indicator")
+        .call(dragTime)
+      timeGrp.append('rect')
+        .attr('class', 'time-indicator__line')
+        .attr('x', -1)
+        .attr('y', 0)
+        .attr('width', 1)
+        .attr('height', 1000)
+      timeGrp.append('path')
+        .attr('class', 'time-indicator__handle')
+        .attr('d', 'M -10 0 L 0 10 L 10 0 L -10 0')
+
+
 
       # First render
       @render()
 
     render: () ->
       bar = @renderLines()
+      @renderTimeIndicator()
       @renderProperties(bar)
       @renderKeys()
+
+    renderTimeIndicator: () ->
+      timeSelection = @svg.selectAll('.time-indicator')
+      timeSelection.attr('transform', 'translate(' + @x(@currentTime[0]) + ', -7)')
+
 
     renderLines: () ->
       self = this
@@ -91,6 +127,7 @@ define (require) ->
         mouse = d3.mouse(this)
         dx = self.x.invert(mouse[0] + dragOffset)
         dx = dx.getTime()
+        dx = Math.max(0, dx)
         diff = dx - d.start
         d.start += diff
         d.end += diff

@@ -19252,8 +19252,9 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
     tpl_timeline = require('text!modules/templates/timeline.tpl.html');
     return Editor = (function() {
       function Editor() {
-        var $timeline, height, margin, width, xAxis, xAxisGrid, xGrid;
+        var $timeline, dragTime, dragTimeMove, height, margin, self, timeGrp, timeSelection, width, xAxis, xAxisGrid, xGrid;
         this.app = window.app;
+        this.currentTime = [10];
         $timeline = $(tpl_timeline);
         $('body').append($timeline);
         margin = {
@@ -19266,6 +19267,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
         height = 270 - margin.top - margin.bottom;
         this.lineHeight = 20;
         this.label_position_x = -170;
+        this.dy = 10 + margin.top;
         this.data = [
           {
             id: 'track1',
@@ -19325,15 +19327,38 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
         xAxisGrid = d3.svg.axis().scale(this.x).ticks(40).tickSize(-height, 0).tickFormat("").orient("top");
         xGrid = this.svg.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(xAxisGrid);
         this.svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxis);
-        this.dy = 10 + margin.top;
+        self = this;
+        dragTimeMove = function(d) {
+          var dx;
+          d3.event.sourceEvent.stopPropagation();
+          dx = self.x.invert(d3.event.sourceEvent.x - margin.left);
+          dx = dx.getTime();
+          dx = Math.max(0, dx);
+          self.currentTime[0] = dx;
+          return self.render();
+        };
+        dragTime = d3.behavior.drag().origin(function(d) {
+          return d;
+        }).on("drag", dragTimeMove);
+        timeSelection = this.svg.selectAll('.time-indicator').data(this.currentTime);
+        timeGrp = timeSelection.enter().append("g").attr('class', "time-indicator").call(dragTime);
+        timeGrp.append('rect').attr('class', 'time-indicator__line').attr('x', -1).attr('y', 0).attr('width', 1).attr('height', 1000);
+        timeGrp.append('path').attr('class', 'time-indicator__handle').attr('d', 'M -10 0 L 0 10 L 10 0 L -10 0');
         this.render();
       }
 
       Editor.prototype.render = function() {
         var bar;
         bar = this.renderLines();
+        this.renderTimeIndicator();
         this.renderProperties(bar);
         return this.renderKeys();
+      };
+
+      Editor.prototype.renderTimeIndicator = function() {
+        var timeSelection;
+        timeSelection = this.svg.selectAll('.time-indicator');
+        return timeSelection.attr('transform', 'translate(' + this.x(this.currentTime[0]) + ', -7)');
       };
 
       Editor.prototype.renderLines = function() {
@@ -19351,6 +19376,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
           mouse = d3.mouse(this);
           dx = self.x.invert(mouse[0] + dragOffset);
           dx = dx.getTime();
+          dx = Math.max(0, dx);
           diff = dx - d.start;
           d.start += diff;
           d.end += diff;
