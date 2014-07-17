@@ -21,6 +21,15 @@ define (require) ->
       # Make the app accessible for the editor.
       window.app = this
       @timer = new Timer()
+      @data = [
+        {id: 'track1', label: "object 1", start: 15.2, end: 20, properties: [
+          {name: "opacity", keys: [{time: 15.5, val: 0}, {time: 17, val: 0.8}]},
+          {name: "quantity", keys: [{time: 15.5, val: 10}, {time: 20, val: 15}]}
+        ]},
+        {id: 'track2', label: "object 2", start: 60, end: 142, properties: [
+          {name: "opacity", keys: [{time: 60, val: 0}, {time: 72, val: 0.3}]}
+        ]},
+      ]
 
 
       @time = Date.now() * 0.0001

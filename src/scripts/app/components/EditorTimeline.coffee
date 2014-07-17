@@ -4,7 +4,7 @@ define (require) ->
 
   class EditorTimeline
     constructor: () ->
-      #@currentTime = [0]
+      @app = window.app
       @currentTime = window.app.timer.time
       # in millisecond
       @totalDuration = 240 * 1000
@@ -15,16 +15,6 @@ define (require) ->
       @lineHeight = 20
       @label_position_x = -170
       @dy = 10 + margin.top
-
-      @data = [
-        {id: 'track1', label: "object 1", start: 15.2, end: 20, properties: [
-          {name: "opacity", keys: [{time: 15.5, val: 0}, {time: 17, val: 0.8}]},
-          {name: "quantity", keys: [{time: 15.5, val: 10}, {time: 20, val: 15}]}
-        ]},
-        {id: 'track2', label: "object 2", start: 60, end: 142, properties: [
-          {name: "opacity", keys: [{time: 60, val: 0}, {time: 72, val: 0.3}]}
-        ]},
-      ]
 
       @x = d3.time.scale().range([0, width])
       #@x = d3.scale.linear().range([0, width])
@@ -136,7 +126,7 @@ define (require) ->
 
       bar_border = 1
       bar = @svg.selectAll(".line-grp")
-        .data(@data, (d) -> d.id)
+        .data(@app.data, (d) -> d.id)
 
       barEnter = bar.enter()
         .append('g').attr('class', 'line-grp')

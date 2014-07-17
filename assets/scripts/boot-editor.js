@@ -19255,6 +19255,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       function EditorTimeline() {
         this.render = __bind(this.render, this);
         var dragTime, dragTimeMove, height, margin, self, timeGrp, timeSelection, width, xAxis, xAxisGrid, xGrid;
+        this.app = window.app;
         this.currentTime = window.app.timer.time;
         this.totalDuration = 240 * 1000;
         margin = {
@@ -19268,58 +19269,6 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.lineHeight = 20;
         this.label_position_x = -170;
         this.dy = 10 + margin.top;
-        this.data = [
-          {
-            id: 'track1',
-            label: "object 1",
-            start: 15.2,
-            end: 20,
-            properties: [
-              {
-                name: "opacity",
-                keys: [
-                  {
-                    time: 15.5,
-                    val: 0
-                  }, {
-                    time: 17,
-                    val: 0.8
-                  }
-                ]
-              }, {
-                name: "quantity",
-                keys: [
-                  {
-                    time: 15.5,
-                    val: 10
-                  }, {
-                    time: 20,
-                    val: 15
-                  }
-                ]
-              }
-            ]
-          }, {
-            id: 'track2',
-            label: "object 2",
-            start: 60,
-            end: 142,
-            properties: [
-              {
-                name: "opacity",
-                keys: [
-                  {
-                    time: 60,
-                    val: 0
-                  }, {
-                    time: 72,
-                    val: 0.3
-                  }
-                ]
-              }
-            ]
-          }
-        ];
         this.x = d3.time.scale().range([0, width]);
         this.x.domain([0, this.totalDuration - 220 * 1000]);
         xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(this.formatMinutes);
@@ -19401,7 +19350,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return d;
         }).on("drag", dragmove).on("dragstart", dragstart);
         bar_border = 1;
-        bar = this.svg.selectAll(".line-grp").data(this.data, function(d) {
+        bar = this.svg.selectAll(".line-grp").data(this.app.data, function(d) {
           return d.id;
         });
         barEnter = bar.enter().append('g').attr('class', 'line-grp').attr("transform", function(d, i) {
