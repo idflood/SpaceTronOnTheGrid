@@ -19350,6 +19350,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
           var diff, dx, key, mouse, prop, _i, _j, _len, _len1, _ref, _ref1;
           mouse = d3.mouse(this);
           dx = self.x.invert(mouse[0] + dragOffset);
+          dx = dx.getTime();
           diff = dx - d.start;
           d.start += diff;
           d.end += diff;
@@ -19408,13 +19409,16 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
           return "translate(0," + sub_height + ")";
         });
         subGrp.append('rect').attr('class', 'click-handler click-handler--property').attr('x', 0).attr('y', 0).attr('width', self.x(240 + 100)).attr('height', self.lineHeight).on('dblclick', function(d) {
-          var dx, mouse;
-          console.log("dblclick");
-          console.log(d);
+          var dx, mouse, newKey;
           mouse = d3.mouse(this);
           dx = self.x.invert(mouse[0]);
-          console.log(mouse[0]);
-          return console.log(dx);
+          dx = dx.getTime();
+          newKey = {
+            time: dx,
+            val: 42
+          };
+          d.keys.push(newKey);
+          return self.render();
         });
         subGrp.append('text').attr("class", "line--label line--label-small").attr("x", self.label_position_x).attr("y", 15).text(function(d) {
           return d.name;
@@ -19423,8 +19427,19 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
       };
 
       Editor.prototype.renderKeys = function() {
-        var key_size, keys, propKey, propValue, self;
+        var drag, dragmove, key_size, keys, propKey, propValue, self;
         self = this;
+        dragmove = function(d) {
+          var dx, mouse;
+          mouse = d3.mouse(this);
+          dx = self.x.invert(mouse[0]);
+          dx = dx.getTime();
+          d.time += dx;
+          return self.render();
+        };
+        drag = d3.behavior.drag().origin(function(d) {
+          return d;
+        }).on("drag", dragmove);
         propValue = function(d, i, j) {
           return d.keys;
         };
@@ -19433,7 +19448,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
         };
         keys = this.properties.selectAll('.key').data(propValue, propKey);
         key_size = 6;
-        keys.enter().append('g').attr('class', 'key').append('g').attr('class', 'key__item').append('rect').attr('x', -3).attr('width', key_size).attr('height', key_size).attr('class', 'line--key').attr('transform', 'rotate(45)');
+        keys.enter().append('g').attr('class', 'key').append('g').attr('class', 'key__item').call(drag).append('rect').attr('x', -3).attr('width', key_size).attr('height', key_size).attr('class', 'line--key').attr('transform', 'rotate(45)');
         keys.selectAll('.key__item').attr('transform', function(d) {
           var dx, dy;
           dx = self.x(d.time) + 3;

@@ -90,6 +90,7 @@ define (require) ->
       dragmove = (d) ->
         mouse = d3.mouse(this)
         dx = self.x.invert(mouse[0] + dragOffset)
+        dx = dx.getTime()
         diff = dx - d.start
         d.start += diff
         d.end += diff
@@ -164,12 +165,13 @@ define (require) ->
         .attr('width', self.x(240 + 100))
         .attr('height', self.lineHeight)
         .on 'dblclick', (d) ->
-          console.log "dblclick"
-          console.log d
           mouse = d3.mouse(this)
           dx = self.x.invert(mouse[0])
-          console.log mouse[0]
-          console.log dx
+          dx = dx.getTime()
+          newKey = {time: dx, val: 42}
+          d.keys.push(newKey)
+          self.render()
+
 
       subGrp.append('text')
         .attr("class", "line--label line--label-small")
@@ -187,7 +189,18 @@ define (require) ->
 
     renderKeys: () ->
       self = this
-      # Keys
+
+      dragmove = (d) ->
+        mouse = d3.mouse(this)
+        dx = self.x.invert(mouse[0])
+        dx = dx.getTime()
+        d.time += dx
+        self.render()
+
+      drag = d3.behavior.drag()
+        .origin((d) -> return d;)
+        .on("drag", dragmove)
+
       propValue = (d,i,j) -> d.keys
       propKey = (d, k) ->
         return k
@@ -199,6 +212,7 @@ define (require) ->
         .attr('class', 'key')
         .append('g')
         .attr('class', 'key__item')
+        .call(drag)
         .append('rect')
         .attr('x', -3)
         .attr('width', key_size)
