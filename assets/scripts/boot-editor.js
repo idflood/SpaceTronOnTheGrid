@@ -19255,6 +19255,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
         var $timeline, dragTime, dragTimeMove, height, margin, self, timeGrp, timeSelection, width, xAxis, xAxisGrid, xGrid;
         this.app = window.app;
         this.currentTime = [0];
+        this.totalDuration = 20 * 1000;
         $timeline = $(tpl_timeline);
         $('body').append($timeline);
         margin = {
@@ -19272,14 +19273,14 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
           {
             id: 'track1',
             label: "object 1",
-            start: 15,
+            start: 15.2,
             end: 20,
             properties: [
               {
                 name: "opacity",
                 keys: [
                   {
-                    time: 15,
+                    time: 15.5,
                     val: 0
                   }, {
                     time: 17,
@@ -19290,7 +19291,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
                 name: "quantity",
                 keys: [
                   {
-                    time: 15,
+                    time: 15.5,
                     val: 10
                   }, {
                     time: 20,
@@ -19321,7 +19322,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
           }
         ];
         this.x = d3.time.scale().range([0, width]);
-        this.x.domain([0, 240]);
+        this.x.domain([0, this.totalDuration]);
         xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(this.formatMinutes);
         this.svg = d3.select($timeline.get(0)).append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         xAxisGrid = d3.svg.axis().scale(this.x).ticks(40).tickSize(-height, 0).tickFormat("").orient("top");
@@ -19369,13 +19370,13 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
           var mouse, mouseX;
           mouse = d3.mouse(this);
           mouseX = mouse[0];
-          return dragOffset = self.x(d.start) - mouseX;
+          return dragOffset = self.x(d.start) * 1000 - mouseX;
         };
         dragmove = function(d) {
           var diff, dx, key, mouse, prop, _i, _j, _len, _len1, _ref, _ref1;
           mouse = d3.mouse(this);
           dx = self.x.invert(mouse[0] + dragOffset);
-          dx = dx.getTime();
+          dx = dx.getTime() / 1000;
           dx = Math.max(0, dx);
           diff = dx - d.start;
           d.start += diff;
@@ -19407,14 +19408,14 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
         });
         barEnter.append("rect").attr("class", "bar").attr("y", 3).attr("height", 14);
         bar.selectAll('.bar').attr("x", function(d) {
-          return self.x(d.start) + bar_border;
+          return self.x(d.start * 1000) + bar_border;
         }).attr("width", function(d) {
-          return self.x(d.end - d.start) - bar_border;
+          return self.x((d.end - d.start) * 1000) - bar_border;
         }).call(drag);
         barEnter.append("text").attr("class", "line--label").attr("x", self.label_position_x).attr("y", 16).text(function(d) {
           return d.label;
         });
-        barEnter.append("line").attr("class", 'line--separator').attr("x1", -200).attr("x2", self.x(240 + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
+        barEnter.append("line").attr("class", 'line--separator').attr("x1", -200).attr("x2", self.x(self.totalDuration + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
         bar.exit().remove();
         return bar;
       };
@@ -19434,7 +19435,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
           sub_height = (i + 1) * self.lineHeight;
           return "translate(0," + sub_height + ")";
         });
-        subGrp.append('rect').attr('class', 'click-handler click-handler--property').attr('x', 0).attr('y', 0).attr('width', self.x(240 + 100)).attr('height', self.lineHeight).on('dblclick', function(d) {
+        subGrp.append('rect').attr('class', 'click-handler click-handler--property').attr('x', 0).attr('y', 0).attr('width', self.x(self.totalDuration + 100)).attr('height', self.lineHeight).on('dblclick', function(d) {
           var dx, mouse, newKey;
           mouse = d3.mouse(this);
           dx = self.x.invert(mouse[0]);
@@ -19449,7 +19450,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
         subGrp.append('text').attr("class", "line--label line--label-small").attr("x", self.label_position_x).attr("y", 15).text(function(d) {
           return d.name;
         });
-        return subGrp.append("line").attr("class", 'line--separator-secondary').attr("x1", -200).attr("x2", self.x(240 + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
+        return subGrp.append("line").attr("class", 'line--separator-secondary').attr("x1", -200).attr("x2", self.x(self.totalDuration + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
       };
 
       Editor.prototype.renderKeys = function() {
@@ -19460,7 +19461,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
           mouse = d3.mouse(this);
           dx = self.x.invert(mouse[0]);
           dx = dx.getTime();
-          d.time += dx;
+          d.time += dx / 1000;
           return self.render();
         };
         drag = d3.behavior.drag().origin(function(d) {
@@ -19477,7 +19478,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
         keys.enter().append('g').attr('class', 'key').append('g').attr('class', 'key__item').call(drag).append('rect').attr('x', -3).attr('width', key_size).attr('height', key_size).attr('class', 'line--key').attr('transform', 'rotate(45)');
         keys.selectAll('.key__item').attr('transform', function(d) {
           var dx, dy;
-          dx = self.x(d.time) + 3;
+          dx = self.x(d.time) * 1000 + 3;
           dy = 9;
           return "translate(" + dx + "," + dy + ")";
         });
@@ -19486,6 +19487,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
 
       Editor.prototype.formatMinutes = function(d) {
         var hours, minutes, output, seconds;
+        d = d / 1000;
         hours = Math.floor(d / 3600);
         minutes = Math.floor((d - (hours * 3600)) / 60);
         seconds = d - (minutes * 60);

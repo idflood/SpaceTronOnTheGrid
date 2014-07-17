@@ -17,6 +17,7 @@ define (require) ->
     constructor: () ->
       @app = window.app
       @currentTime = [0]
+      @totalDuration = 20 * 1000
 
       $timeline = $(tpl_timeline)
       $('body').append($timeline)
@@ -29,9 +30,9 @@ define (require) ->
       @dy = 10 + margin.top
 
       @data = [
-        {id: 'track1', label: "object 1", start: 15, end: 20, properties: [
-          {name: "opacity", keys: [{time: 15, val: 0}, {time: 17, val: 0.8}]},
-          {name: "quantity", keys: [{time: 15, val: 10}, {time: 20, val: 15}]}
+        {id: 'track1', label: "object 1", start: 15.2, end: 20, properties: [
+          {name: "opacity", keys: [{time: 15.5, val: 0}, {time: 17, val: 0.8}]},
+          {name: "quantity", keys: [{time: 15.5, val: 10}, {time: 20, val: 15}]}
         ]},
         {id: 'track2', label: "object 2", start: 60, end: 142, properties: [
           {name: "opacity", keys: [{time: 60, val: 0}, {time: 72, val: 0.3}]}
@@ -40,12 +41,13 @@ define (require) ->
 
       @x = d3.time.scale().range([0, width])
       #@x = d3.scale.linear().range([0, width])
-      @x.domain([0, 240])
+      @x.domain([0, @totalDuration])
 
       xAxis = d3.svg.axis()
         .scale(@x)
         .orient("top")
         .tickSize(-height, 0)
+        #.tickFormat(d3.time.format("%S %L"))
         .tickFormat(@formatMinutes)
 
       @svg = d3.select($timeline.get(0)).append("svg")
@@ -119,14 +121,16 @@ define (require) ->
       dragstart = (d) ->
         mouse = d3.mouse(this)
         mouseX = mouse[0]
-        dragOffset = self.x(d.start) - mouseX
+        dragOffset = self.x(d.start) * 1000 - mouseX
+        #dragOffset = mouseX
 
       dragmove = (d) ->
         mouse = d3.mouse(this)
         dx = self.x.invert(mouse[0] + dragOffset)
-        dx = dx.getTime()
+        dx = dx.getTime() / 1000
         dx = Math.max(0, dx)
-        diff = dx - d.start
+
+        diff = (dx - d.start)
         d.start += diff
         d.end += diff
 
@@ -159,8 +163,8 @@ define (require) ->
         .attr("height", 14)
 
       bar.selectAll('.bar')
-        .attr("x", (d) -> return self.x(d.start) + bar_border)
-        .attr("width", (d) -> return self.x(d.end - d.start) - bar_border)
+        .attr("x", (d) -> return self.x(d.start * 1000) + bar_border)
+        .attr("width", (d) -> return self.x((d.end - d.start) * 1000) - bar_border)
         .call(drag)
 
       barEnter.append("text")
@@ -172,7 +176,7 @@ define (require) ->
       barEnter.append("line")
         .attr("class", 'line--separator')
         .attr("x1", -200)
-        .attr("x2", self.x(240 + 100))
+        .attr("x2", self.x(self.totalDuration + 100))
         .attr("y1", self.lineHeight)
         .attr("y2", self.lineHeight)
 
@@ -197,7 +201,7 @@ define (require) ->
         .attr('class', 'click-handler click-handler--property')
         .attr('x', 0)
         .attr('y', 0)
-        .attr('width', self.x(240 + 100))
+        .attr('width', self.x(self.totalDuration + 100))
         .attr('height', self.lineHeight)
         .on 'dblclick', (d) ->
           mouse = d3.mouse(this)
@@ -218,7 +222,7 @@ define (require) ->
       subGrp.append("line")
         .attr("class", 'line--separator-secondary')
         .attr("x1", -200)
-        .attr("x2", self.x(240 + 100))
+        .attr("x2", self.x(self.totalDuration + 100))
         .attr("y1", self.lineHeight)
         .attr("y2", self.lineHeight)
 
@@ -229,7 +233,7 @@ define (require) ->
         mouse = d3.mouse(this)
         dx = self.x.invert(mouse[0])
         dx = dx.getTime()
-        d.time += dx
+        d.time += dx / 1000
         self.render()
 
       drag = d3.behavior.drag()
@@ -257,13 +261,15 @@ define (require) ->
 
       keys.selectAll('.key__item')
         .attr 'transform', (d) ->
-          dx = self.x(d.time) + 3
+          dx = self.x(d.time) * 1000 + 3
           dy = 9
           return "translate(" + dx + "," + dy + ")"
 
       keys.exit().remove()
 
     formatMinutes: (d) ->
+      # convert milliseconds to seconds
+      d = d / 1000
       hours = Math.floor(d / 3600)
       minutes = Math.floor((d - (hours * 3600)) / 60)
       seconds = d - (minutes * 60)
