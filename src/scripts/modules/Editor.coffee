@@ -206,7 +206,7 @@ define (require) ->
         .on 'dblclick', (d) ->
           mouse = d3.mouse(this)
           dx = self.x.invert(mouse[0])
-          dx = dx.getTime()
+          dx = dx.getTime() / 1000
           newKey = {time: dx, val: 42}
           d.keys.push(newKey)
           self.render()

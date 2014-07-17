@@ -19439,7 +19439,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
           var dx, mouse, newKey;
           mouse = d3.mouse(this);
           dx = self.x.invert(mouse[0]);
-          dx = dx.getTime();
+          dx = dx.getTime() / 1000;
           newKey = {
             time: dx,
             val: 42
