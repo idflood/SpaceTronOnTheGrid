@@ -9,8 +9,16 @@ require.config({
     threejs: "bower_components/three.js/three",
     rng: "bower_components/rng-js/rng",
     d3: "bower_components/d3/d3",
+    Signal: "bower_components/js-signals/dist/signals",
+    TweenMax: "bower_components/gsap/src/uncompressed/TweenMax",
+    TimelineMax: "bower_components/gsap/src/uncompressed/TimelineMax",
   },
   shim: {
+    TimelineMax: {
+      exports: 'TimelineLite',
+      deps: ['TweenMax']
+    },
+
     threejs: {
       exports: 'THREE' // This match something in path section.
     },

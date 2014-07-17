@@ -19256,8 +19256,8 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.render = __bind(this.render, this);
         var dragTime, dragTimeMove, height, margin, self, timeGrp, timeSelection, width, xAxis, xAxisGrid, xGrid;
         this.app = window.app;
-        this.currentTime = window.app.timer.time;
-        this.totalDuration = 240 * 1000;
+        this.timer = this.app.timer;
+        this.currentTime = this.timer.time;
         margin = {
           top: 15,
           right: 20,
@@ -19270,7 +19270,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.label_position_x = -170;
         this.dy = 10 + margin.top;
         this.x = d3.time.scale().range([0, width]);
-        this.x.domain([0, this.totalDuration - 220 * 1000]);
+        this.x.domain([0, this.timer.totalDuration - 220 * 1000]);
         xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(this.formatMinutes);
         this.svg = d3.select('.editor__time-main').append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         xAxisGrid = d3.svg.axis().scale(this.x).ticks(100).tickSize(-height, 0).tickFormat("").orient("top");
@@ -19369,7 +19369,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         barEnter.append("text").attr("class", "line--label").attr("x", self.label_position_x).attr("y", 16).text(function(d) {
           return d.label;
         });
-        barEnter.append("line").attr("class", 'line--separator').attr("x1", -200).attr("x2", self.x(self.totalDuration + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
+        barEnter.append("line").attr("class", 'line--separator').attr("x1", -200).attr("x2", self.x(self.timer.totalDuration + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
         bar.exit().remove();
         return bar;
       };
@@ -19389,7 +19389,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           sub_height = (i + 1) * self.lineHeight;
           return "translate(0," + sub_height + ")";
         });
-        subGrp.append('rect').attr('class', 'click-handler click-handler--property').attr('x', 0).attr('y', 0).attr('width', self.x(self.totalDuration + 100)).attr('height', self.lineHeight).on('dblclick', function(d) {
+        subGrp.append('rect').attr('class', 'click-handler click-handler--property').attr('x', 0).attr('y', 0).attr('width', self.x(self.timer.totalDuration + 100)).attr('height', self.lineHeight).on('dblclick', function(d) {
           var dx, mouse, newKey;
           mouse = d3.mouse(this);
           dx = self.x.invert(mouse[0]);
@@ -19403,7 +19403,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         subGrp.append('text').attr("class", "line--label line--label-small").attr("x", self.label_position_x).attr("y", 15).text(function(d) {
           return d.name;
         });
-        return subGrp.append("line").attr("class", 'line--separator-secondary').attr("x1", -200).attr("x2", self.x(self.totalDuration + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
+        return subGrp.append("line").attr("class", 'line--separator-secondary').attr("x1", -200).attr("x2", self.x(self.timer.totalDuration + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
       };
 
       EditorTimeline.prototype.renderKeys = function() {

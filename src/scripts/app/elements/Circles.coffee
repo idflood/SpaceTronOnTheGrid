@@ -6,10 +6,17 @@ define (require) ->
   Colors = require 'cs!app/components/Colors'
 
   class Circles
-    constructor: (@scene, @numItems, @seed, @radius = 80, @circleRadius = 20, @circleRadiusMax= 30) ->
+    constructor: (options = {}) ->
+      #, @seed, @radius = 80, @circleRadius = 20, @circleRadiusMax= 30
+      @numItems = options.numItems || 10
+      @seed = options.seed || 12000
+      @radius = options.radius || 80
+      @circleRadius = options.circleRadius || 20
+      @circleRadiusMax = options.circleRadiusMax || 30
+
       @rng = new RNG(@seed)
       @rngOutline = new RNG(@seed)
-      @object = new THREE.Object3D()
+      @container = new THREE.Object3D()
 
       @blackMaterial = new THREE.MeshBasicMaterial({color: 0x7ed2f1, transparent: true, depthWrite: false, depthTest: false})
       @blackMaterial.blending = THREE.AdditiveBlending
@@ -17,7 +24,10 @@ define (require) ->
       for i in [0..@numItems]
         @createCircle()
 
-      @scene.add(@object)
+      #@scene.add(@container)
+
+    update: (seconds, values) ->
+      # todo.
 
     getRandomPosition: () ->
       return @rng.random(-@radius, @radius)
@@ -40,7 +50,7 @@ define (require) ->
       #object = new THREE.Mesh( new THREE.BoxGeometry(30, 30, 30 , 2, 2, 2), material )
       object.position.set( x, y, 0 )
       #object.rotation.set(Math.PI / -2, 0, 0)
-      @object.add( object )
+      @container.add( object )
 
       if size > 4 && @rngOutline.exponential() > 1.2
         @drawOutline(x, y, size)
@@ -49,4 +59,7 @@ define (require) ->
       borderRadius = @rngOutline.exponential()
       object = new THREE.Mesh( new THREE.RingGeometry( size - 1, size + borderRadius, 50, 1, 0, Math.PI * 2 ), @blackMaterial )
       object.position.set( x, y, 0 )
-      @object.add( object )
+      @container.add( object )
+
+    destroy: () ->
+      # clean up...

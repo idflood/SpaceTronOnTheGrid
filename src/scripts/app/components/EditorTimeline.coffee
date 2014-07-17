@@ -5,9 +5,9 @@ define (require) ->
   class EditorTimeline
     constructor: () ->
       @app = window.app
-      @currentTime = window.app.timer.time
-      # in millisecond
-      @totalDuration = 240 * 1000
+      @timer = @app.timer
+      @currentTime = @timer.time
+
 
       margin = {top: 15, right: 20, bottom: 0, left: 190}
       width = window.innerWidth - margin.left - margin.right
@@ -18,7 +18,7 @@ define (require) ->
 
       @x = d3.time.scale().range([0, width])
       #@x = d3.scale.linear().range([0, width])
-      @x.domain([0, @totalDuration - 220 * 1000])
+      @x.domain([0, @timer.totalDuration - 220 * 1000])
 
       xAxis = d3.svg.axis()
         .scale(@x)
@@ -156,7 +156,7 @@ define (require) ->
       barEnter.append("line")
         .attr("class", 'line--separator')
         .attr("x1", -200)
-        .attr("x2", self.x(self.totalDuration + 100))
+        .attr("x2", self.x(self.timer.totalDuration + 100))
         .attr("y1", self.lineHeight)
         .attr("y2", self.lineHeight)
 
@@ -181,7 +181,7 @@ define (require) ->
         .attr('class', 'click-handler click-handler--property')
         .attr('x', 0)
         .attr('y', 0)
-        .attr('width', self.x(self.totalDuration + 100))
+        .attr('width', self.x(self.timer.totalDuration + 100))
         .attr('height', self.lineHeight)
         .on 'dblclick', (d) ->
           mouse = d3.mouse(this)
@@ -202,7 +202,7 @@ define (require) ->
       subGrp.append("line")
         .attr("class", 'line--separator-secondary')
         .attr("x1", -200)
-        .attr("x2", self.x(self.totalDuration + 100))
+        .attr("x2", self.x(self.timer.totalDuration + 100))
         .attr("y1", self.lineHeight)
         .attr("y2", self.lineHeight)
 

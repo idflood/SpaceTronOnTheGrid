@@ -12,8 +12,9 @@ define (require) ->
   Background = require 'cs!app/components/Background'
   PostFX = require 'cs!app/components/PostFX'
   Timer = require 'cs!app/components/Timer'
+  Orchestrator = require 'cs!app/components/Orchestrator'
 
-  Circles = require 'cs!app/elements/Circles'
+  #Circles = require 'cs!app/elements/Circles'
 
 
   class App
@@ -21,6 +22,7 @@ define (require) ->
       # Make the app accessible for the editor.
       window.app = this
       @timer = new Timer()
+
       @data = [
         {id: 'track1', label: "object 1", start: 15.2, end: 20, properties: [
           {name: "opacity", keys: [{time: 15.5, val: 0}, {time: 17, val: 0.8}]},
@@ -31,12 +33,29 @@ define (require) ->
         ]},
       ]
 
+      @data = [
+        {
+          id: 'item1',
+          label: 'Test circles',
+          type: 'Circles'
+          start: 0, end: 10,
+          options: {numItems: 42},
+          properties: [
+            {name: 'percent', keys: [{time: 2, val: 7}, {time: 5, val: 42}, {time: 10, val: 4}]}
+          ]
+
+        }
+      ]
+
+      @scene = new THREE.Scene()
+      @orchestrator = new Orchestrator(@timer, @data, @scene)
+
 
       @time = Date.now() * 0.0001
       container = document.createElement( 'div' )
       document.body.appendChild( container )
 
-      @scene = new THREE.Scene()
+
 
       @camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 )
       @camera.position.z = 600
@@ -47,8 +66,8 @@ define (require) ->
       #@renderer.setClearColor( 0xe1d8c7, 1)
       @renderer.setClearColor( 0x000000, 1)
 
-      circles = new Circles(@scene, 10, 4323, 130, 20, 50)
-      circles2 = new Circles(@scene, 20, 51232, 180, 4, 10)
+      #circles = new Circles(@scene, 10, 4323, 130, 20, 50)
+      #circles2 = new Circles(@scene, 20, 51232, 180, 4, 10)
 
       #@createElements()
 
