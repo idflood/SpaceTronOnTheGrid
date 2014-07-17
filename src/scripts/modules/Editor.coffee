@@ -37,6 +37,7 @@ define (require) ->
       ]
 
       @x = d3.time.scale().range([0, width])
+      #@x = d3.scale.linear().range([0, width])
       @x.domain([0, 240])
 
       xAxis = d3.svg.axis()
@@ -155,6 +156,20 @@ define (require) ->
         .attr "transform", (d, i) ->
           sub_height = (i + 1) * self.lineHeight
           return "translate(0," + sub_height + ")"
+
+      subGrp.append('rect')
+        .attr('class', 'click-handler click-handler--property')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', self.x(240 + 100))
+        .attr('height', self.lineHeight)
+        .on 'dblclick', (d) ->
+          console.log "dblclick"
+          console.log d
+          mouse = d3.mouse(this)
+          dx = self.x.invert(mouse[0])
+          console.log mouse[0]
+          console.log dx
 
       subGrp.append('text')
         .attr("class", "line--label line--label-small")

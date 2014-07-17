@@ -19409,6 +19409,15 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
           sub_height = (i + 1) * self.lineHeight;
           return "translate(0," + sub_height + ")";
         });
+        subGrp.append('rect').attr('class', 'click-handler click-handler--property').attr('x', 0).attr('y', 0).attr('width', self.x(240 + 100)).attr('height', self.lineHeight).on('dblclick', function(d) {
+          var dx, mouse;
+          console.log("dblclick");
+          console.log(d);
+          mouse = d3.mouse(this);
+          dx = self.x.invert(mouse[0]);
+          console.log(mouse[0]);
+          return console.log(dx);
+        });
         subGrp.append('text').attr("class", "line--label line--label-small").attr("x", self.label_position_x).attr("y", 15).text(function(d) {
           return d.name;
         });
