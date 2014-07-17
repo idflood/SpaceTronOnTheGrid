@@ -37242,6 +37242,57 @@ define("vendors/three.js-extras/shaders/ConvolutionShader", function(){});
 
 }).call(this);
 
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  define('cs!app/components/Timer',['require'],function(require) {
+    var Timer;
+    return Timer = (function() {
+      function Timer() {
+        this.update = __bind(this.update, this);
+        this.time = [0];
+        this.is_playing = false;
+        this.last_timeStamp = -1;
+        window.requestAnimationFrame(this.update);
+      }
+
+      Timer.prototype.play = function() {
+        return this.is_playing = true;
+      };
+
+      Timer.prototype.stop = function() {
+        return this.is_playing = false;
+      };
+
+      Timer.prototype.toggle = function() {
+        return this.is_playing = !this.is_playing;
+      };
+
+      Timer.prototype.seek = function(time) {
+        return this.time = time;
+      };
+
+      Timer.prototype.update = function(timestamp) {
+        var elapsed;
+        if (this.last_timeStamp === -1) {
+          this.last_timeStamp = timestamp;
+        }
+        elapsed = timestamp - this.last_timeStamp;
+        if (this.is_playing) {
+          this.time[0] += elapsed;
+        }
+        this.last_timeStamp = timestamp;
+        return window.requestAnimationFrame(this.update);
+      };
+
+      return Timer;
+
+    })();
+  });
+
+}).call(this);
+
 /**
  * Seedable random number generator functions.
  * @version 1.0.0
@@ -37583,11 +37634,12 @@ define("rng", (function (global) {
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/Main',['require','threejs','cs!app/components/Background','cs!app/components/PostFX','cs!app/elements/Circles'],function(require) {
-    var App, Background, Circles, PostFX, THREE;
+  define('cs!app/Main',['require','threejs','cs!app/components/Background','cs!app/components/PostFX','cs!app/components/Timer','cs!app/elements/Circles'],function(require) {
+    var App, Background, Circles, PostFX, THREE, Timer;
     THREE = require('threejs');
     Background = require('cs!app/components/Background');
     PostFX = require('cs!app/components/PostFX');
+    Timer = require('cs!app/components/Timer');
     Circles = require('cs!app/elements/Circles');
     return App = (function() {
       function App() {
@@ -37595,6 +37647,7 @@ define("rng", (function (global) {
         this.onWindowResize = __bind(this.onWindowResize, this);
         var circles, circles2, container;
         window.app = this;
+        this.timer = new Timer();
         this.time = Date.now() * 0.0001;
         container = document.createElement('div');
         document.body.appendChild(container);

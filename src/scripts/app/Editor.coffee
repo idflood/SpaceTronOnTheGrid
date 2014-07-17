@@ -25,8 +25,17 @@ define (require) ->
   class Editor
     constructor: () ->
       @app = window.app
+      @timer = @app.timer
 
-      $timeline = $(tpl_timeline)
-      $('body').append($timeline)
+      @$timeline = $(tpl_timeline)
+      $('body').append(@$timeline)
 
       @timeline = new EditorTimeline()
+      @initControls()
+
+    initControls: () ->
+      $play_pause = @$timeline.find('.control.icon-play')
+      $play_pause.click (e) =>
+        e.preventDefault()
+        @timer.toggle()
+        console.log "toggle " + @timer.is_playing

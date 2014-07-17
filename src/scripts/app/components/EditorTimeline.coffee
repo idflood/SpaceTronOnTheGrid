@@ -4,7 +4,8 @@ define (require) ->
 
   class EditorTimeline
     constructor: () ->
-      @currentTime = [0]
+      #@currentTime = [0]
+      @currentTime = window.app.timer.time
       # in millisecond
       @totalDuration = 240 * 1000
 
@@ -67,7 +68,7 @@ define (require) ->
         dx = dx.getTime()
         dx = Math.max(0, dx)
         self.currentTime[0] = dx
-        self.render()
+        #self.render()
 
       dragTime = d3.behavior.drag()
         .origin((d) -> return d;)
@@ -89,13 +90,15 @@ define (require) ->
         .attr('d', 'M -10 0 L 0 10 L 10 0 L -10 0')
 
       # First render
-      @render()
+      #@render()
+      window.requestAnimationFrame(@render)
 
-    render: () ->
+    render: () =>
       bar = @renderLines()
       @renderTimeIndicator()
       @renderProperties(bar)
       @renderKeys()
+      window.requestAnimationFrame(@render)
 
     renderTimeIndicator: () ->
       timeSelection = @svg.selectAll('.time-indicator')
@@ -124,7 +127,7 @@ define (require) ->
         for prop in d.properties
           for key in prop.keys
             key.time += diff
-        self.render()
+        #self.render()
 
       drag = d3.behavior.drag()
         .origin((d) -> return d;)
@@ -196,7 +199,7 @@ define (require) ->
           dx = dx.getTime() / 1000
           newKey = {time: dx, val: 42}
           d.keys.push(newKey)
-          self.render()
+          #self.render()
 
 
       subGrp.append('text')
@@ -221,7 +224,7 @@ define (require) ->
         dx = self.x.invert(mouse[0])
         dx = dx.getTime()
         d.time += dx / 1000
-        self.render()
+        #self.render()
 
       drag = d3.behavior.drag()
         .origin((d) -> return d;)

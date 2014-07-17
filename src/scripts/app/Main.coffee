@@ -11,13 +11,18 @@ define (require) ->
 
   Background = require 'cs!app/components/Background'
   PostFX = require 'cs!app/components/PostFX'
+  Timer = require 'cs!app/components/Timer'
 
   Circles = require 'cs!app/elements/Circles'
+
 
   class App
     constructor: () ->
       # Make the app accessible for the editor.
       window.app = this
+      @timer = new Timer()
+
+
       @time = Date.now() * 0.0001
       container = document.createElement( 'div' )
       document.body.appendChild( container )
