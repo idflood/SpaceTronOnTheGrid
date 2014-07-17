@@ -40,6 +40,11 @@ define (require) ->
         if !item.timeline
           item.timeline = new TimelineMax()
           @mainTimeline.add(item.timeline)
+          item.isDirty = true
+
+        if item.timeline and item.isDirty
+          item.isDirty = false
+          item.timeline.clear()
 
           for property in item.properties
             propertyTimeline = new TimelineMax()
@@ -49,8 +54,8 @@ define (require) ->
                 next_key = property.keys[key_index + 1]
                 tween_duration = next_key.time - key.time
                 tween_value = next_key.val
-                console.log "add tween: " + propName
-                console.log {duration: tween_duration, val: tween_value, time: key.time}
+                #console.log "add tween: " + propName
+                #console.log {duration: tween_duration, val: tween_value, time: key.time}
                 val = {}
                 val[propName] = tween_value
                 tween = TweenLite.to(item.values, tween_duration, val)

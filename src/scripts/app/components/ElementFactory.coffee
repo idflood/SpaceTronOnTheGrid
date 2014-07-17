@@ -12,7 +12,7 @@ define (require) ->
       Circles:
         options:
           numItems: 20
-          seed: 12000
+          seed: 12001
           radius: 80
           circleRadius: 20
           circleRadiusMax: 20
@@ -20,14 +20,12 @@ define (require) ->
           # Assign default parameters if not defined
           defaults = ElementFactory.elements.Circles.options
           options = extend (extend {}, defaults), options
-          console.log options
+
           item = new Circles(options)
           return item
 
-    #constructor: () ->
 
     create: (itemName, data) ->
-      console.log ElementFactory
       item = ElementFactory.elements[itemName]
       if !item
         console.warn("Can't create item: " + itemName)

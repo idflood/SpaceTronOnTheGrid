@@ -19321,7 +19321,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return dragOffset = self.x(d.start) * 1000 - mouseX;
         };
         dragmove = function(d) {
-          var diff, dx, key, mouse, prop, _i, _len, _ref, _results;
+          var diff, dx, key, mouse, prop, _i, _j, _len, _len1, _ref, _ref1;
           mouse = d3.mouse(this);
           dx = self.x.invert(mouse[0] + dragOffset);
           dx = dx.getTime() / 1000;
@@ -19330,21 +19330,15 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           d.start += diff;
           d.end += diff;
           _ref = d.properties;
-          _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             prop = _ref[_i];
-            _results.push((function() {
-              var _j, _len1, _ref1, _results1;
-              _ref1 = prop.keys;
-              _results1 = [];
-              for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-                key = _ref1[_j];
-                _results1.push(key.time += diff);
-              }
-              return _results1;
-            })());
+            _ref1 = prop.keys;
+            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+              key = _ref1[_j];
+              key.time += diff;
+            }
           }
-          return _results;
+          return d.isDirty = true;
         };
         drag = d3.behavior.drag().origin(function(d) {
           return d;

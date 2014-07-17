@@ -3,7 +3,7 @@ define (require) ->
 
   items = [
     new THREE.Color(0xc0ddde),
-    #new THREE.Color(0xf1c47e),
+    new THREE.Color(0xf1c47e),
   ]
 
   length = items.length

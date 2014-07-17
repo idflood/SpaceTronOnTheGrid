@@ -37989,7 +37989,7 @@ define("rng", (function (global) {
   define('cs!app/components/Colors',['require','threejs'],function(require) {
     var Colors, THREE, items, length;
     THREE = require('threejs');
-    items = [new THREE.Color(0xc0ddde)];
+    items = [new THREE.Color(0xc0ddde), new THREE.Color(0xf1c47e)];
     length = items.length;
     return Colors = (function() {
       function Colors() {}
@@ -38008,6 +38008,8 @@ define("rng", (function (global) {
 
 
 (function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
   define('cs!app/elements/Circles',['require','threejs','rng','cs!app/components/Colors'],function(require) {
     var Circles, Colors, RNG, THREE;
     THREE = require('threejs');
@@ -38015,27 +38017,32 @@ define("rng", (function (global) {
     Colors = require('cs!app/components/Colors');
     return Circles = (function() {
       function Circles(options) {
-        var i, _i, _ref;
+        var color, i, rndtype, size, x, y, _i, _ref;
         if (options == null) {
           options = {};
         }
+        this.drawOutline = __bind(this.drawOutline, this);
+        this.createCircle = __bind(this.createCircle, this);
         this.numItems = options.numItems || 10;
-        this.seed = options.seed || 12000;
+        this.seed = options.seed || 12001;
         this.radius = options.radius || 80;
         this.circleRadius = options.circleRadius || 20;
         this.circleRadiusMax = options.circleRadiusMax || 30;
         this.rng = new RNG(this.seed);
         this.rngOutline = new RNG(this.seed);
         this.container = new THREE.Object3D();
-        this.blackMaterial = new THREE.MeshBasicMaterial({
-          color: 0x7ed2f1,
-          transparent: true,
-          depthWrite: false,
-          depthTest: false
-        });
-        this.blackMaterial.blending = THREE.AdditiveBlending;
         for (i = _i = 0, _ref = this.numItems; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-          this.createCircle();
+          color = Colors.get(this.rng.random(0, 1000));
+          rndtype = this.rng.random(0, 1000) / 1000;
+          size = this.rng.random(this.circleRadius, this.circleRadiusMax);
+          x = this.getRandomPosition();
+          y = this.getRandomPosition();
+          if (rndtype < 0.8) {
+            this.drawOutline(x, y, size, color);
+          }
+          if (rndtype > 0.5) {
+            this.createCircle(x, y, size, color);
+          }
         }
       }
 
@@ -38045,10 +38052,9 @@ define("rng", (function (global) {
         return this.rng.random(-this.radius, this.radius);
       };
 
-      Circles.prototype.createCircle = function() {
-        var color, material, numSegments, object, size, x, y;
-        color = Colors.get(this.rng.random(0, 1000));
-        color.multiplyScalar(this.rng.random(0.5, 1));
+      Circles.prototype.createCircle = function(x, y, size, color) {
+        var material, numSegments, object;
+        color = color.clone().multiplyScalar(this.rng.random(0.3, 0.5));
         material = new THREE.MeshBasicMaterial({
           color: color,
           transparent: true,
@@ -38056,27 +38062,37 @@ define("rng", (function (global) {
           depthTest: false
         });
         material.blending = THREE.AdditiveBlending;
-        size = this.rng.random(this.circleRadius, this.circleRadiusMax);
-        x = this.getRandomPosition();
-        y = this.getRandomPosition();
         numSegments = parseInt(size / 1.5, 10) + 4;
         object = new THREE.Mesh(new THREE.CircleGeometry(size, numSegments, 0, Math.PI * 2), material);
-        object.position.set(x, y, 0);
-        this.container.add(object);
-        if (size > 4 && this.rngOutline.exponential() > 1.2) {
-          return this.drawOutline(x, y, size);
-        }
-      };
-
-      Circles.prototype.drawOutline = function(x, y, size) {
-        var borderRadius, object;
-        borderRadius = this.rngOutline.exponential();
-        object = new THREE.Mesh(new THREE.RingGeometry(size - 1, size + borderRadius, 50, 1, 0, Math.PI * 2), this.blackMaterial);
         object.position.set(x, y, 0);
         return this.container.add(object);
       };
 
-      Circles.prototype.destroy = function() {};
+      Circles.prototype.drawOutline = function(x, y, size, color) {
+        var borderRadius, material, object;
+        borderRadius = this.rngOutline.exponential();
+        material = new THREE.MeshBasicMaterial({
+          color: color,
+          transparent: true,
+          depthWrite: false,
+          depthTest: false
+        });
+        material.blending = THREE.AdditiveBlending;
+        object = new THREE.Mesh(new THREE.RingGeometry(size - 1, size + borderRadius, 50, 1, 0, Math.PI * 2), material);
+        object.position.set(x, y, 0);
+        return this.container.add(object);
+      };
+
+      Circles.prototype.destroy = function() {
+        if (this.container) {
+          if (this.container.parent) {
+            this.container.parent.remove(this.container);
+          }
+          delete this.container;
+        }
+        delete this.rng;
+        return delete this.rngOutline;
+      };
 
       return Circles;
 
@@ -38105,7 +38121,7 @@ define("rng", (function (global) {
         Circles: {
           options: {
             numItems: 20,
-            seed: 12000,
+            seed: 12001,
             radius: 80,
             circleRadius: 20,
             circleRadiusMax: 20
@@ -38114,7 +38130,6 @@ define("rng", (function (global) {
             var defaults, item;
             defaults = ElementFactory.elements.Circles.options;
             options = extend(extend({}, defaults), options);
-            console.log(options);
             item = new Circles(options);
             return item;
           }
@@ -38123,7 +38138,6 @@ define("rng", (function (global) {
 
       ElementFactory.prototype.create = function(itemName, data) {
         var item;
-        console.log(ElementFactory);
         item = ElementFactory.elements[itemName];
         if (!item) {
           console.warn("Can't create item: " + itemName);
@@ -46069,6 +46083,11 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           if (!item.timeline) {
             item.timeline = new TimelineMax();
             this.mainTimeline.add(item.timeline);
+            item.isDirty = true;
+          }
+          if (item.timeline && item.isDirty) {
+            item.isDirty = false;
+            item.timeline.clear();
             _ref2 = item.properties;
             for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
               property = _ref2[_k];
@@ -46081,12 +46100,6 @@ define("TimelineMax", ["TweenMax"], (function (global) {
                   next_key = property.keys[key_index + 1];
                   tween_duration = next_key.time - key.time;
                   tween_value = next_key.val;
-                  console.log("add tween: " + propName);
-                  console.log({
-                    duration: tween_duration,
-                    val: tween_value,
-                    time: key.time
-                  });
                   val = {};
                   val[propName] = tween_value;
                   tween = TweenLite.to(item.values, tween_duration, val);
@@ -46198,7 +46211,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
             start: 0,
             end: 10,
             options: {
-              numItems: 42
+              numItems: 12
             },
             properties: [
               {

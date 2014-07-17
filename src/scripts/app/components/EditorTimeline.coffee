@@ -117,6 +117,8 @@ define (require) ->
         for prop in d.properties
           for key in prop.keys
             key.time += diff
+
+        d.isDirty = true
         #self.render()
 
       drag = d3.behavior.drag()
