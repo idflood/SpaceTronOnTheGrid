@@ -10008,7 +10008,7 @@ define('text',['module'], function (module) {
 });
 
 
-define('text!modules/templates/timeline.tpl.html',[],function () { return '<div class="editor__time">\n  <div class="editor__time-controls controls">\n    <a href="#" class="control control--first icon-first"></a>\n    <a href="#" class="control control--play-pause icon-play"></a>\n    <a href="#" class="control control--last icon-last"></a>\n  </div>\n  <div class="editor__time-header">\n\n  </div>\n  <div class="editor__time-main">\n\n  </div>\n</div>\n';});
+define('text!app/templates/timeline.tpl.html',[],function () { return '<div class="editor__time">\n  <div class="editor__time-controls controls">\n    <a href="#" class="control control--first icon-first"></a>\n    <a href="#" class="control control--play-pause icon-play"></a>\n    <a href="#" class="control control--last icon-last"></a>\n  </div>\n  <div class="editor__time-header">\n\n  </div>\n  <div class="editor__time-main">\n\n  </div>\n</div>\n';});
 
 !function() {
   var d3 = {
@@ -19245,7 +19245,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
 }();
 
 (function() {
-  define('cs!modules/elements/EditorTimeline',['require','jquery','d3'],function(require) {
+  define('cs!app/components/EditorTimeline',['require','jquery','d3'],function(require) {
     var $, EditorTimeline, d3;
     $ = require('jquery');
     d3 = require('d3');
@@ -19506,11 +19506,11 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
 
 
 (function() {
-  define('cs!modules/Editor',['require','jquery','text!modules/templates/timeline.tpl.html','cs!modules/elements/EditorTimeline'],function(require) {
+  define('cs!app/Editor',['require','jquery','text!app/templates/timeline.tpl.html','cs!app/components/EditorTimeline'],function(require) {
     var $, Editor, EditorTimeline, tpl_timeline;
     $ = require('jquery');
-    tpl_timeline = require('text!modules/templates/timeline.tpl.html');
-    EditorTimeline = require('cs!modules/elements/EditorTimeline');
+    tpl_timeline = require('text!app/templates/timeline.tpl.html');
+    EditorTimeline = require('cs!app/components/EditorTimeline');
     return Editor = (function() {
       function Editor() {
         var $timeline;
@@ -19537,8 +19537,8 @@ require.config({
   }
 });
 
-require(['cs!modules/Editor'], function (Editor) {
-  var app = new Editor();
+require(['cs!app/Editor'], function (Editor) {
+  var editor = new Editor();
 });
 
 define("boot-editor", function(){});

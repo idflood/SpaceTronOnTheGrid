@@ -8,6 +8,6 @@ require.config({
   }
 });
 
-require(['cs!modules/App'], function (App) {
-  var app = new App();
+require(['cs!app/Main'], function (Main) {
+  var app = new Main();
 });

@@ -9,10 +9,10 @@
 define (require) ->
   THREE = require 'threejs'
 
-  Background = require 'cs!modules/elements/Background'
-  PostFX = require 'cs!modules/elements/PostFX'
+  Background = require 'cs!app/components/Background'
+  PostFX = require 'cs!app/components/PostFX'
 
-  Circles = require 'cs!modules/elements/Circles'
+  Circles = require 'cs!app/elements/Circles'
 
   class App
     constructor: () ->

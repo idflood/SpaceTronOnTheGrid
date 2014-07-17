@@ -8,6 +8,6 @@ require.config({
   }
 });
 
-require(['cs!modules/Editor'], function (Editor) {
-  var app = new Editor();
+require(['cs!app/Editor'], function (Editor) {
+  var editor = new Editor();
 });

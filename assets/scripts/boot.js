@@ -36276,7 +36276,7 @@ define("threejs", (function (global) {
 
 
 (function() {
-  define('cs!modules/elements/Background',['require','threejs'],function(require) {
+  define('cs!app/components/Background',['require','threejs'],function(require) {
     var Background, THREE;
     THREE = require('threejs');
     return Background = (function() {
@@ -37192,7 +37192,7 @@ define("vendors/three.js-extras/shaders/ConvolutionShader", function(){});
 
 
 (function() {
-  define('cs!modules/elements/PostFX',['require','threejs','vendors/three.js-extras/postprocessing/EffectComposer','vendors/three.js-extras/postprocessing/MaskPass','vendors/three.js-extras/postprocessing/BloomPass','vendors/three.js-extras/postprocessing/ShaderPass','vendors/three.js-extras/postprocessing/RenderPass','vendors/three.js-extras/postprocessing/FilmPass','vendors/three.js-extras/shaders/CopyShader','vendors/three.js-extras/shaders/FXAAShader','vendors/three.js-extras/shaders/FilmShader','vendors/three.js-extras/shaders/ConvolutionShader'],function(require) {
+  define('cs!app/components/PostFX',['require','threejs','vendors/three.js-extras/postprocessing/EffectComposer','vendors/three.js-extras/postprocessing/MaskPass','vendors/three.js-extras/postprocessing/BloomPass','vendors/three.js-extras/postprocessing/ShaderPass','vendors/three.js-extras/postprocessing/RenderPass','vendors/three.js-extras/postprocessing/FilmPass','vendors/three.js-extras/shaders/CopyShader','vendors/three.js-extras/shaders/FXAAShader','vendors/three.js-extras/shaders/FilmShader','vendors/three.js-extras/shaders/ConvolutionShader'],function(require) {
     var PostFX, THREE;
     THREE = require('threejs');
     require('vendors/three.js-extras/postprocessing/EffectComposer');
@@ -37485,7 +37485,7 @@ define("rng", (function (global) {
 
 
 (function() {
-  define('cs!modules/elements/Colors',['require','threejs'],function(require) {
+  define('cs!app/components/Colors',['require','threejs'],function(require) {
     var Colors, THREE, items, length;
     THREE = require('threejs');
     items = [new THREE.Color(0xc0ddde)];
@@ -37507,11 +37507,11 @@ define("rng", (function (global) {
 
 
 (function() {
-  define('cs!modules/elements/Circles',['require','threejs','rng','cs!modules/elements/Colors'],function(require) {
+  define('cs!app/elements/Circles',['require','threejs','rng','cs!app/components/Colors'],function(require) {
     var Circles, Colors, RNG, THREE;
     THREE = require('threejs');
     RNG = require('rng');
-    Colors = require('cs!modules/elements/Colors');
+    Colors = require('cs!app/components/Colors');
     return Circles = (function() {
       function Circles(scene, numItems, seed, radius, circleRadius, circleRadiusMax) {
         var i, _i, _ref;
@@ -37583,12 +37583,12 @@ define("rng", (function (global) {
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!modules/App',['require','threejs','cs!modules/elements/Background','cs!modules/elements/PostFX','cs!modules/elements/Circles'],function(require) {
+  define('cs!app/Main',['require','threejs','cs!app/components/Background','cs!app/components/PostFX','cs!app/elements/Circles'],function(require) {
     var App, Background, Circles, PostFX, THREE;
     THREE = require('threejs');
-    Background = require('cs!modules/elements/Background');
-    PostFX = require('cs!modules/elements/PostFX');
-    Circles = require('cs!modules/elements/Circles');
+    Background = require('cs!app/components/Background');
+    PostFX = require('cs!app/components/PostFX');
+    Circles = require('cs!app/elements/Circles');
     return App = (function() {
       function App() {
         this.animate = __bind(this.animate, this);
@@ -37712,8 +37712,8 @@ require.config({
   }
 });
 
-require(['cs!modules/App'], function (App) {
-  var app = new App();
+require(['cs!app/Main'], function (Main) {
+  var app = new Main();
 });
 
 define("boot", function(){});

@@ -18,8 +18,8 @@
 define (require) ->
   $ = require 'jquery'
 
-  tpl_timeline = require 'text!modules/templates/timeline.tpl.html'
-  EditorTimeline = require 'cs!modules/elements/EditorTimeline'
+  tpl_timeline = require 'text!app/templates/timeline.tpl.html'
+  EditorTimeline = require 'cs!app/components/EditorTimeline'
 
 
   class Editor

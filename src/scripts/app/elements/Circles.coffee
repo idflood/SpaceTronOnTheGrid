@@ -3,7 +3,7 @@ define (require) ->
 
   RNG = require 'rng'
 
-  Colors = require 'cs!modules/elements/Colors'
+  Colors = require 'cs!app/components/Colors'
 
   class Circles
     constructor: (@scene, @numItems, @seed, @radius = 80, @circleRadius = 20, @circleRadiusMax= 30) ->
