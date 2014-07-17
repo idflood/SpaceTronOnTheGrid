@@ -38016,6 +38016,14 @@ define("rng", (function (global) {
     RNG = require('rng');
     Colors = require('cs!app/components/Colors');
     return Circles = (function() {
+      Circles.defaults = {
+        numItems: 20,
+        seed: 12002,
+        radius: 80,
+        circleRadius: 20,
+        circleRadiusMax: 20
+      };
+
       function Circles(options) {
         var color, i, rndtype, size, x, y, _i, _ref;
         if (options == null) {
@@ -38023,11 +38031,11 @@ define("rng", (function (global) {
         }
         this.drawOutline = __bind(this.drawOutline, this);
         this.createCircle = __bind(this.createCircle, this);
-        this.numItems = options.numItems || 10;
-        this.seed = options.seed || 12001;
-        this.radius = options.radius || 80;
-        this.circleRadius = options.circleRadius || 20;
-        this.circleRadiusMax = options.circleRadiusMax || 30;
+        this.numItems = options.numItems || Circles.defaults.numItems;
+        this.seed = options.seed || Circles.defaults.seed;
+        this.radius = options.radius || Circles.defaults.radius;
+        this.circleRadius = options.circleRadius || Circles.defaults.circleRadius;
+        this.circleRadiusMax = options.circleRadiusMax || Circles.defaults.circleRadiusMax;
         this.rng = new RNG(this.seed);
         this.rngOutline = new RNG(this.seed);
         this.container = new THREE.Object3D();
@@ -38119,16 +38127,9 @@ define("rng", (function (global) {
 
       ElementFactory.elements = {
         Circles: {
-          options: {
-            numItems: 20,
-            seed: 12001,
-            radius: 80,
-            circleRadius: 20,
-            circleRadiusMax: 20
-          },
           create: function(options) {
             var defaults, item;
-            defaults = ElementFactory.elements.Circles.options;
+            defaults = Circles.defaults;
             options = extend(extend({}, defaults), options);
             item = new Circles(options);
             return item;

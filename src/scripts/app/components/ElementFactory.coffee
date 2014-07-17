@@ -10,15 +10,9 @@ define (require) ->
   class ElementFactory
     @elements:
       Circles:
-        options:
-          numItems: 20
-          seed: 12001
-          radius: 80
-          circleRadius: 20
-          circleRadiusMax: 20
         create: (options) ->
           # Assign default parameters if not defined
-          defaults = ElementFactory.elements.Circles.options
+          defaults = Circles.defaults
           options = extend (extend {}, defaults), options
 
           item = new Circles(options)

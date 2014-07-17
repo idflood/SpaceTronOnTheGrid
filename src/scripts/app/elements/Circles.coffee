@@ -6,12 +6,19 @@ define (require) ->
   Colors = require 'cs!app/components/Colors'
 
   class Circles
+    @defaults:
+      numItems: 20
+      seed: 12002
+      radius: 80
+      circleRadius: 20
+      circleRadiusMax: 20
+
     constructor: (options = {}) ->
-      @numItems = options.numItems || 10
-      @seed = options.seed || 12001
-      @radius = options.radius || 80
-      @circleRadius = options.circleRadius || 20
-      @circleRadiusMax = options.circleRadiusMax || 30
+      @numItems = options.numItems || Circles.defaults.numItems
+      @seed = options.seed || Circles.defaults.seed
+      @radius = options.radius || Circles.defaults.radius
+      @circleRadius = options.circleRadius || Circles.defaults.circleRadius
+      @circleRadiusMax = options.circleRadiusMax || Circles.defaults.circleRadiusMax
 
       @rng = new RNG(@seed)
       @rngOutline = new RNG(@seed)
