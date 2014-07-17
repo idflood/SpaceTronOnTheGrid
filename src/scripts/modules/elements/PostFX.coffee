@@ -21,9 +21,9 @@ define (require) ->
       @effectFXAA = new THREE.ShaderPass( THREE.FXAAShader )
       @effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight )
 
-      @bloom = new THREE.BloomPass(1.2)
+      @bloom = new THREE.BloomPass(1.5, 25, 4)
 
-      @filmShader = new THREE.FilmPass( 0.09, 0.0, 648, false )
+      @filmShader = new THREE.FilmPass( 0.12, 0.0, 648, false )
       @filmShader.renderToScreen = true
 
       @composer = new THREE.EffectComposer( @renderer )

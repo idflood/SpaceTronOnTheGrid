@@ -19251,23 +19251,26 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
     d3 = require('d3');
     tpl_timeline = require('text!modules/templates/timeline.tpl.html');
     return Editor = (function() {
+      var formatMinutes;
+
       function Editor() {
-        var $timeline, bar, bar_border, data, drag, dragOffset, dragmove, dragstart, dy, formatMinutes, height, key_size, keys, label_position_x, lineHeight, margin, properties, subGrp, svg, width, x, xAxis, xAxisGrid, xGrid;
+        var $timeline, height, margin, width, xAxis, xAxisGrid, xGrid;
         this.app = window.app;
         $timeline = $(tpl_timeline);
         $('body').append($timeline);
         margin = {
           top: 15,
           right: 20,
-          bottom: 30,
+          bottom: 0,
           left: 190
         };
         width = window.innerWidth - margin.left - margin.right;
         height = 270 - margin.top - margin.bottom;
-        lineHeight = 20;
-        label_position_x = -170;
-        data = [
+        this.lineHeight = 20;
+        this.label_position_x = -170;
+        this.data = [
           {
+            id: 'track1',
             label: "object 1",
             start: 15,
             end: 20,
@@ -19297,6 +19300,7 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
               }
             ]
           }, {
+            id: 'track2',
             label: "object 2",
             start: 60,
             end: 142,
@@ -19316,88 +19320,136 @@ define('text!modules/templates/timeline.tpl.html',[],function () { return '<div 
             ]
           }
         ];
-        x = d3.time.scale().range([0, width]);
-        x.domain([0, 240]);
-        formatMinutes = function(d) {
-          var hours, minutes, output, seconds;
-          hours = Math.floor(d / 3600);
-          minutes = Math.floor((d - (hours * 3600)) / 60);
-          seconds = d - (minutes * 60);
-          output = seconds + "s";
-          if (minutes) {
-            output = minutes + "m " + output;
-          }
-          if (hours) {
-            output = hours + "h " + output;
-          }
-          return output;
-        };
-        xAxis = d3.svg.axis().scale(x).orient("top").tickSize(-height, 0).tickFormat(formatMinutes);
-        svg = d3.select($timeline.get(0)).append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-        xAxisGrid = d3.svg.axis().scale(x).ticks(40).tickSize(-height, 0).tickFormat("").orient("top");
-        xGrid = svg.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(xAxisGrid);
-        svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxis);
-        dy = 10 + margin.top;
-        bar = svg.selectAll(".line-grp").data(data).enter().append('g').attr('class', 'line-grp').attr("transform", function(d, i) {
-          var numProperties, y;
-          numProperties = d.properties ? d.properties.length : 0;
-          y = dy;
-          console.log(numProperties + " / " + i);
-          dy += ((i + 1) + numProperties) * lineHeight;
-          return "translate(0," + y + ")";
-        });
+        this.x = d3.time.scale().range([0, width]);
+        this.x.domain([0, 240]);
+        xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(this.formatMinutes);
+        this.svg = d3.select($timeline.get(0)).append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        xAxisGrid = d3.svg.axis().scale(this.x).ticks(40).tickSize(-height, 0).tickFormat("").orient("top");
+        xGrid = this.svg.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(xAxisGrid);
+        this.svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxis);
+        this.dy = 10 + margin.top;
+        this.render();
+      }
+
+      Editor.prototype.render = function() {
+        var bar;
+        bar = this.renderLines();
+        this.renderProperties(bar);
+        return this.renderKeys();
+      };
+
+      Editor.prototype.renderLines = function() {
+        var bar, barEnter, bar_border, drag, dragOffset, dragmove, dragstart, self;
+        self = this;
         dragOffset = 0;
         dragstart = function(d) {
           var mouse, mouseX;
           mouse = d3.mouse(this);
           mouseX = mouse[0];
-          return dragOffset = x(d.start) - mouseX;
+          return dragOffset = self.x(d.start) - mouseX;
         };
         dragmove = function(d) {
-          var diff, dx, mouse;
+          var diff, dx, key, mouse, prop, _i, _j, _len, _len1, _ref, _ref1;
           mouse = d3.mouse(this);
-          dx = x.invert(mouse[0] + dragOffset);
+          dx = self.x.invert(mouse[0] + dragOffset);
           diff = dx - d.start;
-          d.start = d.start + diff;
-          d.end = d.end + diff;
-          return d3.select(this).attr('x', x(d.start));
+          d.start += diff;
+          d.end += diff;
+          _ref = d.properties;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            prop = _ref[_i];
+            _ref1 = prop.keys;
+            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+              key = _ref1[_j];
+              key.time += diff;
+            }
+          }
+          return self.render();
         };
         drag = d3.behavior.drag().origin(function(d) {
           return d;
         }).on("drag", dragmove).on("dragstart", dragstart);
         bar_border = 1;
-        bar.append("rect").attr("class", "bar").attr("y", 3).attr("height", 14).attr("x", function(d) {
-          return x(d.start) + bar_border;
+        bar = this.svg.selectAll(".line-grp").data(this.data, function(d) {
+          return d.id;
+        });
+        barEnter = bar.enter().append('g').attr('class', 'line-grp').attr("transform", function(d, i) {
+          var numProperties, y;
+          numProperties = d.properties ? d.properties.length : 0;
+          y = self.dy;
+          self.dy += ((i + 1) + numProperties) * self.lineHeight;
+          return "translate(0," + y + ")";
+        });
+        barEnter.append("rect").attr("class", "bar").attr("y", 3).attr("height", 14);
+        bar.selectAll('.bar').attr("x", function(d) {
+          return self.x(d.start) + bar_border;
         }).attr("width", function(d) {
-          return x(d.end - d.start) - bar_border;
+          return self.x(d.end - d.start) - bar_border;
         }).call(drag);
-        bar.append("text").attr("class", "line--label").attr("x", label_position_x).attr("y", 16).text(function(d) {
+        barEnter.append("text").attr("class", "line--label").attr("x", self.label_position_x).attr("y", 16).text(function(d) {
           return d.label;
         });
-        bar.append("line").attr("class", 'line--separator').attr("x1", -200).attr("x2", x(240 + 100)).attr("y1", lineHeight).attr("y2", lineHeight);
-        properties = bar.selectAll('.line--sub').data(function(d, i, j) {
+        barEnter.append("line").attr("class", 'line--separator').attr("x1", -200).attr("x2", self.x(240 + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
+        bar.exit().remove();
+        return bar;
+      };
+
+      Editor.prototype.renderProperties = function(bar) {
+        var propKey, propVal, self, subGrp;
+        self = this;
+        propVal = function(d, i) {
           return d.properties;
-        });
-        subGrp = properties.enter().append('g').attr("class", 'line--sub').attr("transform", function(d, i) {
+        };
+        propKey = function(d) {
+          return d.name;
+        };
+        self.properties = bar.selectAll('.line--sub').data(propVal, propKey);
+        subGrp = self.properties.enter().append('g').attr("class", 'line--sub').attr("transform", function(d, i) {
           var sub_height;
-          sub_height = (i + 1) * lineHeight;
+          sub_height = (i + 1) * self.lineHeight;
           return "translate(0," + sub_height + ")";
         });
-        subGrp.append('text').attr("class", "line--label line--label-small").attr("x", label_position_x).attr("y", 15).text(function(d) {
+        subGrp.append('text').attr("class", "line--label line--label-small").attr("x", self.label_position_x).attr("y", 15).text(function(d) {
           return d.name;
         });
-        keys = properties.selectAll('.key').data(function(d, i, j) {
+        return subGrp.append("line").attr("class", 'line--separator-secondary').attr("x1", -200).attr("x2", self.x(240 + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
+      };
+
+      Editor.prototype.renderKeys = function() {
+        var key_size, keys, propKey, propValue, self;
+        self = this;
+        propValue = function(d, i, j) {
           return d.keys;
-        });
-        keys.enter().append("line").attr("class", 'line--separator-secondary').attr("x1", -200).attr("x2", x(240 + 100)).attr("y1", lineHeight).attr("y2", lineHeight);
+        };
+        propKey = function(d, k) {
+          return k;
+        };
+        keys = this.properties.selectAll('.key').data(propValue, propKey);
         key_size = 6;
-        keys.enter().append('g').attr('class', 'key').attr('transform', function(d) {
-          var dx;
-          dx = x(d.time) + 3;
+        keys.enter().append('g').attr('class', 'key').append('g').attr('class', 'key__item').append('rect').attr('x', -3).attr('width', key_size).attr('height', key_size).attr('class', 'line--key').attr('transform', 'rotate(45)');
+        keys.selectAll('.key__item').attr('transform', function(d) {
+          var dx, dy;
+          dx = self.x(d.time) + 3;
           dy = 9;
           return "translate(" + dx + "," + dy + ")";
-        }).append('rect').attr('x', -3).attr('width', key_size).attr('height', key_size).attr('class', 'line--key').attr('transform', 'rotate(45)');
-      }
+        });
+        return keys.exit().remove();
+      };
+
+      formatMinutes = function(d) {
+        var hours, minutes, output, seconds;
+        hours = Math.floor(d / 3600);
+        minutes = Math.floor((d - (hours * 3600)) / 60);
+        seconds = d - (minutes * 60);
+        output = seconds + "s";
+        if (minutes) {
+          output = minutes + "m " + output;
+        }
+        if (hours) {
+          output = hours + "h " + output;
+        }
+        return output;
+      };
 
       return Editor;
 
