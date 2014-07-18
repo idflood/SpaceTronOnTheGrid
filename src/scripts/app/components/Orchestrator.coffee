@@ -37,6 +37,16 @@ define (require) ->
               # Take the value of the first key as initial value.
               # @todo: update this when the value of the first key change. (when rebuilding the timeline, simply delete item.values before item.timeline)
               item.values[property.name] = property.keys[0].val
+            else if property.default
+              item.values[property.name] = property.default
+            else
+              item.values[property.name] = 0
+          console.log item
+
+        # Handle adding keys to previously emptry properties
+        #if item.isDirty && item.values
+        #  for key, prop of item.properties
+        #    if !item.values[key]
 
 
         # Create the timeline if needed
@@ -46,6 +56,8 @@ define (require) ->
           item.isDirty = true
 
         if item.timeline and item.isDirty
+          #console.log "dirty timeline"
+          #console.log item
           item.isDirty = false
           item.timeline.clear()
 
@@ -65,10 +77,11 @@ define (require) ->
               if key_index < property.keys.length - 1
                 next_key = property.keys[key_index + 1]
                 tween_duration = next_key.time - key.time
-                #console.log "add tween: " + propName
-                #console.log {duration: tween_duration, val: tween_value, time: key.time}
+
                 val = {}
                 val[propName] = next_key.val
+                #console.log "add tween: " + propName
+                #console.log {values: item.values, duration: tween_duration, val: val, time: key.time}
                 tween = TweenLite.to(item.values, tween_duration, val)
                 propertyTimeline.add(tween, key.time)
             item.timeline.add(propertyTimeline)

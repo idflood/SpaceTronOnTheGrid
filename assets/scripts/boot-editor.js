@@ -19500,7 +19500,10 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           });
         };
         subGrp.append('rect').attr('class', 'click-handler click-handler--property').attr('x', 0).attr('y', 0).attr('width', self.x(self.timer.totalDuration + 100)).attr('height', self.lineHeight).on('dblclick', function(d) {
-          var def, dx, mouse, newKey;
+          var def, dx, lineObject, lineValue, mouse, newKey;
+          console.log(d);
+          lineObject = this.parentNode.parentNode;
+          lineValue = d3.select(lineObject).datum();
           def = d["default"] ? d["default"] : 0;
           mouse = d3.mouse(this);
           dx = self.x.invert(mouse[0]);
@@ -19510,7 +19513,8 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
             val: def
           };
           d.keys.push(newKey);
-          return d.keys = sortKeys(d.keys);
+          d.keys = sortKeys(d.keys);
+          return lineValue.isDirty = true;
         });
         subGrp.append('g').attr('class', 'keys--wrapper');
         subGrp.append("rect").attr("class", "graph-mask").attr("x", -self.margin.left).attr("y", 1).attr("width", self.margin.left).attr("height", self.lineHeight - 2);
@@ -19531,7 +19535,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         dragmove = function(d) {
           var currentDomainStart, dx, lineData, lineObject, mouse, propertyData, propertyObject;
           propertyObject = this.parentNode.parentNode;
-          lineObject = propertyObject.parentNode;
+          lineObject = propertyObject.parentNode.parentNode;
           propertyData = d3.select(propertyObject).datum();
           lineData = d3.select(lineObject).datum();
           currentDomainStart = self.x.domain()[0];

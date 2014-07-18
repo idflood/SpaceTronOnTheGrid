@@ -46097,8 +46097,13 @@ define("TimelineMax", ["TweenMax"], (function (global) {
               property = _ref1[_j];
               if (property.keys.length) {
                 item.values[property.name] = property.keys[0].val;
+              } else if (property["default"]) {
+                item.values[property.name] = property["default"];
+              } else {
+                item.values[property.name] = 0;
               }
             }
+            console.log(item);
           }
           if (!item.timeline) {
             item.timeline = new TimelineMax();

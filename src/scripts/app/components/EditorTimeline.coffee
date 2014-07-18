@@ -333,14 +333,23 @@ define (require) ->
         .attr('width', self.x(self.timer.totalDuration + 100))
         .attr('height', self.lineHeight)
         .on 'dblclick', (d) ->
+          console.log d
+          lineObject = this.parentNode.parentNode
+          lineValue = d3.select(lineObject).datum()
+          #console.log lineObject
+          #console.log lineValue
           def = if d.default then d.default else 0
           mouse = d3.mouse(this)
           dx = self.x.invert(mouse[0])
           dx = dx.getTime() / 1000
           newKey = {time: dx, val: def}
+          #console.log "creating a key"
+          #console.log newKey
           d.keys.push(newKey)
           # Sort the keys for tweens creation
           d.keys = sortKeys(d.keys)
+
+          lineValue.isDirty = true
 
       subGrp.append('g').attr('class','keys--wrapper')
 
@@ -372,7 +381,7 @@ define (require) ->
 
       dragmove = (d) ->
         propertyObject = this.parentNode.parentNode
-        lineObject = propertyObject.parentNode
+        lineObject = propertyObject.parentNode.parentNode
         propertyData = d3.select(propertyObject).datum()
         lineData = d3.select(lineObject).datum()
 
@@ -384,7 +393,7 @@ define (require) ->
 
         #console.log propertyData
         propertyData.keys = sortKeys(propertyData.keys)
-
+        #console.log lineData
         lineData.isDirty = true
 
       drag = d3.behavior.drag()
