@@ -151,19 +151,9 @@ define (require) ->
 
     renderLines: () ->
       self = this
-      dragOffset = 0
-      dragstart = (d) ->
-        mouse = d3.mouse(this)
-        mouseX = mouse[0]
-        dragOffset = self.x(d.start) * 1000 - mouseX
-        #dragOffset = mouseX
 
       dragmove = (d) ->
-        mouse = d3.mouse(this)
-        dx = self.x.invert(mouse[0] + dragOffset)
-        dx = dx.getTime() / 1000
-        dx = Math.max(0, dx)
-
+        dx = self.x.invert(d3.event.x).getTime() / 1000
         diff = (dx - d.start)
         d.start += diff
         d.end += diff
@@ -176,7 +166,9 @@ define (require) ->
         #self.render()
 
       drag = d3.behavior.drag()
-        .origin((d) -> return d;)
+        .origin((d) ->
+          t = d3.select(this)
+          return {x: t.attr('x'), y: t.attr('y')})
         .on("drag", dragmove)
         .on("dragstart", dragstart)
 
@@ -203,6 +195,7 @@ define (require) ->
         .attr("width", (d) ->
           #console.log (self.x(d.end) - self.x(d.start)))
           return Math.max(0, (self.x(d.end) - self.x(d.start)) * 1000 - bar_border)
+        )
         #.attr("width", (d) -> return self.x((d.end - d.start) * 1000) - bar_border)
         .call(drag)
 
@@ -271,10 +264,13 @@ define (require) ->
       self = this
 
       dragmove = (d) ->
+        currentDomainStart = self.x.domain()[0]
+        #offsetX = self.x.invert(d3.event.dx).getTime()
         mouse = d3.mouse(this)
         dx = self.x.invert(mouse[0])
         dx = dx.getTime()
-        d.time += dx / 1000
+        d.time += dx / 1000 - currentDomainStart / 1000
+        #d.time += offsetX / 1000
         #self.render()
 
       drag = d3.behavior.drag()

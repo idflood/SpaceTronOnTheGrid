@@ -41,7 +41,7 @@ define (require) ->
 
     update: (seconds, values) ->
       # todo.
-      @container.position.x = values.percent
+      @container.position.x = values.progression
 
     getRandomPosition: () ->
       return @rng.random(-@radius, @radius)

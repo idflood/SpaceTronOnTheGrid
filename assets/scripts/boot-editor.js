@@ -19349,21 +19349,11 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       };
 
       EditorTimeline.prototype.renderLines = function() {
-        var bar, barEnter, bar_border, drag, dragOffset, dragmove, dragstart, self;
+        var bar, barEnter, bar_border, drag, dragmove, self;
         self = this;
-        dragOffset = 0;
-        dragstart = function(d) {
-          var mouse, mouseX;
-          mouse = d3.mouse(this);
-          mouseX = mouse[0];
-          return dragOffset = self.x(d.start) * 1000 - mouseX;
-        };
         dragmove = function(d) {
-          var diff, dx, key, mouse, prop, _i, _j, _len, _len1, _ref, _ref1;
-          mouse = d3.mouse(this);
-          dx = self.x.invert(mouse[0] + dragOffset);
-          dx = dx.getTime() / 1000;
-          dx = Math.max(0, dx);
+          var diff, dx, key, prop, _i, _j, _len, _len1, _ref, _ref1;
+          dx = self.x.invert(d3.event.x).getTime() / 1000;
           diff = dx - d.start;
           d.start += diff;
           d.end += diff;
@@ -19379,7 +19369,12 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return d.isDirty = true;
         };
         drag = d3.behavior.drag().origin(function(d) {
-          return d;
+          var t;
+          t = d3.select(this);
+          return {
+            x: t.attr('x'),
+            y: t.attr('y')
+          };
         }).on("drag", dragmove).on("dragstart", dragstart);
         bar_border = 1;
         bar = this.svgContainer.selectAll(".line-grp").data(this.app.data, function(d) {
@@ -19396,7 +19391,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         bar.selectAll('.bar').attr("x", function(d) {
           return self.x(d.start * 1000) + bar_border;
         }).attr("width", function(d) {
-          return Math.max(0, (self.x(d.end) - self.x(d.start)) * 1000) - bar_border;
+          return Math.max(0, (self.x(d.end) - self.x(d.start)) * 1000 - bar_border);
         }).call(drag);
         barEnter.append("text").attr("class", "line--label").attr("x", self.label_position_x).attr("y", 16).text(function(d) {
           return d.label;
@@ -19445,11 +19440,12 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         var drag, dragmove, key_size, keys, propKey, propValue, self;
         self = this;
         dragmove = function(d) {
-          var dx, mouse;
+          var currentDomainStart, dx, mouse;
+          currentDomainStart = self.x.domain()[0];
           mouse = d3.mouse(this);
           dx = self.x.invert(mouse[0]);
           dx = dx.getTime();
-          return d.time += dx / 1000;
+          return d.time += dx / 1000 - currentDomainStart / 1000;
         };
         drag = d3.behavior.drag().origin(function(d) {
           return d;

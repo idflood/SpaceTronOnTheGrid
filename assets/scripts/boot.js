@@ -38055,7 +38055,7 @@ define("rng", (function (global) {
       }
 
       Circles.prototype.update = function(seconds, values) {
-        return this.container.position.x = values.percent;
+        return this.container.position.x = values.progression;
       };
 
       Circles.prototype.getRandomPosition = function() {
@@ -46218,7 +46218,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
             },
             properties: [
               {
-                name: 'percent',
+                name: 'progression',
                 keys: [
                   {
                     time: 2,
