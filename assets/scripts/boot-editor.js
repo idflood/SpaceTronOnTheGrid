@@ -19461,13 +19461,14 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           });
         };
         subGrp.append('rect').attr('class', 'click-handler click-handler--property').attr('x', 0).attr('y', 0).attr('width', self.x(self.timer.totalDuration + 100)).attr('height', self.lineHeight).on('dblclick', function(d) {
-          var dx, mouse, newKey;
+          var def, dx, mouse, newKey;
+          def = d["default"] ? d["default"] : 0;
           mouse = d3.mouse(this);
           dx = self.x.invert(mouse[0]);
           dx = dx.getTime() / 1000;
           newKey = {
             time: dx,
-            val: 42
+            val: def
           };
           d.keys.push(newKey);
           return d.keys = sortKeys(d.keys);

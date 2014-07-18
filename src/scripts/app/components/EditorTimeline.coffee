@@ -286,10 +286,11 @@ define (require) ->
         .attr('width', self.x(self.timer.totalDuration + 100))
         .attr('height', self.lineHeight)
         .on 'dblclick', (d) ->
+          def = if d.default then d.default else 0
           mouse = d3.mouse(this)
           dx = self.x.invert(mouse[0])
           dx = dx.getTime() / 1000
-          newKey = {time: dx, val: 42}
+          newKey = {time: dx, val: def}
           d.keys.push(newKey)
           # Sort the keys for tweens creation
           d.keys = sortKeys(d.keys)
@@ -353,6 +354,7 @@ define (require) ->
         lineObject = propertyObject.parentNode
         lineData = d3.select(lineObject).datum()
         #propertyData = d3.select(propertyObject).datum()
+        #console.log propertyData
         #propertyName = propertyData.name
         if window.gui then window.gui.destroy()
         gui = new dat.GUI()
