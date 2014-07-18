@@ -56,7 +56,7 @@ define (require) ->
             for key, key_index in property.keys
               if key_index == 0
                 # Add a tween before start for initial value
-                tween_time = -1
+                tween_time = Math.min(-1, key.time - 1)
                 tween_duration = key.time - tween_time
                 val = {}
                 val[propName] = key.val
