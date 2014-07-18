@@ -19514,6 +19514,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           };
           d.keys.push(newKey);
           d.keys = sortKeys(d.keys);
+          console.log(d.keys);
           return lineValue.isDirty = true;
         });
         subGrp.append('g').attr('class', 'keys--wrapper');
@@ -19544,6 +19545,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           dx = dx.getTime();
           d.time += dx / 1000 - currentDomainStart / 1000;
           propertyData.keys = sortKeys(propertyData.keys);
+          console.log(lineData);
           return lineData.isDirty = true;
         };
         drag = d3.behavior.drag().origin(function(d) {
@@ -19553,13 +19555,13 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return d.keys;
         };
         propKey = function(d, k) {
-          return k;
+          return d.time;
         };
         keys = this.properties.select('.keys--wrapper').selectAll('.key').data(propValue, propKey);
         selectKey = function(d) {
           var controller, gui, lineData, lineObject, propertyObject;
           propertyObject = this.parentNode.parentNode;
-          lineObject = propertyObject.parentNode;
+          lineObject = propertyObject.parentNode.parentNode;
           lineData = d3.select(lineObject).datum();
           if (window.gui) {
             window.gui.destroy();
@@ -19651,7 +19653,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
               start: current_time,
               end: current_time + 2,
               options: {},
-              properties: window.ElementFactory.elements[element_name].default_properties()
+              properties: window.ElementFactory.elements[element_name].default_properties(current_time)
             };
             window.app.data.push(data);
             return console.log(window.app.data);

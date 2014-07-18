@@ -62,7 +62,7 @@ define (require) ->
             end: current_time + 2
             options: {}
             #options: window.ElementFactory.elements[element_name].default_attributes()
-            properties: window.ElementFactory.elements[element_name].default_properties()
+            properties: window.ElementFactory.elements[element_name].default_properties(current_time)
           window.app.data.push(data)
           console.log window.app.data
 

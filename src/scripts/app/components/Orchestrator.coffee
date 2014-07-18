@@ -41,7 +41,7 @@ define (require) ->
               item.values[property.name] = property.default
             else
               item.values[property.name] = 0
-          console.log item
+          #console.log item
 
         # Handle adding keys to previously emptry properties
         #if item.isDirty && item.values
@@ -52,7 +52,7 @@ define (require) ->
         # Create the timeline if needed
         if !item.timeline
           item.timeline = new TimelineMax()
-          @mainTimeline.add(item.timeline)
+          @mainTimeline.add(item.timeline, 0)
           item.isDirty = true
 
         if item.timeline and item.isDirty
@@ -65,6 +65,7 @@ define (require) ->
             propertyTimeline = new TimelineMax()
             propName = property.name
 
+
             for key, key_index in property.keys
               if key_index == 0
                 # Add a tween before start for initial value
@@ -74,17 +75,17 @@ define (require) ->
                 val[propName] = key.val
                 tween = TweenLite.to(item.values, tween_duration, val)
                 propertyTimeline.add(tween, tween_time)
+
               if key_index < property.keys.length - 1
                 next_key = property.keys[key_index + 1]
                 tween_duration = next_key.time - key.time
 
                 val = {}
                 val[propName] = next_key.val
-                #console.log "add tween: " + propName
-                #console.log {values: item.values, duration: tween_duration, val: val, time: key.time}
                 tween = TweenLite.to(item.values, tween_duration, val)
                 propertyTimeline.add(tween, key.time)
-            item.timeline.add(propertyTimeline)
+
+            item.timeline.add(propertyTimeline, 0)
 
           # force main timeline to refresh
           seconds = seconds - 0.0000001

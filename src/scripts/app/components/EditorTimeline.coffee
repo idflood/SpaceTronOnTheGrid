@@ -193,7 +193,6 @@ define (require) ->
           controller.onChange (v) -> d.isDirtyObject = true
         window.gui = gui
 
-
       dragmove = (d) ->
         dx = self.x.invert(d3.event.x).getTime() / 1000
         diff = (dx - d.start)
@@ -348,6 +347,7 @@ define (require) ->
           d.keys.push(newKey)
           # Sort the keys for tweens creation
           d.keys = sortKeys(d.keys)
+          console.log d.keys
 
           lineValue.isDirty = true
 
@@ -393,7 +393,7 @@ define (require) ->
 
         #console.log propertyData
         propertyData.keys = sortKeys(propertyData.keys)
-        #console.log lineData
+        console.log lineData
         lineData.isDirty = true
 
       drag = d3.behavior.drag()
@@ -402,13 +402,15 @@ define (require) ->
 
       propValue = (d,i,j) -> d.keys
       propKey = (d, k) ->
-        return k
+        #return k
+        return d.time
       keys = @properties.select('.keys--wrapper').selectAll('.key').data(propValue, propKey)
 
       selectKey = (d) ->
         propertyObject = this.parentNode.parentNode
-        lineObject = propertyObject.parentNode
+        lineObject = propertyObject.parentNode.parentNode
         lineData = d3.select(lineObject).datum()
+        #console.log lineData
         #propertyData = d3.select(propertyObject).datum()
         #console.log propertyData
         #propertyName = propertyData.name
@@ -417,7 +419,6 @@ define (require) ->
         controller = gui.add(d, "val")
         controller.onChange (v) -> lineData.isDirty = true
         window.gui = gui
-
 
 
       key_size = 6

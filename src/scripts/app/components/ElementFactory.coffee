@@ -11,7 +11,7 @@ define (require) ->
     @elements:
       Circles:
         default_attributes: () -> extend({}, Circles.defaults)
-        default_properties: () ->
+        default_properties: (time = 0) ->
           return [
             {name: "progression", default: 1, keys: []}
           ]

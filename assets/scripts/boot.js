@@ -38134,7 +38134,10 @@ define("rng", (function (global) {
           default_attributes: function() {
             return extend({}, Circles.defaults);
           },
-          default_properties: function() {
+          default_properties: function(time) {
+            if (time == null) {
+              time = 0;
+            }
             return [
               {
                 name: "progression",
@@ -46103,11 +46106,10 @@ define("TimelineMax", ["TweenMax"], (function (global) {
                 item.values[property.name] = 0;
               }
             }
-            console.log(item);
           }
           if (!item.timeline) {
             item.timeline = new TimelineMax();
-            this.mainTimeline.add(item.timeline);
+            this.mainTimeline.add(item.timeline, 0);
             item.isDirty = true;
           }
           if (item.timeline && item.isDirty) {
@@ -46138,7 +46140,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
                   propertyTimeline.add(tween, key.time);
                 }
               }
-              item.timeline.add(propertyTimeline);
+              item.timeline.add(propertyTimeline, 0);
             }
             seconds = seconds - 0.0000001;
           }
