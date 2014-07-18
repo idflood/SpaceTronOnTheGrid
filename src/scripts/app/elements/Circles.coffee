@@ -41,7 +41,8 @@ define (require) ->
 
     update: (seconds, values) ->
       # todo.
-      @container.position.x = values.progression
+      if values.progression != undefined
+        @container.position.x = values.progression
 
     getRandomPosition: () ->
       return @rng.random(-@radius, @radius)

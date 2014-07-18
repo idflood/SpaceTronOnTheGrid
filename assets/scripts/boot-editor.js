@@ -10008,7 +10008,7 @@ define('text',['module'], function (module) {
 });
 
 
-define('text!app/templates/timeline.tpl.html',[],function () { return '<div class="editor__time">\n  <div class="editor__menu">\n    <a href="#" class="menu-item" data-action="export">Export</a>\n  </div>\n  <div class="editor__time-controls controls">\n    <a href="#" class="control control--first icon-first"></a>\n    <a href="#" class="control control--play-pause icon-play"></a>\n    <a href="#" class="control control--last icon-last"></a>\n  </div>\n  <div class="editor__time-header">\n\n  </div>\n  <div class="editor__time-main">\n\n  </div>\n</div>\n';});
+define('text!app/templates/timeline.tpl.html',[],function () { return '<div class="editor__time">\n  <div class="editor__menu">\n    <span class="menu-item">\n      Add\n      <div class="submenu submenu--add"></div>\n    </span>\n    <a href="#" class="menu-item" data-action="export">Export</a>\n  </div>\n  <div class="editor__time-controls controls">\n    <a href="#" class="control control--first icon-first"></a>\n    <a href="#" class="control control--play-pause icon-play"></a>\n    <a href="#" class="control control--last icon-last"></a>\n  </div>\n  <div class="editor__time-header">\n\n  </div>\n  <div class="editor__time-main">\n\n  </div>\n</div>\n';});
 
 !function() {
   var d3 = {
@@ -19532,7 +19532,45 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.timeline = new EditorTimeline();
         this.initControls();
         this.initExport();
+        this.initAdd();
       }
+
+      Editor.prototype.initAdd = function() {
+        var $container, $link, element, element_name, elements;
+        $container = this.$timeline.find('.submenu--add');
+        elements = window.ElementFactory.elements;
+        for (element_name in elements) {
+          element = elements[element_name];
+          $link = $('<a href="#" data-key="' + element_name + '">' + element_name + '</a>');
+          $container.append($link);
+        }
+        return $container.find('a').click(function(e) {
+          var all_data, current_time, data, id, label, next_id;
+          e.preventDefault();
+          element_name = $(this).data('key');
+          if (ElementFactory.elements[element_name]) {
+            all_data = window.app.data;
+            next_id = all_data.length + 1;
+            id = "item" + next_id;
+            label = element_name + " " + next_id;
+            current_time = window.app.timer.time[0] / 1000;
+            data = {
+              isDirty: true,
+              id: id,
+              label: label,
+              type: element_name,
+              start: current_time,
+              end: current_time + 2,
+              options: {
+                numItems: 50
+              },
+              properties: window.ElementFactory.elements[element_name].default_properties()
+            };
+            window.app.data.push(data);
+            return console.log(window.app.data);
+          }
+        });
+      };
 
       Editor.prototype.initExport = function() {
         var copyAndClean;

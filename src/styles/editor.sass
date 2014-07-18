@@ -9,16 +9,38 @@ $menu_height: 25px
   padding: 0 20px
   background: #111
 
+.menu-item,
 a.menu-item
+  position: relative
   display: inline-block
   height: $menu_height
+  margin-right: 20px
   color: #eee
   font-size: 11px
   vertical-align: middle
   text-decoration: none
-
+  cursor: pointer
   &:hover
     color: #fff
+
+.submenu
+  display: none
+  position: absolute
+  left: -10px
+  min-width: 120px
+  bottom: $menu_height
+  padding-bottom: 5px
+  background: #111
+  border: 1px solid #333
+
+  a
+    display: block
+    padding: 0 10px
+    text-decoration: none
+    color: #eee !important
+
+.menu-item:hover > .submenu
+  display: block
 
 .controls
   position: absolute

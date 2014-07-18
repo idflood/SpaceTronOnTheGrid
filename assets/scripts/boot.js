@@ -38055,7 +38055,9 @@ define("rng", (function (global) {
       }
 
       Circles.prototype.update = function(seconds, values) {
-        return this.container.position.x = values.progression;
+        if (values.progression !== void 0) {
+          return this.container.position.x = values.progression;
+        }
       };
 
       Circles.prototype.getRandomPosition = function() {
@@ -38124,11 +38126,20 @@ define("rng", (function (global) {
       }
       return object;
     };
-    return ElementFactory = (function() {
+    ElementFactory = (function() {
       function ElementFactory() {}
 
       ElementFactory.elements = {
         Circles: {
+          default_properties: function() {
+            return [
+              {
+                name: "progression",
+                "default": 1,
+                keys: []
+              }
+            ];
+          },
           create: function(options) {
             var defaults, item;
             defaults = Circles.defaults;
@@ -38154,6 +38165,7 @@ define("rng", (function (global) {
       return ElementFactory;
 
     })();
+    return window.ElementFactory = ElementFactory;
   });
 
 }).call(this);
@@ -46080,7 +46092,9 @@ define("TimelineMax", ["TweenMax"], (function (global) {
             _ref1 = item.properties;
             for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
               property = _ref1[_j];
-              item.values[property.name] = property.keys[0].val;
+              if (property.keys.length) {
+                item.values[property.name] = property.keys[0].val;
+              }
             }
           }
           if (!item.timeline) {

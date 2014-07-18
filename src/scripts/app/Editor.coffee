@@ -33,6 +33,37 @@ define (require) ->
       @timeline = new EditorTimeline()
       @initControls()
       @initExport()
+      @initAdd()
+
+    initAdd: () ->
+      $container = @$timeline.find('.submenu--add')
+      elements = window.ElementFactory.elements
+
+      for element_name, element of elements
+        # body...
+        $link = $('<a href="#" data-key="' + element_name + '">' + element_name + '</a>')
+        $container.append($link)
+
+      $container.find('a').click (e) ->
+        e.preventDefault()
+        element_name = $(this).data('key')
+        if ElementFactory.elements[element_name]
+          all_data = window.app.data
+          next_id = all_data.length + 1
+          id = "item" + next_id
+          label = element_name + " " + next_id
+          current_time = window.app.timer.time[0] / 1000
+          data =
+            isDirty: true
+            id: id
+            label: label
+            type: element_name
+            start: current_time
+            end: current_time + 2
+            options: {numItems: 50}
+            properties: window.ElementFactory.elements[element_name].default_properties()
+          window.app.data.push(data)
+          console.log window.app.data
 
     initExport: () ->
       copyAndClean = (source) ->

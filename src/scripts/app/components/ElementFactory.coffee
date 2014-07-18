@@ -10,11 +10,14 @@ define (require) ->
   class ElementFactory
     @elements:
       Circles:
+        default_properties: () ->
+          return [
+            {name: "progression", default: 1, keys: []}
+          ]
         create: (options) ->
           # Assign default parameters if not defined
           defaults = Circles.defaults
           options = extend (extend {}, defaults), options
-
           item = new Circles(options)
           return item
 
@@ -27,3 +30,5 @@ define (require) ->
       console.log("will create a " + itemName)
       console.log data
       return item.create(data)
+
+  window.ElementFactory = ElementFactory

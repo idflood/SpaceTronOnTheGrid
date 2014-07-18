@@ -33,9 +33,10 @@ define (require) ->
           #item.isDirty = true
           #if item.values && item.isDirty
           for property in item.properties
-            # Take the value of the first key as initial value.
-            # @todo: update this when the value of the first key change. (when rebuilding the timeline, simply delete item.values before item.timeline)
-            item.values[property.name] = property.keys[0].val
+            if property.keys.length
+              # Take the value of the first key as initial value.
+              # @todo: update this when the value of the first key change. (when rebuilding the timeline, simply delete item.values before item.timeline)
+              item.values[property.name] = property.keys[0].val
 
 
         # Create the timeline if needed
