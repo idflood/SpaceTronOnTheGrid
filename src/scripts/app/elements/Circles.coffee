@@ -1,9 +1,11 @@
 define (require) ->
   THREE = require 'threejs'
-
   RNG = require 'rng'
 
   Colors = require 'cs!app/components/Colors'
+  AnimatedCircle = require 'cs!app/elements/AnimatedCircle'
+
+  TimelineMax = require 'TimelineMax'
 
   class Circles
     @defaults:
@@ -20,29 +22,57 @@ define (require) ->
       @circleRadius = options.circleRadius || Circles.defaults.circleRadius
       @circleRadiusMax = options.circleRadiusMax || Circles.defaults.circleRadiusMax
 
+      @timeline = new TimelineMax()
       @rng = new RNG(@seed)
+      @rngAnimation = new RNG(@seed + "lorem")
       @rngOutline = new RNG(@seed)
       @container = new THREE.Object3D()
+      @totalDuration = 0
+      @items = []
 
       #@blackMaterial = new THREE.MeshBasicMaterial({color: 0x7ed2f1, transparent: true, depthWrite: false, depthTest: false})
       #@blackMaterial.blending = THREE.AdditiveBlending
 
-      for i in [0..@numItems]
+      for i in [0..@numItems - 1]
         color = Colors.get(@rng.random(0, 1000))
+        fillColor = color.clone().multiplyScalar(@rng.random(0.3, 0.5))
         rndtype = @rng.random(0, 1000) / 1000
         size = @rng.random(@circleRadius, @circleRadiusMax)
         x = @getRandomPosition()
         y = @getRandomPosition()
-
-        if rndtype < 0.8
-          @drawOutline(x, y, size, color)
-        if rndtype > 0.5
-          @createCircle(x, y, size, color)
+        delay = @rngAnimation.random(0, 2400) / 1000
+        duration = @rngAnimation.random(600, 800) / 1000
+        border_radius = @rngOutline.exponential()
+        draw_outline = if rndtype < 0.8 then true else false
+        draw_circle = if rndtype > 0.5 then true else false
+        item = new AnimatedCircle({
+          size: size,
+          outlineWidth: border_radius,
+          drawOutline: draw_outline,
+          drawCircle: draw_circle,
+          color: color,
+          fillColor: fillColor,
+          delay: delay,
+          duration: duration
+          }, {
+            x: x,
+            y: y
+            })
+        @container.add(item.container)
+        @timeline.add(item.timeline, 0)
+        @items.push(item)
+        #@drawOutline(x, y, size, color)
+        #@createCircle(x, y, size, color)
+      @totalDuration = @timeline.duration()
 
     update: (seconds, values) ->
       # todo.
       if values.progression != undefined
-        @container.position.x = values.progression
+        #@container.position.x = values.progression
+        progression = values.progression / 2
+        @timeline.seek(@totalDuration * progression)
+        for item in @items
+          item.update(seconds, values.progression)
 
     getRandomPosition: () ->
       return @rng.random(-@radius, @radius)
@@ -51,24 +81,10 @@ define (require) ->
       #return x
 
     createCircle: (x, y, size, color) =>
-      color = color.clone().multiplyScalar(@rng.random(0.3, 0.5))
-      material = new THREE.MeshBasicMaterial({color: color, transparent: true, depthWrite: false, depthTest: false})
-      material.blending = THREE.AdditiveBlending
 
-      numSegments = parseInt(size / 1.5, 10) + 4
-      object = new THREE.Mesh( new THREE.CircleGeometry( size, numSegments, 0, Math.PI * 2 ), material )
-      #object = new THREE.Mesh( new THREE.BoxGeometry(30, 30, 30 , 2, 2, 2), material )
-      object.position.set( x, y, 0 )
-      #object.rotation.set(Math.PI / -2, 0, 0)
-      @container.add( object )
 
     drawOutline: (x, y, size, color) =>
-      borderRadius = @rngOutline.exponential()
-      material = new THREE.MeshBasicMaterial({color: color, transparent: true, depthWrite: false, depthTest: false})
-      material.blending = THREE.AdditiveBlending
-      object = new THREE.Mesh( new THREE.RingGeometry( size - 1, size + borderRadius, 50, 1, 0, Math.PI * 2 ), material )
-      object.position.set(x, y, 0 )
-      @container.add( object )
+
 
     destroy: () ->
       # clean up...

@@ -38006,176 +38006,6 @@ define("rng", (function (global) {
 
 }).call(this);
 
-
-(function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
-  define('cs!app/elements/Circles',['require','threejs','rng','cs!app/components/Colors'],function(require) {
-    var Circles, Colors, RNG, THREE;
-    THREE = require('threejs');
-    RNG = require('rng');
-    Colors = require('cs!app/components/Colors');
-    return Circles = (function() {
-      Circles.defaults = {
-        numItems: 20,
-        seed: 12002,
-        radius: 80,
-        circleRadius: 20,
-        circleRadiusMax: 20
-      };
-
-      function Circles(options) {
-        var color, i, rndtype, size, x, y, _i, _ref;
-        if (options == null) {
-          options = {};
-        }
-        this.drawOutline = __bind(this.drawOutline, this);
-        this.createCircle = __bind(this.createCircle, this);
-        this.numItems = options.numItems || Circles.defaults.numItems;
-        this.seed = options.seed || Circles.defaults.seed;
-        this.radius = options.radius || Circles.defaults.radius;
-        this.circleRadius = options.circleRadius || Circles.defaults.circleRadius;
-        this.circleRadiusMax = options.circleRadiusMax || Circles.defaults.circleRadiusMax;
-        this.rng = new RNG(this.seed);
-        this.rngOutline = new RNG(this.seed);
-        this.container = new THREE.Object3D();
-        for (i = _i = 0, _ref = this.numItems; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-          color = Colors.get(this.rng.random(0, 1000));
-          rndtype = this.rng.random(0, 1000) / 1000;
-          size = this.rng.random(this.circleRadius, this.circleRadiusMax);
-          x = this.getRandomPosition();
-          y = this.getRandomPosition();
-          if (rndtype < 0.8) {
-            this.drawOutline(x, y, size, color);
-          }
-          if (rndtype > 0.5) {
-            this.createCircle(x, y, size, color);
-          }
-        }
-      }
-
-      Circles.prototype.update = function(seconds, values) {
-        if (values.progression !== void 0) {
-          return this.container.position.x = values.progression;
-        }
-      };
-
-      Circles.prototype.getRandomPosition = function() {
-        return this.rng.random(-this.radius, this.radius);
-      };
-
-      Circles.prototype.createCircle = function(x, y, size, color) {
-        var material, numSegments, object;
-        color = color.clone().multiplyScalar(this.rng.random(0.3, 0.5));
-        material = new THREE.MeshBasicMaterial({
-          color: color,
-          transparent: true,
-          depthWrite: false,
-          depthTest: false
-        });
-        material.blending = THREE.AdditiveBlending;
-        numSegments = parseInt(size / 1.5, 10) + 4;
-        object = new THREE.Mesh(new THREE.CircleGeometry(size, numSegments, 0, Math.PI * 2), material);
-        object.position.set(x, y, 0);
-        return this.container.add(object);
-      };
-
-      Circles.prototype.drawOutline = function(x, y, size, color) {
-        var borderRadius, material, object;
-        borderRadius = this.rngOutline.exponential();
-        material = new THREE.MeshBasicMaterial({
-          color: color,
-          transparent: true,
-          depthWrite: false,
-          depthTest: false
-        });
-        material.blending = THREE.AdditiveBlending;
-        object = new THREE.Mesh(new THREE.RingGeometry(size - 1, size + borderRadius, 50, 1, 0, Math.PI * 2), material);
-        object.position.set(x, y, 0);
-        return this.container.add(object);
-      };
-
-      Circles.prototype.destroy = function() {
-        if (this.container) {
-          if (this.container.parent) {
-            this.container.parent.remove(this.container);
-          }
-          delete this.container;
-        }
-        delete this.rng;
-        return delete this.rngOutline;
-      };
-
-      return Circles;
-
-    })();
-  });
-
-}).call(this);
-
-
-(function() {
-  define('cs!app/components/ElementFactory',['require','cs!app/elements/Circles'],function(require) {
-    var Circles, ElementFactory, extend;
-    Circles = require('cs!app/elements/Circles');
-    extend = function(object, properties) {
-      var key, val;
-      for (key in properties) {
-        val = properties[key];
-        object[key] = val;
-      }
-      return object;
-    };
-    ElementFactory = (function() {
-      function ElementFactory() {}
-
-      ElementFactory.elements = {
-        Circles: {
-          default_attributes: function() {
-            return extend({}, Circles.defaults);
-          },
-          default_properties: function(time) {
-            if (time == null) {
-              time = 0;
-            }
-            return [
-              {
-                name: "progression",
-                "default": 1,
-                keys: []
-              }
-            ];
-          },
-          create: function(options) {
-            var defaults, item;
-            defaults = Circles.defaults;
-            options = extend(extend({}, defaults), options);
-            item = new Circles(options);
-            return item;
-          }
-        }
-      };
-
-      ElementFactory.prototype.create = function(itemName, data) {
-        var item;
-        item = ElementFactory.elements[itemName];
-        if (!item) {
-          console.warn("Can't create item: " + itemName);
-          return false;
-        }
-        console.log("will create a " + itemName);
-        console.log(data);
-        return item.create(data);
-      };
-
-      return ElementFactory;
-
-    })();
-    return window.ElementFactory = ElementFactory;
-  });
-
-}).call(this);
-
 /*!
  * VERSION: 1.12.1
  * DATE: 2014-06-26
@@ -46066,6 +45896,299 @@ define("TimelineMax", ["TweenMax"], (function (global) {
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
+  define('cs!app/elements/AnimatedCircle',['require','threejs','rng','cs!app/components/Colors','TweenMax','TimelineMax'],function(require) {
+    var AnimatedCircle, Colors, RNG, THREE, TimelineMax, TweenMax;
+    THREE = require('threejs');
+    RNG = require('rng');
+    Colors = require('cs!app/components/Colors');
+    TweenMax = require('TweenMax');
+    TimelineMax = require('TimelineMax');
+    return AnimatedCircle = (function() {
+      AnimatedCircle.defaults = {
+        size: 80,
+        outlineWidth: 2,
+        drawOutline: true,
+        drawCircle: false,
+        color: false,
+        fillColor: false,
+        delay: 0,
+        duration: 0.5
+      };
+
+      function AnimatedCircle(options, values) {
+        var tween;
+        if (options == null) {
+          options = {};
+        }
+        if (values == null) {
+          values = {
+            x: 0,
+            y: 0
+          };
+        }
+        this.renderOutline = __bind(this.renderOutline, this);
+        this.renderCircle = __bind(this.renderCircle, this);
+        this.size = options.size || AnimatedCircle.defaults.size;
+        this.outlineWidth = options.outlineWidth || AnimatedCircle.defaults.outlineWidth;
+        this.drawOutline = options.drawOutline || AnimatedCircle.defaults.drawOutline;
+        this.drawCircle = options.drawCircle || AnimatedCircle.defaults.drawCircle;
+        this.color = options.color || Colors.get(0);
+        this.fillColor = options.fillColor || Colors.get(0).clone().multiplyScalar(0.5);
+        this.delay = options.delay || AnimatedCircle.defaults.delay;
+        this.duration = options.duration || AnimatedCircle.defaults.duration;
+        this.container = new THREE.Object3D();
+        this.container.scale.set(0, 0, 0);
+        this.container.position.set(values.x, values.y, 0);
+        this.animatedProperties = {
+          scale: 0
+        };
+        this.timeline = new TimelineMax();
+        tween = TweenLite.to(this.animatedProperties, 0, {
+          scale: 0.00001,
+          ease: Linear.easeNone
+        });
+        this.timeline.add(tween, 0);
+        tween = TweenLite.to(this.animatedProperties, this.duration, {
+          scale: 1,
+          delay: this.delay,
+          ease: Cubic.easeOut
+        });
+        this.timeline.add(tween);
+        tween = TweenLite.to(this.animatedProperties, this.duration * 0.5, {
+          scale: 1.1,
+          ease: Cubic.easeOut
+        });
+        this.timeline.add(tween);
+        tween = TweenLite.to(this.animatedProperties, this.duration, {
+          scale: 0.00001,
+          ease: Cubic.easeIn
+        });
+        this.timeline.add(tween);
+        if (this.drawOutline) {
+          this.renderOutline(this.size, this.color, this.outlineWidth);
+        }
+        if (this.drawCircle) {
+          this.renderCircle(this.size, this.fillColor);
+        }
+      }
+
+      AnimatedCircle.prototype.update = function(seconds, progression) {
+        return this.container.scale.set(this.animatedProperties.scale, this.animatedProperties.scale, this.animatedProperties.scale);
+      };
+
+      AnimatedCircle.prototype.renderCircle = function(size, color) {
+        var material, numSegments, object;
+        material = new THREE.MeshBasicMaterial({
+          color: color,
+          transparent: true,
+          depthWrite: false,
+          depthTest: false
+        });
+        material.blending = THREE.AdditiveBlending;
+        numSegments = parseInt(size / 1.5, 10) + 4;
+        object = new THREE.Mesh(new THREE.CircleGeometry(size, numSegments, 0, Math.PI * 2), material);
+        return this.container.add(object);
+      };
+
+      AnimatedCircle.prototype.renderOutline = function(size, color, outlineWidth) {
+        var material, object;
+        material = new THREE.MeshBasicMaterial({
+          color: color,
+          transparent: true,
+          depthWrite: false,
+          depthTest: false
+        });
+        material.blending = THREE.AdditiveBlending;
+        object = new THREE.Mesh(new THREE.RingGeometry(size - 1, size + outlineWidth, 50, 1, 0, Math.PI * 2), material);
+        return this.container.add(object);
+      };
+
+      return AnimatedCircle;
+
+    })();
+  });
+
+}).call(this);
+
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  define('cs!app/elements/Circles',['require','threejs','rng','cs!app/components/Colors','cs!app/elements/AnimatedCircle','TimelineMax'],function(require) {
+    var AnimatedCircle, Circles, Colors, RNG, THREE, TimelineMax;
+    THREE = require('threejs');
+    RNG = require('rng');
+    Colors = require('cs!app/components/Colors');
+    AnimatedCircle = require('cs!app/elements/AnimatedCircle');
+    TimelineMax = require('TimelineMax');
+    return Circles = (function() {
+      Circles.defaults = {
+        numItems: 20,
+        seed: 12002,
+        radius: 80,
+        circleRadius: 20,
+        circleRadiusMax: 20
+      };
+
+      function Circles(options) {
+        var border_radius, color, delay, draw_circle, draw_outline, duration, fillColor, i, item, rndtype, size, x, y, _i, _ref;
+        if (options == null) {
+          options = {};
+        }
+        this.drawOutline = __bind(this.drawOutline, this);
+        this.createCircle = __bind(this.createCircle, this);
+        this.numItems = options.numItems || Circles.defaults.numItems;
+        this.seed = options.seed || Circles.defaults.seed;
+        this.radius = options.radius || Circles.defaults.radius;
+        this.circleRadius = options.circleRadius || Circles.defaults.circleRadius;
+        this.circleRadiusMax = options.circleRadiusMax || Circles.defaults.circleRadiusMax;
+        this.timeline = new TimelineMax();
+        this.rng = new RNG(this.seed);
+        this.rngAnimation = new RNG(this.seed + "lorem");
+        this.rngOutline = new RNG(this.seed);
+        this.container = new THREE.Object3D();
+        this.totalDuration = 0;
+        this.items = [];
+        for (i = _i = 0, _ref = this.numItems - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+          color = Colors.get(this.rng.random(0, 1000));
+          fillColor = color.clone().multiplyScalar(this.rng.random(0.3, 0.5));
+          rndtype = this.rng.random(0, 1000) / 1000;
+          size = this.rng.random(this.circleRadius, this.circleRadiusMax);
+          x = this.getRandomPosition();
+          y = this.getRandomPosition();
+          delay = this.rngAnimation.random(0, 2400) / 1000;
+          duration = this.rngAnimation.random(600, 800) / 1000;
+          border_radius = this.rngOutline.exponential();
+          draw_outline = rndtype < 0.8 ? true : false;
+          draw_circle = rndtype > 0.5 ? true : false;
+          item = new AnimatedCircle({
+            size: size,
+            outlineWidth: border_radius,
+            drawOutline: draw_outline,
+            drawCircle: draw_circle,
+            color: color,
+            fillColor: fillColor,
+            delay: delay,
+            duration: duration
+          }, {
+            x: x,
+            y: y
+          });
+          this.container.add(item.container);
+          this.timeline.add(item.timeline, 0);
+          this.items.push(item);
+        }
+        this.totalDuration = this.timeline.duration();
+      }
+
+      Circles.prototype.update = function(seconds, values) {
+        var item, progression, _i, _len, _ref, _results;
+        if (values.progression !== void 0) {
+          progression = values.progression / 2;
+          this.timeline.seek(this.totalDuration * progression);
+          _ref = this.items;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            item = _ref[_i];
+            _results.push(item.update(seconds, values.progression));
+          }
+          return _results;
+        }
+      };
+
+      Circles.prototype.getRandomPosition = function() {
+        return this.rng.random(-this.radius, this.radius);
+      };
+
+      Circles.prototype.createCircle = function(x, y, size, color) {};
+
+      Circles.prototype.drawOutline = function(x, y, size, color) {};
+
+      Circles.prototype.destroy = function() {
+        if (this.container) {
+          if (this.container.parent) {
+            this.container.parent.remove(this.container);
+          }
+          delete this.container;
+        }
+        delete this.rng;
+        return delete this.rngOutline;
+      };
+
+      return Circles;
+
+    })();
+  });
+
+}).call(this);
+
+
+(function() {
+  define('cs!app/components/ElementFactory',['require','cs!app/elements/Circles'],function(require) {
+    var Circles, ElementFactory, extend;
+    Circles = require('cs!app/elements/Circles');
+    extend = function(object, properties) {
+      var key, val;
+      for (key in properties) {
+        val = properties[key];
+        object[key] = val;
+      }
+      return object;
+    };
+    ElementFactory = (function() {
+      function ElementFactory() {}
+
+      ElementFactory.elements = {
+        Circles: {
+          default_attributes: function() {
+            return extend({}, Circles.defaults);
+          },
+          default_properties: function(time) {
+            if (time == null) {
+              time = 0;
+            }
+            return [
+              {
+                name: "progression",
+                "default": 1,
+                keys: []
+              }
+            ];
+          },
+          create: function(options) {
+            var defaults, item;
+            defaults = Circles.defaults;
+            options = extend(extend({}, defaults), options);
+            item = new Circles(options);
+            return item;
+          }
+        }
+      };
+
+      ElementFactory.prototype.create = function(itemName, data) {
+        var item;
+        item = ElementFactory.elements[itemName];
+        if (!item) {
+          console.warn("Can't create item: " + itemName);
+          return false;
+        }
+        console.log("will create a " + itemName);
+        console.log(data);
+        return item.create(data);
+      };
+
+      return ElementFactory;
+
+    })();
+    return window.ElementFactory = ElementFactory;
+  });
+
+}).call(this);
+
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
   define('cs!app/components/Orchestrator',['require','cs!app/components/ElementFactory','TweenMax','TimelineMax'],function(require) {
     var ElementFactory, Orchestrator, TimelineMax, TweenMax;
     ElementFactory = require('cs!app/components/ElementFactory');
@@ -46563,7 +46686,7 @@ define('text',['module'], function (module) {
 });
 
 
-define('text!app/data.json',[],function () { return '[{"id":"item1","label":"Test circles","start":1,"end":10,"options":{"numItems":12,"seed":12002,"radius":84},"properties":[{"name":"progression","keys":[{"time":2,"val":7},{"time":3,"val":42},{"time":5,"val":-40}]}]}]\n';});
+define('text!app/data.json',[],function () { return '[{"id":"item1","label":"Test circles","start":0,"end":2,"options":{"numItems":12,"seed":12002,"radius":84},"properties":[{"name":"progression","keys":[{"time":0,"val":0},{"time":1,"val":1},{"time":2,"val":2}]}]}]\n';});
 
 
 (function() {
