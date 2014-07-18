@@ -19357,7 +19357,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       };
 
       EditorTimeline.prototype.renderLines = function() {
-        var bar, barEnter, bar_border, drag, dragmove, self;
+        var bar, barEnter, bar_border, drag, dragmove, selectBar, self;
         self = this;
         dragmove = function(d) {
           var diff, dx, key, prop, _i, _j, _len, _len1, _ref, _ref1;
@@ -19396,11 +19396,27 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return "translate(0," + y + ")";
         });
         barEnter.append("rect").attr("class", "bar").attr("y", 3).attr("height", 14);
+        selectBar = function(d) {
+          var controller, gui, key, value, _ref;
+          if (window.gui) {
+            window.gui.destroy();
+          }
+          gui = new dat.GUI();
+          _ref = d.options;
+          for (key in _ref) {
+            value = _ref[key];
+            controller = gui.add(d.options, key);
+            controller.onChange(function(v) {
+              return d.isDirtyObject = true;
+            });
+          }
+          return window.gui = gui;
+        };
         bar.selectAll('.bar').attr("x", function(d) {
           return self.x(d.start * 1000) + bar_border;
         }).attr("width", function(d) {
           return Math.max(0, (self.x(d.end) - self.x(d.start)) * 1000 - bar_border);
-        }).call(drag);
+        }).call(drag).on("click", selectBar);
         barEnter.append("rect").attr("class", "graph-mask").attr("x", -self.margin.left).attr("y", 1).attr("width", self.margin.left).attr("height", self.lineHeight - 2);
         barEnter.append("text").attr("class", "line--label").attr("x", self.label_position_x).attr("y", 16).text(function(d) {
           return d.label;
@@ -19451,7 +19467,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       };
 
       EditorTimeline.prototype.renderKeys = function() {
-        var drag, dragmove, key_size, keys, propKey, propValue, self, sortKeys;
+        var drag, dragmove, key_size, keys, propKey, propValue, selectKey, self, sortKeys;
         self = this;
         sortKeys = function(keys) {
           return keys.sort(function(a, b) {
@@ -19482,8 +19498,23 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return k;
         };
         keys = this.properties.select('.keys--wrapper').selectAll('.key').data(propValue, propKey);
+        selectKey = function(d) {
+          var controller, gui, lineData, lineObject, propertyObject;
+          propertyObject = this.parentNode.parentNode;
+          lineObject = propertyObject.parentNode;
+          lineData = d3.select(lineObject).datum();
+          if (window.gui) {
+            window.gui.destroy();
+          }
+          gui = new dat.GUI();
+          controller = gui.add(d, "val");
+          controller.onChange(function(v) {
+            return lineData.isDirty = true;
+          });
+          return window.gui = gui;
+        };
         key_size = 6;
-        keys.enter().append('g').attr('class', 'key').append('g').attr('class', 'key__item').call(drag).append('rect').attr('x', -3).attr('width', key_size).attr('height', key_size).attr('class', 'line--key').attr('transform', 'rotate(45)');
+        keys.enter().append('g').attr('class', 'key').append('g').attr('class', 'key__item').call(drag).on('click', selectKey).append('rect').attr('x', -3).attr('width', key_size).attr('height', key_size).attr('class', 'line--key').attr('transform', 'rotate(45)');
         keys.selectAll('.key__item').attr('transform', function(d) {
           var dx, dy;
           dx = self.x(d.time * 1000) + 3;

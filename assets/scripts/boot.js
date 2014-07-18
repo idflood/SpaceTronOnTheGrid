@@ -46134,15 +46134,18 @@ define("TimelineMax", ["TweenMax"], (function (global) {
             }
             seconds = seconds - 0.0000001;
           }
+          if ((item.object && should_exist === false) || item.isDirtyObject) {
+            item.isDirtyObject = false;
+            if (item.object) {
+              this.scene.remove(item.object.container);
+              item.object.destroy();
+              delete item.object;
+            }
+          }
           if (should_exist && !item.object) {
             el = this.factory.create('Circles', item.options);
             this.scene.add(el.container);
             item.object = el;
-          }
-          if (item.object && should_exist === false) {
-            this.scene.remove(item.object.container);
-            item.object.destroy();
-            delete item.object;
           }
           if (item.object) {
             item.object.update(seconds - item.start, item.values);
@@ -46236,7 +46239,11 @@ define("TimelineMax", ["TweenMax"], (function (global) {
             start: 1,
             end: 10,
             options: {
-              numItems: 12
+              numItems: 12,
+              seed: 12002,
+              radius: 80,
+              circleRadius: 20,
+              circleRadiusMax: 20
             },
             properties: [
               {

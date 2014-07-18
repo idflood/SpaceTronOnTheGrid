@@ -209,6 +209,14 @@ define (require) ->
         .attr("y", 3)
         .attr("height", 14)
 
+      selectBar = (d) ->
+        if window.gui then window.gui.destroy()
+        gui = new dat.GUI()
+        for key, value of d.options
+          controller = gui.add(d.options, key)
+          controller.onChange (v) -> d.isDirtyObject = true
+        window.gui = gui
+
       bar.selectAll('.bar')
         .attr("x", (d) -> return self.x(d.start * 1000) + bar_border)
         .attr("width", (d) ->
@@ -217,6 +225,7 @@ define (require) ->
         )
         #.attr("width", (d) -> return self.x((d.end - d.start) * 1000) - bar_border)
         .call(drag)
+        .on("click", selectBar)
 
       barEnter.append("rect")
         .attr("class", "graph-mask")
@@ -326,6 +335,20 @@ define (require) ->
         return k
       keys = @properties.select('.keys--wrapper').selectAll('.key').data(propValue, propKey)
 
+      selectKey = (d) ->
+        propertyObject = this.parentNode.parentNode
+        lineObject = propertyObject.parentNode
+        lineData = d3.select(lineObject).datum()
+        #propertyData = d3.select(propertyObject).datum()
+        #propertyName = propertyData.name
+        if window.gui then window.gui.destroy()
+        gui = new dat.GUI()
+        controller = gui.add(d, "val")
+        controller.onChange (v) -> lineData.isDirty = true
+        window.gui = gui
+
+
+
       key_size = 6
       keys.enter()
         .append('g')
@@ -333,6 +356,7 @@ define (require) ->
         .append('g')
         .attr('class', 'key__item')
         .call(drag)
+        .on('click', selectKey)
         .append('rect')
         .attr('x', -3)
         .attr('width', key_size)

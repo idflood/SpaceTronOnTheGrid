@@ -77,17 +77,19 @@ define (require) ->
           seconds = seconds - 0.0000001
         #if item.values then console.log item.values.percent
 
+        # Remove the item
+        if (item.object && should_exist == false) || item.isDirtyObject
+          item.isDirtyObject = false
+          if item.object
+            @scene.remove(item.object.container)
+            item.object.destroy()
+            delete item.object
+
         # Create the item
         if should_exist && !item.object
           el = @factory.create('Circles', item.options)
           @scene.add(el.container)
           item.object = el
-
-        # Remove the item
-        if item.object && should_exist == false
-          @scene.remove(item.object.container)
-          item.object.destroy()
-          delete item.object
 
         # Update the item
         if item.object then item.object.update(seconds - item.start, item.values)
