@@ -170,7 +170,6 @@ define (require) ->
           t = d3.select(this)
           return {x: t.attr('x'), y: t.attr('y')})
         .on("drag", dragmove)
-        .on("dragstart", dragstart)
 
       bar_border = 1
       bar = @svgContainer.selectAll(".line-grp")
@@ -229,6 +228,8 @@ define (require) ->
           sub_height = (i + 1) * self.lineHeight
           return "translate(0," + sub_height + ")"
 
+      sortKeys = (keys) -> keys.sort((a, b) -> d3.ascending(a.time, b.time))
+
       subGrp.append('rect')
         .attr('class', 'click-handler click-handler--property')
         .attr('x', 0)
@@ -242,9 +243,7 @@ define (require) ->
           newKey = {time: dx, val: 42}
           d.keys.push(newKey)
           # Sort the keys for tweens creation
-          d.keys = d.keys.sort((a, b) -> d3.ascending(a.time, b.time))
-          #self.render()
-
+          d.keys = sortKeys(d.keys)
 
       subGrp.append('text')
         .attr("class", "line--label line--label-small")
@@ -263,15 +262,24 @@ define (require) ->
     renderKeys: () ->
       self = this
 
+      sortKeys = (keys) -> keys.sort((a, b) -> d3.ascending(a.time, b.time))
+
       dragmove = (d) ->
+        propertyObject = this.parentNode.parentNode
+        lineObject = propertyObject.parentNode
+        propertyData = d3.select(propertyObject).datum()
+        lineData = d3.select(lineObject).datum()
+
         currentDomainStart = self.x.domain()[0]
-        #offsetX = self.x.invert(d3.event.dx).getTime()
         mouse = d3.mouse(this)
         dx = self.x.invert(mouse[0])
         dx = dx.getTime()
         d.time += dx / 1000 - currentDomainStart / 1000
-        #d.time += offsetX / 1000
-        #self.render()
+
+        #console.log propertyData
+        propertyData.keys = sortKeys(propertyData.keys)
+
+        lineData.isDirty = true
 
       drag = d3.behavior.drag()
         .origin((d) -> return d;)

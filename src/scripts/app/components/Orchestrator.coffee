@@ -30,6 +30,9 @@ define (require) ->
         # create the values object to contain all properties
         if !item.values && item.properties.length
           item.values = {}
+          item.isDirty = true
+
+        if item.values && item.isDirty
           for property in item.properties
             # Take the value of the first key as initial value.
             # @todo: update this when the value of the first key change. (when rebuilding the timeline, simply delete item.values before item.timeline)
@@ -62,6 +65,8 @@ define (require) ->
                 propertyTimeline.add(tween, key.time)
             item.timeline.add(propertyTimeline)
 
+          # force main timeline to refresh
+          #seconds = seconds - 0.000001
         #if item.values then console.log item.values.percent
 
         # Create the item
@@ -81,3 +86,4 @@ define (require) ->
 
       # Finally update the main timeline.
       @mainTimeline.seek(seconds)
+

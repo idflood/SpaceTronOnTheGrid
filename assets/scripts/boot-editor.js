@@ -19375,7 +19375,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
             x: t.attr('x'),
             y: t.attr('y')
           };
-        }).on("drag", dragmove).on("dragstart", dragstart);
+        }).on("drag", dragmove);
         bar_border = 1;
         bar = this.svgContainer.selectAll(".line-grp").data(this.app.data, function(d) {
           return d.id;
@@ -19402,7 +19402,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       };
 
       EditorTimeline.prototype.renderProperties = function(bar) {
-        var propKey, propVal, self, subGrp;
+        var propKey, propVal, self, sortKeys, subGrp;
         self = this;
         propVal = function(d, i) {
           return d.properties;
@@ -19416,6 +19416,11 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           sub_height = (i + 1) * self.lineHeight;
           return "translate(0," + sub_height + ")";
         });
+        sortKeys = function(keys) {
+          return keys.sort(function(a, b) {
+            return d3.ascending(a.time, b.time);
+          });
+        };
         subGrp.append('rect').attr('class', 'click-handler click-handler--property').attr('x', 0).attr('y', 0).attr('width', self.x(self.timer.totalDuration + 100)).attr('height', self.lineHeight).on('dblclick', function(d) {
           var dx, mouse, newKey;
           mouse = d3.mouse(this);
@@ -19426,9 +19431,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
             val: 42
           };
           d.keys.push(newKey);
-          return d.keys = d.keys.sort(function(a, b) {
-            return d3.ascending(a.time, b.time);
-          });
+          return d.keys = sortKeys(d.keys);
         });
         subGrp.append('text').attr("class", "line--label line--label-small").attr("x", self.label_position_x).attr("y", 15).text(function(d) {
           return d.name;
@@ -19437,15 +19440,26 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       };
 
       EditorTimeline.prototype.renderKeys = function() {
-        var drag, dragmove, key_size, keys, propKey, propValue, self;
+        var drag, dragmove, key_size, keys, propKey, propValue, self, sortKeys;
         self = this;
+        sortKeys = function(keys) {
+          return keys.sort(function(a, b) {
+            return d3.ascending(a.time, b.time);
+          });
+        };
         dragmove = function(d) {
-          var currentDomainStart, dx, mouse;
+          var currentDomainStart, dx, lineData, lineObject, mouse, propertyData, propertyObject;
+          propertyObject = this.parentNode.parentNode;
+          lineObject = propertyObject.parentNode;
+          propertyData = d3.select(propertyObject).datum();
+          lineData = d3.select(lineObject).datum();
           currentDomainStart = self.x.domain()[0];
           mouse = d3.mouse(this);
           dx = self.x.invert(mouse[0]);
           dx = dx.getTime();
-          return d.time += dx / 1000 - currentDomainStart / 1000;
+          d.time += dx / 1000 - currentDomainStart / 1000;
+          propertyData.keys = sortKeys(propertyData.keys);
+          return lineData.isDirty = true;
         };
         drag = d3.behavior.drag().origin(function(d) {
           return d;

@@ -46077,6 +46077,9 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           should_exist = seconds >= item.start && seconds <= item.end ? true : false;
           if (!item.values && item.properties.length) {
             item.values = {};
+            item.isDirty = true;
+          }
+          if (item.values && item.isDirty) {
             _ref1 = item.properties;
             for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
               property = _ref1[_j];
