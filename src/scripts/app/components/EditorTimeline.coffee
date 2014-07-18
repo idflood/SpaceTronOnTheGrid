@@ -123,6 +123,14 @@ define (require) ->
         .attr('class', 'time-indicator__handle')
         .attr('d', 'M -10 0 L 0 10 L 10 0 L -10 0')
 
+      # Mask time indicator
+      @svgContainer.append("rect")
+        .attr("class", "graph-mask")
+        .attr("x", -self.margin.left)
+        .attr("y", -self.margin.top)
+        .attr("width", self.margin.left - 20)
+        .attr("height", height)
+
       # First render
       #@render()
       window.requestAnimationFrame(@render)

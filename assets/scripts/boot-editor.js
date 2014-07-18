@@ -19319,6 +19319,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         timeGrp = timeSelection.enter().append("g").attr('class', "time-indicator").call(dragTime);
         timeGrp.append('rect').attr('class', 'time-indicator__line').attr('x', -1).attr('y', 0).attr('width', 1).attr('height', 1000);
         timeGrp.append('path').attr('class', 'time-indicator__handle').attr('d', 'M -10 0 L 0 10 L 10 0 L -10 0');
+        this.svgContainer.append("rect").attr("class", "graph-mask").attr("x", -self.margin.left).attr("y", -self.margin.top).attr("width", self.margin.left - 20).attr("height", height);
         window.requestAnimationFrame(this.render);
         window.onresize = (function(_this) {
           return function() {
