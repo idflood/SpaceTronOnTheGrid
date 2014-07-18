@@ -177,18 +177,60 @@ define (require) ->
     renderLines: () ->
       self = this
 
+      selectBar = (d) ->
+        # Merge attributes with existing ones on click, so if we add
+        # an attribute we don't have to edit the json manually to allow
+        # existing object to use it.
+        # todo: find a way to get the value as current time (at time between previous and next key)
+        factory = window.ElementFactory
+        el_type = factory.elements[d.type]
+        if el_type
+          d.options = extend(el_type.default_attributes(), d.options)
+        if window.gui then window.gui.destroy()
+        gui = new dat.GUI()
+        for key, value of d.options
+          controller = gui.add(d.options, key)
+          controller.onChange (v) -> d.isDirtyObject = true
+        window.gui = gui
+
+
       dragmove = (d) ->
         dx = self.x.invert(d3.event.x).getTime() / 1000
         diff = (dx - d.start)
         d.start += diff
         d.end += diff
-
         for prop in d.properties
           for key in prop.keys
             key.time += diff
 
         d.isDirty = true
-        #self.render()
+
+
+      dragmoveLeft = (d) ->
+        d3.event.sourceEvent.stopPropagation()
+        dx = self.x.invert(d3.event.x).getTime() / 1000
+        diff = (dx - d.start)
+        d.start += diff
+        d.isDirty = true
+
+      dragmoveRight = (d) ->
+        d3.event.sourceEvent.stopPropagation()
+        dx = self.x.invert(d3.event.x).getTime() / 1000
+        diff = (dx - d.end)
+        d.end += diff
+        d.isDirty = true
+
+      dragLeft = d3.behavior.drag()
+        .origin((d) ->
+          t = d3.select(this)
+          return {x: t.attr('x'), y: t.attr('y')})
+        .on("drag", dragmoveLeft)
+
+      dragRight = d3.behavior.drag()
+        .origin((d) ->
+          t = d3.select(this)
+          return {x: t.attr('x'), y: t.attr('y')})
+        .on("drag", dragmoveRight)
 
       drag = d3.behavior.drag()
         .origin((d) ->
@@ -214,21 +256,26 @@ define (require) ->
         .attr("y", 3)
         .attr("height", 14)
 
-      selectBar = (d) ->
-        console.log d
-        # Merge attributes with existing ones on click, so if we add
-        # an attribute we don't have to edit the json manually to allow
-        # existing object to use it.
-        factory = window.ElementFactory
-        el_type = factory.elements[d.type]
-        if el_type
-          d.options = extend(el_type.default_attributes(), d.options)
-        if window.gui then window.gui.destroy()
-        gui = new dat.GUI()
-        for key, value of d.options
-          controller = gui.add(d.options, key)
-          controller.onChange (v) -> d.isDirtyObject = true
-        window.gui = gui
+
+      barEnter.append("rect")
+        .attr("class", "bar-anchor bar-anchor--left")
+        .attr("y", 2)
+        .attr("height", 16)
+        .attr("width", 6)
+        .call(dragLeft)
+
+      barEnter.append("rect")
+        .attr("class", "bar-anchor bar-anchor--right")
+        .attr("y", 2)
+        .attr("height", 16)
+        .attr("width", 6)
+        .call(dragRight)
+
+      bar.selectAll('.bar-anchor--left')
+        .attr("x", (d) -> return self.x(d.start * 1000) - 1)
+
+      bar.selectAll('.bar-anchor--right')
+        .attr("x", (d) -> return self.x(d.end * 1000) - 1)
 
       bar.selectAll('.bar')
         .attr("x", (d) -> return self.x(d.start * 1000) + bar_border)

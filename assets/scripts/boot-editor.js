@@ -19365,8 +19365,29 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       };
 
       EditorTimeline.prototype.renderLines = function() {
-        var bar, barEnter, bar_border, drag, dragmove, selectBar, self;
+        var bar, barEnter, bar_border, drag, dragLeft, dragRight, dragmove, dragmoveLeft, dragmoveRight, selectBar, self;
         self = this;
+        selectBar = function(d) {
+          var controller, el_type, factory, gui, key, value, _ref;
+          factory = window.ElementFactory;
+          el_type = factory.elements[d.type];
+          if (el_type) {
+            d.options = extend(el_type.default_attributes(), d.options);
+          }
+          if (window.gui) {
+            window.gui.destroy();
+          }
+          gui = new dat.GUI();
+          _ref = d.options;
+          for (key in _ref) {
+            value = _ref[key];
+            controller = gui.add(d.options, key);
+            controller.onChange(function(v) {
+              return d.isDirtyObject = true;
+            });
+          }
+          return window.gui = gui;
+        };
         dragmove = function(d) {
           var diff, dx, key, prop, _i, _j, _len, _len1, _ref, _ref1;
           dx = self.x.invert(d3.event.x).getTime() / 1000;
@@ -19384,6 +19405,38 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           }
           return d.isDirty = true;
         };
+        dragmoveLeft = function(d) {
+          var diff, dx;
+          d3.event.sourceEvent.stopPropagation();
+          dx = self.x.invert(d3.event.x).getTime() / 1000;
+          diff = dx - d.start;
+          d.start += diff;
+          return d.isDirty = true;
+        };
+        dragmoveRight = function(d) {
+          var diff, dx;
+          d3.event.sourceEvent.stopPropagation();
+          dx = self.x.invert(d3.event.x).getTime() / 1000;
+          diff = dx - d.end;
+          d.end += diff;
+          return d.isDirty = true;
+        };
+        dragLeft = d3.behavior.drag().origin(function(d) {
+          var t;
+          t = d3.select(this);
+          return {
+            x: t.attr('x'),
+            y: t.attr('y')
+          };
+        }).on("drag", dragmoveLeft);
+        dragRight = d3.behavior.drag().origin(function(d) {
+          var t;
+          t = d3.select(this);
+          return {
+            x: t.attr('x'),
+            y: t.attr('y')
+          };
+        }).on("drag", dragmoveRight);
         drag = d3.behavior.drag().origin(function(d) {
           var t;
           t = d3.select(this);
@@ -19404,28 +19457,14 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return "translate(0," + y + ")";
         });
         barEnter.append("rect").attr("class", "bar").attr("y", 3).attr("height", 14);
-        selectBar = function(d) {
-          var controller, el_type, factory, gui, key, value, _ref;
-          console.log(d);
-          factory = window.ElementFactory;
-          el_type = factory.elements[d.type];
-          if (el_type) {
-            d.options = extend(el_type.default_attributes(), d.options);
-          }
-          if (window.gui) {
-            window.gui.destroy();
-          }
-          gui = new dat.GUI();
-          _ref = d.options;
-          for (key in _ref) {
-            value = _ref[key];
-            controller = gui.add(d.options, key);
-            controller.onChange(function(v) {
-              return d.isDirtyObject = true;
-            });
-          }
-          return window.gui = gui;
-        };
+        barEnter.append("rect").attr("class", "bar-anchor bar-anchor--left").attr("y", 2).attr("height", 16).attr("width", 6).call(dragLeft);
+        barEnter.append("rect").attr("class", "bar-anchor bar-anchor--right").attr("y", 2).attr("height", 16).attr("width", 6).call(dragRight);
+        bar.selectAll('.bar-anchor--left').attr("x", function(d) {
+          return self.x(d.start * 1000) - 1;
+        });
+        bar.selectAll('.bar-anchor--right').attr("x", function(d) {
+          return self.x(d.end * 1000) - 1;
+        });
         bar.selectAll('.bar').attr("x", function(d) {
           return self.x(d.start * 1000) + bar_border;
         }).attr("width", function(d) {
