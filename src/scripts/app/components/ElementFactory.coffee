@@ -10,6 +10,7 @@ define (require) ->
   class ElementFactory
     @elements:
       Circles:
+        default_attributes: () -> extend({}, Circles.defaults)
         default_properties: () ->
           return [
             {name: "progression", default: 1, keys: []}

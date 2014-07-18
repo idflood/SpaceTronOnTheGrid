@@ -38131,6 +38131,9 @@ define("rng", (function (global) {
 
       ElementFactory.elements = {
         Circles: {
+          default_attributes: function() {
+            return extend({}, Circles.defaults);
+          },
           default_properties: function() {
             return [
               {
@@ -46241,9 +46244,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
             options: {
               numItems: 12,
               seed: 12002,
-              radius: 80,
-              circleRadius: 20,
-              circleRadiusMax: 20
+              radius: 84
             },
             properties: [
               {

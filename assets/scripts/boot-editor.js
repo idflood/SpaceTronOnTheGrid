@@ -19248,9 +19248,17 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   define('cs!app/components/EditorTimeline',['require','jquery','d3'],function(require) {
-    var $, EditorTimeline, d3;
+    var $, EditorTimeline, d3, extend;
     $ = require('jquery');
     d3 = require('d3');
+    extend = function(object, properties) {
+      var key, val;
+      for (key in properties) {
+        val = properties[key];
+        object[key] = val;
+      }
+      return object;
+    };
     return EditorTimeline = (function() {
       function EditorTimeline() {
         this.render = __bind(this.render, this);
@@ -19397,7 +19405,13 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         });
         barEnter.append("rect").attr("class", "bar").attr("y", 3).attr("height", 14);
         selectBar = function(d) {
-          var controller, gui, key, value, _ref;
+          var controller, el_type, factory, gui, key, value, _ref;
+          console.log(d);
+          factory = window.ElementFactory;
+          el_type = factory.elements[d.type];
+          if (el_type) {
+            d.options = extend(el_type.default_attributes(), d.options);
+          }
           if (window.gui) {
             window.gui.destroy();
           }

@@ -2,6 +2,11 @@ define (require) ->
   $ = require 'jquery'
   d3 = require 'd3'
 
+  extend = (object, properties) ->
+    for key, val of properties
+      object[key] = val
+    object
+
   class EditorTimeline
     constructor: () ->
       @app = window.app
@@ -210,6 +215,14 @@ define (require) ->
         .attr("height", 14)
 
       selectBar = (d) ->
+        console.log d
+        # Merge attributes with existing ones on click, so if we add
+        # an attribute we don't have to edit the json manually to allow
+        # existing object to use it.
+        factory = window.ElementFactory
+        el_type = factory.elements[d.type]
+        if el_type
+          d.options = extend(el_type.default_attributes(), d.options)
         if window.gui then window.gui.destroy()
         gui = new dat.GUI()
         for key, value of d.options
