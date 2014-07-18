@@ -19254,7 +19254,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
     return EditorTimeline = (function() {
       function EditorTimeline() {
         this.render = __bind(this.render, this);
-        var dragTime, dragTimeMove, height, margin, self, timeGrp, timeSelection, width, xAxis, xAxisGrid, xGrid;
+        var dragTime, dragTimeMove, height, margin, self, timeGrp, timeSelection, width, xAxis, xAxisElement, xAxisGrid, xGrid;
         this.app = window.app;
         this.timer = this.app.timer;
         this.currentTime = this.timer.time;
@@ -19272,10 +19272,11 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.x = d3.time.scale().range([0, width]);
         this.x.domain([0, this.timer.totalDuration - 220 * 1000]);
         xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(this.formatMinutes);
-        this.svg = d3.select('.editor__time-main').append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        this.svg = d3.select('.editor__time-main').append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom);
+        this.svgContainer = this.svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         xAxisGrid = d3.svg.axis().scale(this.x).ticks(100).tickSize(-height, 0).tickFormat("").orient("top");
-        xGrid = this.svg.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(xAxisGrid);
-        this.svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxis);
+        xGrid = this.svgContainer.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(xAxisGrid);
+        xAxisElement = this.svgContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxis);
         self = this;
         dragTimeMove = function(d) {
           var dx;
@@ -19288,11 +19289,20 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         dragTime = d3.behavior.drag().origin(function(d) {
           return d;
         }).on("drag", dragTimeMove);
-        timeSelection = this.svg.selectAll('.time-indicator').data(this.currentTime);
+        timeSelection = this.svgContainer.selectAll('.time-indicator').data(this.currentTime);
         timeGrp = timeSelection.enter().append("g").attr('class', "time-indicator").call(dragTime);
         timeGrp.append('rect').attr('class', 'time-indicator__line').attr('x', -1).attr('y', 0).attr('width', 1).attr('height', 1000);
         timeGrp.append('path').attr('class', 'time-indicator__handle').attr('d', 'M -10 0 L 0 10 L 10 0 L -10 0');
         window.requestAnimationFrame(this.render);
+        window.onresize = (function(_this) {
+          return function() {
+            width = window.innerWidth - margin.left - margin.right;
+            _this.svg.attr("width", width + margin.left + margin.right);
+            _this.x.range([0, width]);
+            xGrid.call(xAxisGrid);
+            return xAxisElement.call(xAxis);
+          };
+        })(this);
       }
 
       EditorTimeline.prototype.render = function() {
@@ -19306,7 +19316,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 
       EditorTimeline.prototype.renderTimeIndicator = function() {
         var timeSelection;
-        timeSelection = this.svg.selectAll('.time-indicator');
+        timeSelection = this.svgContainer.selectAll('.time-indicator');
         return timeSelection.attr('transform', 'translate(' + (this.x(this.currentTime[0]) + 0.5) + ', -12)');
       };
 
@@ -19344,7 +19354,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return d;
         }).on("drag", dragmove).on("dragstart", dragstart);
         bar_border = 1;
-        bar = this.svg.selectAll(".line-grp").data(this.app.data, function(d) {
+        bar = this.svgContainer.selectAll(".line-grp").data(this.app.data, function(d) {
           return d.id;
         });
         barEnter = bar.enter().append('g').attr('class', 'line-grp').attr("transform", function(d, i) {

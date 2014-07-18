@@ -31,7 +31,7 @@ define (require) ->
       @svg = d3.select('.editor__time-main').append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-        .append("g")
+      @svgContainer = @svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
       xAxisGrid = d3.svg.axis()
@@ -41,12 +41,12 @@ define (require) ->
         .tickFormat("")
         .orient("top")
 
-      xGrid = @svg.append('g')
+      xGrid = @svgContainer.append('g')
         .attr('class', 'x axis grid')
         .attr("transform", "translate(0," + margin.top + ")")
         .call(xAxisGrid)
 
-      @svg.append("g")
+      xAxisElement = @svgContainer.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + margin.top + ")")
         .call(xAxis)
@@ -64,7 +64,7 @@ define (require) ->
         .origin((d) -> return d;)
         .on("drag", dragTimeMove)
 
-      timeSelection = @svg.selectAll('.time-indicator').data(@currentTime)
+      timeSelection = @svgContainer.selectAll('.time-indicator').data(@currentTime)
 
       timeGrp = timeSelection.enter().append("g")
         .attr('class', "time-indicator")
@@ -83,6 +83,14 @@ define (require) ->
       #@render()
       window.requestAnimationFrame(@render)
 
+      window.onresize = () =>
+        width = window.innerWidth - margin.left - margin.right
+        @svg.attr("width", width + margin.left + margin.right)
+
+        @x.range([0, width])
+        xGrid.call(xAxisGrid)
+        xAxisElement.call(xAxis)
+
     render: () =>
       bar = @renderLines()
       @renderTimeIndicator()
@@ -91,7 +99,7 @@ define (require) ->
       window.requestAnimationFrame(@render)
 
     renderTimeIndicator: () ->
-      timeSelection = @svg.selectAll('.time-indicator')
+      timeSelection = @svgContainer.selectAll('.time-indicator')
       timeSelection.attr('transform', 'translate(' + (@x(@currentTime[0]) + 0.5) + ', -12)')
 
 
@@ -127,7 +135,7 @@ define (require) ->
         .on("dragstart", dragstart)
 
       bar_border = 1
-      bar = @svg.selectAll(".line-grp")
+      bar = @svgContainer.selectAll(".line-grp")
         .data(@app.data, (d) -> d.id)
 
       barEnter = bar.enter()
