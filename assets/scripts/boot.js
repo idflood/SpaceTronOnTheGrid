@@ -38054,7 +38054,9 @@ define("rng", (function (global) {
         }
       }
 
-      Circles.prototype.update = function(seconds, values) {};
+      Circles.prototype.update = function(seconds, values) {
+        return this.container.position.x = values.percent;
+      };
 
       Circles.prototype.getRandomPosition = function() {
         return this.rng.random(-this.radius, this.radius);
@@ -46222,11 +46224,11 @@ define("TimelineMax", ["TweenMax"], (function (global) {
                     time: 2,
                     val: 7
                   }, {
-                    time: 5,
+                    time: 3,
                     val: 42
                   }, {
-                    time: 10,
-                    val: 4
+                    time: 5,
+                    val: -40
                   }
                 ]
               }

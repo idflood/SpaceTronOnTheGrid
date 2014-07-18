@@ -191,6 +191,8 @@ define (require) ->
           dx = dx.getTime() / 1000
           newKey = {time: dx, val: 42}
           d.keys.push(newKey)
+          # Sort the keys for tweens creation
+          d.keys = d.keys.sort((a, b) -> d3.ascending(a.time, b.time))
           #self.render()
 
 

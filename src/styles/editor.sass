@@ -1,3 +1,25 @@
+$menu_height: 25px
+.editor__menu
+  position: absolute
+  top: -$menu_height - 2px
+  left: 0
+  right: 0
+  height: $menu_height
+  border-top: 1px solid #333
+  padding: 0 20px
+  background: #111
+
+a.menu-item
+  display: inline-block
+  height: $menu_height
+  color: #eee
+  font-size: 11px
+  vertical-align: middle
+  text-decoration: none
+
+  &:hover
+    color: #fff
+
 .controls
   position: absolute
   top: 10px

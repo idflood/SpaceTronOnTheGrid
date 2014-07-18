@@ -41,7 +41,7 @@ define (require) ->
           start: 0, end: 10,
           options: {numItems: 12},
           properties: [
-            {name: 'percent', keys: [{time: 2, val: 7}, {time: 5, val: 42}, {time: 10, val: 4}]}
+            {name: 'percent', keys: [{time: 2, val: 7}, {time: 3, val: 42}, {time: 5, val: -40}]}
           ]
 
         }

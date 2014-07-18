@@ -10008,7 +10008,7 @@ define('text',['module'], function (module) {
 });
 
 
-define('text!app/templates/timeline.tpl.html',[],function () { return '<div class="editor__time">\n  <div class="editor__time-controls controls">\n    <a href="#" class="control control--first icon-first"></a>\n    <a href="#" class="control control--play-pause icon-play"></a>\n    <a href="#" class="control control--last icon-last"></a>\n  </div>\n  <div class="editor__time-header">\n\n  </div>\n  <div class="editor__time-main">\n\n  </div>\n</div>\n';});
+define('text!app/templates/timeline.tpl.html',[],function () { return '<div class="editor__time">\n  <div class="editor__menu">\n    <a href="#" class="menu-item" data-action="export">Export</a>\n  </div>\n  <div class="editor__time-controls controls">\n    <a href="#" class="control control--first icon-first"></a>\n    <a href="#" class="control control--play-pause icon-play"></a>\n    <a href="#" class="control control--last icon-last"></a>\n  </div>\n  <div class="editor__time-header">\n\n  </div>\n  <div class="editor__time-main">\n\n  </div>\n</div>\n';});
 
 !function() {
   var d3 = {
@@ -19392,7 +19392,10 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
             time: dx,
             val: 42
           };
-          return d.keys.push(newKey);
+          d.keys.push(newKey);
+          return d.keys = d.keys.sort(function(a, b) {
+            return d3.ascending(a.time, b.time);
+          });
         });
         subGrp.append('text').attr("class", "line--label line--label-small").attr("x", self.label_position_x).attr("y", 15).text(function(d) {
           return d.name;
@@ -19469,7 +19472,36 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         $('body').append(this.$timeline);
         this.timeline = new EditorTimeline();
         this.initControls();
+        this.initExport();
       }
+
+      Editor.prototype.initExport = function() {
+        var copyAndClean;
+        copyAndClean = function(source) {
+          var new_data, obj, target, _i, _len;
+          target = [];
+          for (_i = 0, _len = source.length; _i < _len; _i++) {
+            obj = source[_i];
+            new_data = {
+              id: obj.id,
+              label: obj.label,
+              start: obj.start,
+              end: obj.end,
+              options: obj.options,
+              properties: obj.properties
+            };
+            target.push(new_data);
+          }
+          return target;
+        };
+        return this.$timeline.find('[data-action="export"]').click(function(e) {
+          var data, export_data;
+          e.preventDefault();
+          export_data = copyAndClean(window.app.data);
+          data = JSON.stringify(export_data);
+          return console.log(data);
+        });
+      };
 
       Editor.prototype.initControls = function() {
         var $play_pause;
