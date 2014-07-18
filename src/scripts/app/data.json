@@ -1,0 +1,1 @@
+[{"id":"item1","label":"Test circles","start":1,"end":10,"options":{"numItems":12,"seed":12002,"radius":84},"properties":[{"name":"progression","keys":[{"time":2,"val":7},{"time":3,"val":42},{"time":5,"val":-40}]}]}]

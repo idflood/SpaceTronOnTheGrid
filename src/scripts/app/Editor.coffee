@@ -60,7 +60,7 @@ define (require) ->
             type: element_name
             start: current_time
             end: current_time + 2
-            options: {numItems: 50}
+            options: {}
             #options: window.ElementFactory.elements[element_name].default_attributes()
             properties: window.ElementFactory.elements[element_name].default_properties()
           window.app.data.push(data)

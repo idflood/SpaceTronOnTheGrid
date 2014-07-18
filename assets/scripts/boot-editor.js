@@ -19606,9 +19606,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
               type: element_name,
               start: current_time,
               end: current_time + 2,
-              options: {
-                numItems: 50
-              },
+              options: {},
               properties: window.ElementFactory.elements[element_name].default_properties()
             };
             window.app.data.push(data);
