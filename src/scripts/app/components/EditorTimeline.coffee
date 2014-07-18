@@ -332,7 +332,7 @@ define (require) ->
         .attr('width', self.x(self.timer.totalDuration + 100))
         .attr('height', self.lineHeight)
         .on 'dblclick', (d) ->
-          console.log d
+          #console.log d
           lineObject = this.parentNode.parentNode
           lineValue = d3.select(lineObject).datum()
           #console.log lineObject
@@ -347,7 +347,6 @@ define (require) ->
           d.keys.push(newKey)
           # Sort the keys for tweens creation
           d.keys = sortKeys(d.keys)
-          console.log d.keys
 
           lineValue.isDirty = true
 
@@ -393,7 +392,6 @@ define (require) ->
 
         #console.log propertyData
         propertyData.keys = sortKeys(propertyData.keys)
-        console.log lineData
         lineData.isDirty = true
 
       drag = d3.behavior.drag()

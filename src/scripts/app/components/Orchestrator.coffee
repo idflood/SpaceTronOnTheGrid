@@ -69,8 +69,9 @@ define (require) ->
             for key, key_index in property.keys
               if key_index == 0
                 # Add a tween before start for initial value
-                tween_time = Math.min(-1, key.time - 1)
-                tween_duration = key.time - tween_time
+                tween_time = Math.min(-1, key.time - 0.1)
+                #tween_duration = key.time - tween_time
+                tween_duration = 0
                 val = {}
                 val[propName] = key.val
                 tween = TweenLite.to(item.values, tween_duration, val)

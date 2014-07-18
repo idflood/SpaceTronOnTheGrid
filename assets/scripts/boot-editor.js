@@ -19501,7 +19501,6 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         };
         subGrp.append('rect').attr('class', 'click-handler click-handler--property').attr('x', 0).attr('y', 0).attr('width', self.x(self.timer.totalDuration + 100)).attr('height', self.lineHeight).on('dblclick', function(d) {
           var def, dx, lineObject, lineValue, mouse, newKey;
-          console.log(d);
           lineObject = this.parentNode.parentNode;
           lineValue = d3.select(lineObject).datum();
           def = d["default"] ? d["default"] : 0;
@@ -19514,7 +19513,6 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           };
           d.keys.push(newKey);
           d.keys = sortKeys(d.keys);
-          console.log(d.keys);
           return lineValue.isDirty = true;
         });
         subGrp.append('g').attr('class', 'keys--wrapper');
@@ -19545,7 +19543,6 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           dx = dx.getTime();
           d.time += dx / 1000 - currentDomainStart / 1000;
           propertyData.keys = sortKeys(propertyData.keys);
-          console.log(lineData);
           return lineData.isDirty = true;
         };
         drag = d3.behavior.drag().origin(function(d) {

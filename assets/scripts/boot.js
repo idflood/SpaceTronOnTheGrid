@@ -46124,8 +46124,8 @@ define("TimelineMax", ["TweenMax"], (function (global) {
               for (key_index = _l = 0, _len3 = _ref3.length; _l < _len3; key_index = ++_l) {
                 key = _ref3[key_index];
                 if (key_index === 0) {
-                  tween_time = Math.min(-1, key.time - 1);
-                  tween_duration = key.time - tween_time;
+                  tween_time = Math.min(-1, key.time - 0.1);
+                  tween_duration = 0;
                   val = {};
                   val[propName] = key.val;
                   tween = TweenLite.to(item.values, tween_duration, val);
