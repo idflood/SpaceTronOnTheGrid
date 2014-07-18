@@ -19254,11 +19254,11 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
     return EditorTimeline = (function() {
       function EditorTimeline() {
         this.render = __bind(this.render, this);
-        var dragTime, dragTimeMove, gBrush, height, margin, margin_mini, mini_height, onBrush, self, timeGrp, timeSelection, width, xAxis, xAxisElement, xAxisGrid, xAxisMini, xAxisMiniElement, xGrid;
+        var dragTime, dragTimeMove, gBrush, height, margin, margin_mini, mini_height, onBrush, self, timeClicker, timeGrp, timeSelection, width, xAxis, xAxisElement, xAxisGrid, xAxisMini, xAxisMiniElement, xGrid;
         this.app = window.app;
         this.timer = this.app.timer;
         this.currentTime = this.timer.time;
-        this.initialDomain = [2500, this.timer.totalDuration - 220 * 1000];
+        this.initialDomain = [0, this.timer.totalDuration - 220 * 1000];
         margin = {
           top: 15,
           right: 20,
@@ -19267,7 +19267,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         };
         this.margin = margin;
         margin_mini = {
-          top: 5,
+          top: 10,
           right: 20,
           bottom: 0,
           left: 190
@@ -19291,7 +19291,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         xAxisGrid = d3.svg.axis().scale(this.x).ticks(100).tickSize(-height, 0).tickFormat("").orient("top");
         xGrid = this.svgContainer.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(xAxisGrid);
         xAxisElement = this.svgContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxis);
-        xAxisMiniElement = this.svgMiniContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxisMini);
+        xAxisMiniElement = this.svgMiniContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + (margin_mini.top + 7) + ")").call(xAxisMini);
         onBrush = (function(_this) {
           return function() {
             var extent0;
@@ -19316,6 +19316,14 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return d;
         }).on("drag", dragTimeMove);
         timeSelection = this.svgContainer.selectAll('.time-indicator').data(this.currentTime);
+        timeClicker = timeSelection.enter().append('rect').attr('x', 0).attr('y', -50).attr('width', self.x(self.timer.totalDuration)).attr('height', 50).attr('fill-opacity', 0).on('click', function(d) {
+          var dx, mouse;
+          mouse = d3.mouse(this);
+          dx = self.x.invert(mouse[0]);
+          dx = dx.getTime();
+          dx = Math.max(0, dx);
+          return self.currentTime[0] = dx;
+        });
         timeGrp = timeSelection.enter().append("g").attr('class', "time-indicator").call(dragTime);
         timeGrp.append('rect').attr('class', 'time-indicator__line').attr('x', -1).attr('y', 0).attr('width', 1).attr('height', 1000);
         timeGrp.append('path').attr('class', 'time-indicator__handle').attr('d', 'M -10 0 L 0 10 L 10 0 L -10 0');

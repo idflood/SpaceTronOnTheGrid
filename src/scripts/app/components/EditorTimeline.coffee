@@ -7,12 +7,12 @@ define (require) ->
       @app = window.app
       @timer = @app.timer
       @currentTime = @timer.time
-      @initialDomain = [2500, @timer.totalDuration - 220 * 1000]
+      @initialDomain = [0, @timer.totalDuration - 220 * 1000]
 
 
       margin = {top: 15, right: 20, bottom: 0, left: 190}
       this.margin = margin
-      margin_mini = {top: 5, right: 20, bottom: 0, left: 190}
+      margin_mini = {top: 10, right: 20, bottom: 0, left: 190}
 
       width = window.innerWidth - margin.left - margin.right
       mini_height = 50 - margin_mini.top - margin_mini.bottom
@@ -76,7 +76,7 @@ define (require) ->
 
       xAxisMiniElement = @svgMiniContainer.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + margin.top + ")")
+        .attr("transform", "translate(0," + (margin_mini.top + 7) + ")")
         .call(xAxisMini)
 
       onBrush = () =>
@@ -110,6 +110,20 @@ define (require) ->
 
       timeSelection = @svgContainer.selectAll('.time-indicator').data(@currentTime)
 
+      timeClicker = timeSelection.enter().append('rect')
+        .attr('x', 0)
+        .attr('y', -50)
+        .attr('width', self.x(self.timer.totalDuration))
+        .attr('height', 50)
+        .attr('fill-opacity', 0)
+        .on('click', (d) ->
+          mouse = d3.mouse(this)
+          dx = self.x.invert(mouse[0])
+          dx = dx.getTime()
+          dx = Math.max(0, dx)
+          self.currentTime[0] = dx
+          )
+
       timeGrp = timeSelection.enter().append("g")
         .attr('class', "time-indicator")
         .call(dragTime)
@@ -132,7 +146,6 @@ define (require) ->
         .attr("height", height)
 
       # First render
-      #@render()
       window.requestAnimationFrame(@render)
 
       window.onresize = () =>
