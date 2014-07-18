@@ -46069,7 +46069,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       }
 
       Orchestrator.prototype.update = function(timestamp) {
-        var el, item, key, key_index, next_key, propName, property, propertyTimeline, seconds, should_exist, tween, tween_duration, tween_value, val, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
+        var el, item, key, key_index, next_key, propName, property, propertyTimeline, seconds, should_exist, tween, tween_duration, tween_time, val, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
         seconds = timestamp / 1000;
         _ref = this.data;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -46077,9 +46077,6 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           should_exist = seconds >= item.start && seconds <= item.end ? true : false;
           if (!item.values && item.properties.length) {
             item.values = {};
-            item.isDirty = true;
-          }
-          if (item.values && item.isDirty) {
             _ref1 = item.properties;
             for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
               property = _ref1[_j];
@@ -46102,18 +46099,26 @@ define("TimelineMax", ["TweenMax"], (function (global) {
               _ref3 = property.keys;
               for (key_index = _l = 0, _len3 = _ref3.length; _l < _len3; key_index = ++_l) {
                 key = _ref3[key_index];
+                if (key_index === 0) {
+                  tween_time = -1;
+                  tween_duration = key.time - tween_time;
+                  val = {};
+                  val[propName] = key.val;
+                  tween = TweenLite.to(item.values, tween_duration, val);
+                  propertyTimeline.add(tween, tween_time);
+                }
                 if (key_index < property.keys.length - 1) {
                   next_key = property.keys[key_index + 1];
                   tween_duration = next_key.time - key.time;
-                  tween_value = next_key.val;
                   val = {};
-                  val[propName] = tween_value;
+                  val[propName] = next_key.val;
                   tween = TweenLite.to(item.values, tween_duration, val);
                   propertyTimeline.add(tween, key.time);
                 }
               }
               item.timeline.add(propertyTimeline);
             }
+            seconds = seconds - 0.0000001;
           }
           if (should_exist && !item.object) {
             el = this.factory.create('Circles', item.options);

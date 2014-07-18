@@ -30,9 +30,8 @@ define (require) ->
         # create the values object to contain all properties
         if !item.values && item.properties.length
           item.values = {}
-          item.isDirty = true
-
-        if item.values && item.isDirty
+          #item.isDirty = true
+          #if item.values && item.isDirty
           for property in item.properties
             # Take the value of the first key as initial value.
             # @todo: update this when the value of the first key change. (when rebuilding the timeline, simply delete item.values before item.timeline)
@@ -52,21 +51,29 @@ define (require) ->
           for property in item.properties
             propertyTimeline = new TimelineMax()
             propName = property.name
+
             for key, key_index in property.keys
+              if key_index == 0
+                # Add a tween before start for initial value
+                tween_time = -1
+                tween_duration = key.time - tween_time
+                val = {}
+                val[propName] = key.val
+                tween = TweenLite.to(item.values, tween_duration, val)
+                propertyTimeline.add(tween, tween_time)
               if key_index < property.keys.length - 1
                 next_key = property.keys[key_index + 1]
                 tween_duration = next_key.time - key.time
-                tween_value = next_key.val
                 #console.log "add tween: " + propName
                 #console.log {duration: tween_duration, val: tween_value, time: key.time}
                 val = {}
-                val[propName] = tween_value
+                val[propName] = next_key.val
                 tween = TweenLite.to(item.values, tween_duration, val)
                 propertyTimeline.add(tween, key.time)
             item.timeline.add(propertyTimeline)
 
           # force main timeline to refresh
-          #seconds = seconds - 0.000001
+          seconds = seconds - 0.0000001
         #if item.values then console.log item.values.percent
 
         # Create the item
