@@ -19258,13 +19258,14 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.app = window.app;
         this.timer = this.app.timer;
         this.currentTime = this.timer.time;
-        this.initialDomain = [0, this.timer.totalDuration - 220 * 1000];
+        this.initialDomain = [2500, this.timer.totalDuration - 220 * 1000];
         margin = {
           top: 15,
           right: 20,
           bottom: 0,
           left: 190
         };
+        this.margin = margin;
         margin_mini = {
           top: 5,
           right: 20,
@@ -19295,8 +19296,6 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return function() {
             var extent0;
             extent0 = _this.brush.extent();
-            console.log("on brush");
-            console.log(extent0);
             _this.x.domain(extent0);
             xGrid.call(xAxisGrid);
             return xAxisElement.call(xAxis);
@@ -19393,6 +19392,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         }).attr("width", function(d) {
           return Math.max(0, (self.x(d.end) - self.x(d.start)) * 1000 - bar_border);
         }).call(drag);
+        barEnter.append("rect").attr("class", "graph-mask").attr("x", -self.margin.left).attr("y", 1).attr("width", self.margin.left).attr("height", self.lineHeight - 2);
         barEnter.append("text").attr("class", "line--label").attr("x", self.label_position_x).attr("y", 16).text(function(d) {
           return d.label;
         });
@@ -19433,6 +19433,8 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           d.keys.push(newKey);
           return d.keys = sortKeys(d.keys);
         });
+        subGrp.append('g').attr('class', 'keys--wrapper');
+        subGrp.append("rect").attr("class", "graph-mask").attr("x", -self.margin.left).attr("y", 1).attr("width", self.margin.left).attr("height", self.lineHeight - 2);
         subGrp.append('text').attr("class", "line--label line--label-small").attr("x", self.label_position_x).attr("y", 15).text(function(d) {
           return d.name;
         });
@@ -19470,7 +19472,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         propKey = function(d, k) {
           return k;
         };
-        keys = this.properties.selectAll('.key').data(propValue, propKey);
+        keys = this.properties.select('.keys--wrapper').selectAll('.key').data(propValue, propKey);
         key_size = 6;
         keys.enter().append('g').attr('class', 'key').append('g').attr('class', 'key__item').call(drag).append('rect').attr('x', -3).attr('width', key_size).attr('height', key_size).attr('class', 'line--key').attr('transform', 'rotate(45)');
         keys.selectAll('.key__item').attr('transform', function(d) {

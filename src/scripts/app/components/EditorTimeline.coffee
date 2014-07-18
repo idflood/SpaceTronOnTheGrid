@@ -7,10 +7,11 @@ define (require) ->
       @app = window.app
       @timer = @app.timer
       @currentTime = @timer.time
-      @initialDomain = [0, @timer.totalDuration - 220 * 1000]
+      @initialDomain = [2500, @timer.totalDuration - 220 * 1000]
 
 
       margin = {top: 15, right: 20, bottom: 0, left: 190}
+      this.margin = margin
       margin_mini = {top: 5, right: 20, bottom: 0, left: 190}
 
       width = window.innerWidth - margin.left - margin.right
@@ -80,8 +81,6 @@ define (require) ->
 
       onBrush = () =>
         extent0 = @brush.extent()
-        console.log "on brush"
-        console.log extent0
         @x.domain(extent0)
         xGrid.call(xAxisGrid)
         xAxisElement.call(xAxis)
@@ -198,6 +197,13 @@ define (require) ->
         #.attr("width", (d) -> return self.x((d.end - d.start) * 1000) - bar_border)
         .call(drag)
 
+      barEnter.append("rect")
+        .attr("class", "graph-mask")
+        .attr("x", -self.margin.left)
+        .attr("y", 1)
+        .attr("width", self.margin.left)
+        .attr("height", self.lineHeight - 2)
+
       barEnter.append("text")
         .attr("class", "line--label")
         .attr("x", self.label_position_x)
@@ -245,6 +251,15 @@ define (require) ->
           # Sort the keys for tweens creation
           d.keys = sortKeys(d.keys)
 
+      subGrp.append('g').attr('class','keys--wrapper')
+
+      subGrp.append("rect")
+        .attr("class", "graph-mask")
+        .attr("x", -self.margin.left)
+        .attr("y", 1)
+        .attr("width", self.margin.left)
+        .attr("height", self.lineHeight - 2)
+
       subGrp.append('text')
         .attr("class", "line--label line--label-small")
         .attr("x", self.label_position_x)
@@ -288,7 +303,7 @@ define (require) ->
       propValue = (d,i,j) -> d.keys
       propKey = (d, k) ->
         return k
-      keys = @properties.selectAll('.key').data(propValue, propKey)
+      keys = @properties.select('.keys--wrapper').selectAll('.key').data(propValue, propKey)
 
       key_size = 6
       keys.enter()
