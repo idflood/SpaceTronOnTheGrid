@@ -7,27 +7,48 @@ define (require) ->
       @app = window.app
       @timer = @app.timer
       @currentTime = @timer.time
+      @initialDomain = [0, @timer.totalDuration - 220 * 1000]
 
 
       margin = {top: 15, right: 20, bottom: 0, left: 190}
+      margin_mini = {top: 5, right: 20, bottom: 0, left: 190}
+
       width = window.innerWidth - margin.left - margin.right
-      height = 270 - margin.top - margin.bottom
+      mini_height = 50 - margin_mini.top - margin_mini.bottom
+      height = 270 - margin.top - margin.bottom - mini_height
       @lineHeight = 20
       @label_position_x = -170
       @dy = 10 + margin.top
 
       @x = d3.time.scale().range([0, width])
-      #@x = d3.scale.linear().range([0, width])
-      @x.domain([0, @timer.totalDuration - 220 * 1000])
+      @x.domain(@initialDomain)
+
+      @xMini = d3.time.scale().range([0, width])
+      @xMini.domain([0, @timer.totalDuration])
+
+
 
       xAxis = d3.svg.axis()
         .scale(@x)
         .orient("top")
         .tickSize(-height, 0)
-        #.tickFormat(d3.time.format("%S %L"))
         .tickFormat(@formatMinutes)
 
-      #@svg = d3.select($timeline.get(0)).append("svg")
+      xAxisMini = d3.svg.axis()
+        .scale(@xMini)
+        .orient("top")
+        .tickSize(-5, 0)
+        .tickFormat(@formatMinutes)
+
+
+      @svgMini = d3.select('.editor__time-main').append("svg")
+        .attr("width", width + margin_mini.left + margin_mini.right)
+        .attr("height", mini_height + margin_mini.top + margin_mini.bottom)
+      @svgMiniContainer = @svgMini.append("g")
+        .attr("transform", "translate(" + margin_mini.left + "," + margin_mini.top + ")")
+
+
+
       @svg = d3.select('.editor__time-main').append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
@@ -51,6 +72,30 @@ define (require) ->
         .attr("transform", "translate(0," + margin.top + ")")
         .call(xAxis)
 
+
+      xAxisMiniElement = @svgMiniContainer.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + margin.top + ")")
+        .call(xAxisMini)
+
+      onBrush = () =>
+        extent0 = @brush.extent()
+        console.log "on brush"
+        console.log extent0
+        @x.domain(extent0)
+        xGrid.call(xAxisGrid)
+        xAxisElement.call(xAxis)
+
+      @brush = d3.svg.brush()
+        .x(@xMini)
+        .extent(@initialDomain)
+        .on("brush", onBrush)
+
+      gBrush = @svgMiniContainer.append("g")
+        .attr("class", "brush")
+        .call(@brush)
+        .selectAll("rect")
+        .attr('height', 20)
       self = this
       dragTimeMove = (d) ->
         d3.event.sourceEvent.stopPropagation()
@@ -88,6 +133,7 @@ define (require) ->
         @svg.attr("width", width + margin.left + margin.right)
 
         @x.range([0, width])
+        @xMini.range([0, width])
         xGrid.call(xAxisGrid)
         xAxisElement.call(xAxis)
 
@@ -154,7 +200,10 @@ define (require) ->
 
       bar.selectAll('.bar')
         .attr("x", (d) -> return self.x(d.start * 1000) + bar_border)
-        .attr("width", (d) -> return self.x((d.end - d.start) * 1000) - bar_border)
+        .attr("width", (d) ->
+          #console.log (self.x(d.end) - self.x(d.start)))
+          return Math.max(0, (self.x(d.end) - self.x(d.start)) * 1000 - bar_border)
+        #.attr("width", (d) -> return self.x((d.end - d.start) * 1000) - bar_border)
         .call(drag)
 
       barEnter.append("text")
@@ -253,8 +302,9 @@ define (require) ->
 
       keys.selectAll('.key__item')
         .attr 'transform', (d) ->
-          dx = self.x(d.time) * 1000 + 3
+          dx = self.x(d.time * 1000) + 3
           dy = 9
+          #console.log dx
           return "translate(" + dx + "," + dy + ")"
 
       keys.exit().remove()

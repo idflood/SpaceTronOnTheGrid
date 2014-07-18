@@ -38,7 +38,7 @@ define (require) ->
           id: 'item1',
           label: 'Test circles',
           type: 'Circles'
-          start: 0, end: 10,
+          start: 1, end: 10,
           options: {numItems: 12},
           properties: [
             {name: 'percent', keys: [{time: 2, val: 7}, {time: 3, val: 42}, {time: 5, val: -40}]}

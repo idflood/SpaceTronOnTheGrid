@@ -19254,29 +19254,56 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
     return EditorTimeline = (function() {
       function EditorTimeline() {
         this.render = __bind(this.render, this);
-        var dragTime, dragTimeMove, height, margin, self, timeGrp, timeSelection, width, xAxis, xAxisElement, xAxisGrid, xGrid;
+        var dragTime, dragTimeMove, gBrush, height, margin, margin_mini, mini_height, onBrush, self, timeGrp, timeSelection, width, xAxis, xAxisElement, xAxisGrid, xAxisMini, xAxisMiniElement, xGrid;
         this.app = window.app;
         this.timer = this.app.timer;
         this.currentTime = this.timer.time;
+        this.initialDomain = [0, this.timer.totalDuration - 220 * 1000];
         margin = {
           top: 15,
           right: 20,
           bottom: 0,
           left: 190
         };
+        margin_mini = {
+          top: 5,
+          right: 20,
+          bottom: 0,
+          left: 190
+        };
         width = window.innerWidth - margin.left - margin.right;
-        height = 270 - margin.top - margin.bottom;
+        mini_height = 50 - margin_mini.top - margin_mini.bottom;
+        height = 270 - margin.top - margin.bottom - mini_height;
         this.lineHeight = 20;
         this.label_position_x = -170;
         this.dy = 10 + margin.top;
         this.x = d3.time.scale().range([0, width]);
-        this.x.domain([0, this.timer.totalDuration - 220 * 1000]);
+        this.x.domain(this.initialDomain);
+        this.xMini = d3.time.scale().range([0, width]);
+        this.xMini.domain([0, this.timer.totalDuration]);
         xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(this.formatMinutes);
+        xAxisMini = d3.svg.axis().scale(this.xMini).orient("top").tickSize(-5, 0).tickFormat(this.formatMinutes);
+        this.svgMini = d3.select('.editor__time-main').append("svg").attr("width", width + margin_mini.left + margin_mini.right).attr("height", mini_height + margin_mini.top + margin_mini.bottom);
+        this.svgMiniContainer = this.svgMini.append("g").attr("transform", "translate(" + margin_mini.left + "," + margin_mini.top + ")");
         this.svg = d3.select('.editor__time-main').append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom);
         this.svgContainer = this.svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         xAxisGrid = d3.svg.axis().scale(this.x).ticks(100).tickSize(-height, 0).tickFormat("").orient("top");
         xGrid = this.svgContainer.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(xAxisGrid);
         xAxisElement = this.svgContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxis);
+        xAxisMiniElement = this.svgMiniContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxisMini);
+        onBrush = (function(_this) {
+          return function() {
+            var extent0;
+            extent0 = _this.brush.extent();
+            console.log("on brush");
+            console.log(extent0);
+            _this.x.domain(extent0);
+            xGrid.call(xAxisGrid);
+            return xAxisElement.call(xAxis);
+          };
+        })(this);
+        this.brush = d3.svg.brush().x(this.xMini).extent(this.initialDomain).on("brush", onBrush);
+        gBrush = this.svgMiniContainer.append("g").attr("class", "brush").call(this.brush).selectAll("rect").attr('height', 20);
         self = this;
         dragTimeMove = function(d) {
           var dx;
@@ -19299,6 +19326,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
             width = window.innerWidth - margin.left - margin.right;
             _this.svg.attr("width", width + margin.left + margin.right);
             _this.x.range([0, width]);
+            _this.xMini.range([0, width]);
             xGrid.call(xAxisGrid);
             return xAxisElement.call(xAxis);
           };
@@ -19368,7 +19396,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         bar.selectAll('.bar').attr("x", function(d) {
           return self.x(d.start * 1000) + bar_border;
         }).attr("width", function(d) {
-          return self.x((d.end - d.start) * 1000) - bar_border;
+          return Math.max(0, (self.x(d.end) - self.x(d.start)) * 1000) - bar_border;
         }).call(drag);
         barEnter.append("text").attr("class", "line--label").attr("x", self.label_position_x).attr("y", 16).text(function(d) {
           return d.label;
@@ -19437,7 +19465,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         keys.enter().append('g').attr('class', 'key').append('g').attr('class', 'key__item').call(drag).append('rect').attr('x', -3).attr('width', key_size).attr('height', key_size).attr('class', 'line--key').attr('transform', 'rotate(45)');
         keys.selectAll('.key__item').attr('transform', function(d) {
           var dx, dy;
-          dx = self.x(d.time) * 1000 + 3;
+          dx = self.x(d.time * 1000) + 3;
           dy = 9;
           return "translate(" + dx + "," + dy + ")";
         });

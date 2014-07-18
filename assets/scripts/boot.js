@@ -46211,7 +46211,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
             id: 'item1',
             label: 'Test circles',
             type: 'Circles',
-            start: 0,
+            start: 1,
             end: 10,
             options: {
               numItems: 12
