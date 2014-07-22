@@ -19243,14 +19243,547 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
   if (typeof define === "function" && define.amd) define('d3',d3); else if (typeof module === "object" && module.exports) module.exports = d3;
   this.d3 = d3;
 }();
+/*jslint onevar:true, undef:true, newcap:true, regexp:true, bitwise:true, maxerr:50, indent:4, white:false, nomen:false, plusplus:false */
+/*global define:false, require:false, exports:false, module:false, signals:false */
+
+/** @license
+ * JS Signals <http://millermedeiros.github.com/js-signals/>
+ * Released under the MIT license
+ * Author: Miller Medeiros
+ * Version: 1.0.0 - Build: 268 (2012/11/29 05:48 PM)
+ */
+
+(function(global){
+
+    // SignalBinding -------------------------------------------------
+    //================================================================
+
+    /**
+     * Object that represents a binding between a Signal and a listener function.
+     * <br />- <strong>This is an internal constructor and shouldn't be called by regular users.</strong>
+     * <br />- inspired by Joa Ebert AS3 SignalBinding and Robert Penner's Slot classes.
+     * @author Miller Medeiros
+     * @constructor
+     * @internal
+     * @name SignalBinding
+     * @param {Signal} signal Reference to Signal object that listener is currently bound to.
+     * @param {Function} listener Handler function bound to the signal.
+     * @param {boolean} isOnce If binding should be executed just once.
+     * @param {Object} [listenerContext] Context on which listener will be executed (object that should represent the `this` variable inside listener function).
+     * @param {Number} [priority] The priority level of the event listener. (default = 0).
+     */
+    function SignalBinding(signal, listener, isOnce, listenerContext, priority) {
+
+        /**
+         * Handler function bound to the signal.
+         * @type Function
+         * @private
+         */
+        this._listener = listener;
+
+        /**
+         * If binding should be executed just once.
+         * @type boolean
+         * @private
+         */
+        this._isOnce = isOnce;
+
+        /**
+         * Context on which listener will be executed (object that should represent the `this` variable inside listener function).
+         * @memberOf SignalBinding.prototype
+         * @name context
+         * @type Object|undefined|null
+         */
+        this.context = listenerContext;
+
+        /**
+         * Reference to Signal object that listener is currently bound to.
+         * @type Signal
+         * @private
+         */
+        this._signal = signal;
+
+        /**
+         * Listener priority
+         * @type Number
+         * @private
+         */
+        this._priority = priority || 0;
+    }
+
+    SignalBinding.prototype = {
+
+        /**
+         * If binding is active and should be executed.
+         * @type boolean
+         */
+        active : true,
+
+        /**
+         * Default parameters passed to listener during `Signal.dispatch` and `SignalBinding.execute`. (curried parameters)
+         * @type Array|null
+         */
+        params : null,
+
+        /**
+         * Call listener passing arbitrary parameters.
+         * <p>If binding was added using `Signal.addOnce()` it will be automatically removed from signal dispatch queue, this method is used internally for the signal dispatch.</p>
+         * @param {Array} [paramsArr] Array of parameters that should be passed to the listener
+         * @return {*} Value returned by the listener.
+         */
+        execute : function (paramsArr) {
+            var handlerReturn, params;
+            if (this.active && !!this._listener) {
+                params = this.params? this.params.concat(paramsArr) : paramsArr;
+                handlerReturn = this._listener.apply(this.context, params);
+                if (this._isOnce) {
+                    this.detach();
+                }
+            }
+            return handlerReturn;
+        },
+
+        /**
+         * Detach binding from signal.
+         * - alias to: mySignal.remove(myBinding.getListener());
+         * @return {Function|null} Handler function bound to the signal or `null` if binding was previously detached.
+         */
+        detach : function () {
+            return this.isBound()? this._signal.remove(this._listener, this.context) : null;
+        },
+
+        /**
+         * @return {Boolean} `true` if binding is still bound to the signal and have a listener.
+         */
+        isBound : function () {
+            return (!!this._signal && !!this._listener);
+        },
+
+        /**
+         * @return {boolean} If SignalBinding will only be executed once.
+         */
+        isOnce : function () {
+            return this._isOnce;
+        },
+
+        /**
+         * @return {Function} Handler function bound to the signal.
+         */
+        getListener : function () {
+            return this._listener;
+        },
+
+        /**
+         * @return {Signal} Signal that listener is currently bound to.
+         */
+        getSignal : function () {
+            return this._signal;
+        },
+
+        /**
+         * Delete instance properties
+         * @private
+         */
+        _destroy : function () {
+            delete this._signal;
+            delete this._listener;
+            delete this.context;
+        },
+
+        /**
+         * @return {string} String representation of the object.
+         */
+        toString : function () {
+            return '[SignalBinding isOnce:' + this._isOnce +', isBound:'+ this.isBound() +', active:' + this.active + ']';
+        }
+
+    };
+
+
+/*global SignalBinding:false*/
+
+    // Signal --------------------------------------------------------
+    //================================================================
+
+    function validateListener(listener, fnName) {
+        if (typeof listener !== 'function') {
+            throw new Error( 'listener is a required param of {fn}() and should be a Function.'.replace('{fn}', fnName) );
+        }
+    }
+
+    /**
+     * Custom event broadcaster
+     * <br />- inspired by Robert Penner's AS3 Signals.
+     * @name Signal
+     * @author Miller Medeiros
+     * @constructor
+     */
+    function Signal() {
+        /**
+         * @type Array.<SignalBinding>
+         * @private
+         */
+        this._bindings = [];
+        this._prevParams = null;
+
+        // enforce dispatch to aways work on same context (#47)
+        var self = this;
+        this.dispatch = function(){
+            Signal.prototype.dispatch.apply(self, arguments);
+        };
+    }
+
+    Signal.prototype = {
+
+        /**
+         * Signals Version Number
+         * @type String
+         * @const
+         */
+        VERSION : '1.0.0',
+
+        /**
+         * If Signal should keep record of previously dispatched parameters and
+         * automatically execute listener during `add()`/`addOnce()` if Signal was
+         * already dispatched before.
+         * @type boolean
+         */
+        memorize : false,
+
+        /**
+         * @type boolean
+         * @private
+         */
+        _shouldPropagate : true,
+
+        /**
+         * If Signal is active and should broadcast events.
+         * <p><strong>IMPORTANT:</strong> Setting this property during a dispatch will only affect the next dispatch, if you want to stop the propagation of a signal use `halt()` instead.</p>
+         * @type boolean
+         */
+        active : true,
+
+        /**
+         * @param {Function} listener
+         * @param {boolean} isOnce
+         * @param {Object} [listenerContext]
+         * @param {Number} [priority]
+         * @return {SignalBinding}
+         * @private
+         */
+        _registerListener : function (listener, isOnce, listenerContext, priority) {
+
+            var prevIndex = this._indexOfListener(listener, listenerContext),
+                binding;
+
+            if (prevIndex !== -1) {
+                binding = this._bindings[prevIndex];
+                if (binding.isOnce() !== isOnce) {
+                    throw new Error('You cannot add'+ (isOnce? '' : 'Once') +'() then add'+ (!isOnce? '' : 'Once') +'() the same listener without removing the relationship first.');
+                }
+            } else {
+                binding = new SignalBinding(this, listener, isOnce, listenerContext, priority);
+                this._addBinding(binding);
+            }
+
+            if(this.memorize && this._prevParams){
+                binding.execute(this._prevParams);
+            }
+
+            return binding;
+        },
+
+        /**
+         * @param {SignalBinding} binding
+         * @private
+         */
+        _addBinding : function (binding) {
+            //simplified insertion sort
+            var n = this._bindings.length;
+            do { --n; } while (this._bindings[n] && binding._priority <= this._bindings[n]._priority);
+            this._bindings.splice(n + 1, 0, binding);
+        },
+
+        /**
+         * @param {Function} listener
+         * @return {number}
+         * @private
+         */
+        _indexOfListener : function (listener, context) {
+            var n = this._bindings.length,
+                cur;
+            while (n--) {
+                cur = this._bindings[n];
+                if (cur._listener === listener && cur.context === context) {
+                    return n;
+                }
+            }
+            return -1;
+        },
+
+        /**
+         * Check if listener was attached to Signal.
+         * @param {Function} listener
+         * @param {Object} [context]
+         * @return {boolean} if Signal has the specified listener.
+         */
+        has : function (listener, context) {
+            return this._indexOfListener(listener, context) !== -1;
+        },
+
+        /**
+         * Add a listener to the signal.
+         * @param {Function} listener Signal handler function.
+         * @param {Object} [listenerContext] Context on which listener will be executed (object that should represent the `this` variable inside listener function).
+         * @param {Number} [priority] The priority level of the event listener. Listeners with higher priority will be executed before listeners with lower priority. Listeners with same priority level will be executed at the same order as they were added. (default = 0)
+         * @return {SignalBinding} An Object representing the binding between the Signal and listener.
+         */
+        add : function (listener, listenerContext, priority) {
+            validateListener(listener, 'add');
+            return this._registerListener(listener, false, listenerContext, priority);
+        },
+
+        /**
+         * Add listener to the signal that should be removed after first execution (will be executed only once).
+         * @param {Function} listener Signal handler function.
+         * @param {Object} [listenerContext] Context on which listener will be executed (object that should represent the `this` variable inside listener function).
+         * @param {Number} [priority] The priority level of the event listener. Listeners with higher priority will be executed before listeners with lower priority. Listeners with same priority level will be executed at the same order as they were added. (default = 0)
+         * @return {SignalBinding} An Object representing the binding between the Signal and listener.
+         */
+        addOnce : function (listener, listenerContext, priority) {
+            validateListener(listener, 'addOnce');
+            return this._registerListener(listener, true, listenerContext, priority);
+        },
+
+        /**
+         * Remove a single listener from the dispatch queue.
+         * @param {Function} listener Handler function that should be removed.
+         * @param {Object} [context] Execution context (since you can add the same handler multiple times if executing in a different context).
+         * @return {Function} Listener handler function.
+         */
+        remove : function (listener, context) {
+            validateListener(listener, 'remove');
+
+            var i = this._indexOfListener(listener, context);
+            if (i !== -1) {
+                this._bindings[i]._destroy(); //no reason to a SignalBinding exist if it isn't attached to a signal
+                this._bindings.splice(i, 1);
+            }
+            return listener;
+        },
+
+        /**
+         * Remove all listeners from the Signal.
+         */
+        removeAll : function () {
+            var n = this._bindings.length;
+            while (n--) {
+                this._bindings[n]._destroy();
+            }
+            this._bindings.length = 0;
+        },
+
+        /**
+         * @return {number} Number of listeners attached to the Signal.
+         */
+        getNumListeners : function () {
+            return this._bindings.length;
+        },
+
+        /**
+         * Stop propagation of the event, blocking the dispatch to next listeners on the queue.
+         * <p><strong>IMPORTANT:</strong> should be called only during signal dispatch, calling it before/after dispatch won't affect signal broadcast.</p>
+         * @see Signal.prototype.disable
+         */
+        halt : function () {
+            this._shouldPropagate = false;
+        },
+
+        /**
+         * Dispatch/Broadcast Signal to all listeners added to the queue.
+         * @param {...*} [params] Parameters that should be passed to each handler.
+         */
+        dispatch : function (params) {
+            if (! this.active) {
+                return;
+            }
+
+            var paramsArr = Array.prototype.slice.call(arguments),
+                n = this._bindings.length,
+                bindings;
+
+            if (this.memorize) {
+                this._prevParams = paramsArr;
+            }
+
+            if (! n) {
+                //should come after memorize
+                return;
+            }
+
+            bindings = this._bindings.slice(); //clone array in case add/remove items during dispatch
+            this._shouldPropagate = true; //in case `halt` was called before dispatch or during the previous dispatch.
+
+            //execute all callbacks until end of the list or until a callback returns `false` or stops propagation
+            //reverse loop since listeners with higher priority will be added at the end of the list
+            do { n--; } while (bindings[n] && this._shouldPropagate && bindings[n].execute(paramsArr) !== false);
+        },
+
+        /**
+         * Forget memorized arguments.
+         * @see Signal.memorize
+         */
+        forget : function(){
+            this._prevParams = null;
+        },
+
+        /**
+         * Remove all bindings from signal and destroy any reference to external objects (destroy Signal object).
+         * <p><strong>IMPORTANT:</strong> calling any method on the signal instance after calling dispose will throw errors.</p>
+         */
+        dispose : function () {
+            this.removeAll();
+            delete this._bindings;
+            delete this._prevParams;
+        },
+
+        /**
+         * @return {string} String representation of the object.
+         */
+        toString : function () {
+            return '[Signal active:'+ this.active +' numListeners:'+ this.getNumListeners() +']';
+        }
+
+    };
+
+
+    // Namespace -----------------------------------------------------
+    //================================================================
+
+    /**
+     * Signals namespace
+     * @namespace
+     * @name signals
+     */
+    var signals = Signal;
+
+    /**
+     * Custom event broadcaster
+     * @see Signal
+     */
+    // alias for backwards compatibility (see #gh-44)
+    signals.Signal = Signal;
+
+
+
+    //exports to multiple environments
+    if(typeof define === 'function' && define.amd){ //AMD
+        define('Signal',[],function () { return signals; });
+    } else if (typeof module !== 'undefined' && module.exports){ //node
+        module.exports = signals;
+    } else { //browser
+        //use string because of Google closure compiler ADVANCED_MODE
+        /*jslint sub:true */
+        global['signals'] = signals;
+    }
+
+}(this));
+
+
+(function() {
+  define('cs!app/components/Timeline/TimelineUtils',['require'],function(require) {
+    var TimelineUtils;
+    return TimelineUtils = (function() {
+      function TimelineUtils() {}
+
+      TimelineUtils.formatMinutes = function(d) {
+        var hours, minutes, output, seconds;
+        d = d / 1000;
+        hours = Math.floor(d / 3600);
+        minutes = Math.floor((d - (hours * 3600)) / 60);
+        seconds = d - (minutes * 60);
+        output = seconds + "s";
+        if (minutes) {
+          output = minutes + "m " + output;
+        }
+        if (hours) {
+          output = hours + "h " + output;
+        }
+        return output;
+      };
+
+      return TimelineUtils;
+
+    })();
+  });
+
+}).call(this);
+
 
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/components/EditorTimeline',['require','jquery','d3'],function(require) {
-    var $, EditorTimeline, d3, extend;
+  define('cs!app/components/Timeline/TimelineHeader',['require','jquery','d3','Signal','cs!app/components/Timeline/TimelineUtils'],function(require) {
+    var $, Signals, TimelineHeader, TimelineUtils, d3;
     $ = require('jquery');
     d3 = require('d3');
+    Signals = require('Signal');
+    TimelineUtils = require('cs!app/components/Timeline/TimelineUtils');
+    return TimelineHeader = (function() {
+      function TimelineHeader(app, timer, initialDomain, width) {
+        var gBrush, height, onBrush;
+        this.app = app;
+        this.timer = timer;
+        this.resize = __bind(this.resize, this);
+        this.onBrush = new Signals.Signal();
+        this.margin = {
+          top: 10,
+          right: 20,
+          bottom: 0,
+          left: 190
+        };
+        height = 50 - this.margin.top - this.margin.bottom;
+        this.x = d3.time.scale().range([0, width]);
+        this.x.domain([0, this.timer.totalDuration]);
+        this.xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-5, 0).tickFormat(TimelineUtils.formatMinutes);
+        this.svg = d3.select('.editor__time-header').append("svg").attr("width", width + this.margin.left + this.margin.right).attr("height", 30);
+        this.svgContainer = this.svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+        this.xAxisElement = this.svgContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + (this.margin.top + 7) + ")").call(this.xAxis);
+        onBrush = (function(_this) {
+          return function() {
+            var extent0;
+            extent0 = _this.brush.extent();
+            return _this.onBrush.dispatch(extent0);
+          };
+        })(this);
+        this.brush = d3.svg.brush().x(this.x).extent(initialDomain).on("brush", onBrush);
+        gBrush = this.svgContainer.append("g").attr("class", "brush").call(this.brush).selectAll("rect").attr('height', 20);
+      }
+
+      TimelineHeader.prototype.resize = function(width) {
+        width = width - this.margin.left - this.margin.right;
+        this.svg.attr("width", width + this.margin.left + this.margin.right);
+        this.x.range([0, width]);
+        return this.xAxisElement.call(this.xAxis);
+      };
+
+      return TimelineHeader;
+
+    })();
+  });
+
+}).call(this);
+
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  define('cs!app/components/Timeline/Timeline',['require','jquery','d3','cs!app/components/Timeline/TimelineHeader','cs!app/components/Timeline/TimelineUtils'],function(require) {
+    var $, Timeline, TimelineHeader, TimelineUtils, d3, extend;
+    $ = require('jquery');
+    d3 = require('d3');
+    TimelineHeader = require('cs!app/components/Timeline/TimelineHeader');
+    TimelineUtils = require('cs!app/components/Timeline/TimelineUtils');
     extend = function(object, properties) {
       var key, val;
       for (key in properties) {
@@ -19259,10 +19792,10 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       }
       return object;
     };
-    return EditorTimeline = (function() {
-      function EditorTimeline() {
+    return Timeline = (function() {
+      function Timeline() {
         this.render = __bind(this.render, this);
-        var dragTime, dragTimeMove, gBrush, height, margin, margin_mini, mini_height, onBrush, self, timeClicker, timeGrp, timeSelection, width, xAxis, xAxisElement, xAxisGrid, xAxisMini, xAxisMiniElement, xGrid;
+        var dragTime, dragTimeMove, height, margin, self, timeClicker, timeGrp, timeSelection, width, xAxis, xAxisElement, xAxisGrid, xGrid;
         this.app = window.app;
         this.timer = this.app.timer;
         this.currentTime = this.timer.time;
@@ -19274,43 +19807,27 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           left: 190
         };
         this.margin = margin;
-        margin_mini = {
-          top: 10,
-          right: 20,
-          bottom: 0,
-          left: 190
-        };
         width = window.innerWidth - margin.left - margin.right;
-        mini_height = 50 - margin_mini.top - margin_mini.bottom;
-        height = 270 - margin.top - margin.bottom - mini_height;
+        height = 270 - margin.top - margin.bottom - 40;
         this.lineHeight = 20;
         this.label_position_x = -170;
         this.dy = 10 + margin.top;
+        this.timelineHeader = new TimelineHeader(this.app, this.timer, this.initialDomain, width);
         this.x = d3.time.scale().range([0, width]);
         this.x.domain(this.initialDomain);
-        this.xMini = d3.time.scale().range([0, width]);
-        this.xMini.domain([0, this.timer.totalDuration]);
-        xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(this.formatMinutes);
-        xAxisMini = d3.svg.axis().scale(this.xMini).orient("top").tickSize(-5, 0).tickFormat(this.formatMinutes);
-        this.svgMini = d3.select('.editor__time-header').append("svg").attr("width", width + margin_mini.left + margin_mini.right).attr("height", 30);
-        this.svgMiniContainer = this.svgMini.append("g").attr("transform", "translate(" + margin_mini.left + "," + margin_mini.top + ")");
+        xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(TimelineUtils.formatMinutes);
         this.svg = d3.select('.editor__time-main').append("svg").attr("width", width + margin.left + margin.right).attr("height", 600);
         this.svgContainer = this.svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         xAxisGrid = d3.svg.axis().scale(this.x).ticks(100).tickSize(-height, 0).tickFormat("").orient("top");
         xGrid = this.svgContainer.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(xAxisGrid);
         xAxisElement = this.svgContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxis);
-        xAxisMiniElement = this.svgMiniContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + (margin_mini.top + 7) + ")").call(xAxisMini);
-        onBrush = (function(_this) {
-          return function() {
-            var extent0;
-            extent0 = _this.brush.extent();
-            _this.x.domain(extent0);
+        this.timelineHeader.onBrush.add((function(_this) {
+          return function(extent) {
+            _this.x.domain(extent);
             xGrid.call(xAxisGrid);
             return xAxisElement.call(xAxis);
           };
-        })(this);
-        this.brush = d3.svg.brush().x(this.xMini).extent(this.initialDomain).on("brush", onBrush);
-        gBrush = this.svgMiniContainer.append("g").attr("class", "brush").call(this.brush).selectAll("rect").attr('height', 20);
+        })(this));
         self = this;
         dragTimeMove = function(d) {
           var dx;
@@ -19339,19 +19856,19 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         window.requestAnimationFrame(this.render);
         window.onresize = (function(_this) {
           return function() {
-            width = window.innerWidth - margin.left - margin.right;
+            var INNER_WIDTH;
+            INNER_WIDTH = window.innerWidth;
+            width = INNER_WIDTH - margin.left - margin.right;
             _this.svg.attr("width", width + margin.left + margin.right);
-            _this.svgMini.attr("width", width + margin_mini.left + margin_mini.right);
             _this.x.range([0, width]);
-            _this.xMini.range([0, width]);
             xGrid.call(xAxisGrid);
             xAxisElement.call(xAxis);
-            return xAxisMiniElement.call(xAxisMini);
+            return _this.timelineHeader.resize(INNER_WIDTH);
           };
         })(this);
       }
 
-      EditorTimeline.prototype.render = function() {
+      Timeline.prototype.render = function() {
         var bar;
         bar = this.renderLines();
         this.renderTimeIndicator();
@@ -19360,13 +19877,13 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         return window.requestAnimationFrame(this.render);
       };
 
-      EditorTimeline.prototype.renderTimeIndicator = function() {
+      Timeline.prototype.renderTimeIndicator = function() {
         var timeSelection;
         timeSelection = this.svgContainer.selectAll('.time-indicator');
         return timeSelection.attr('transform', 'translate(' + (this.x(this.currentTime[0]) + 0.5) + ', -12)');
       };
 
-      EditorTimeline.prototype.renderLines = function() {
+      Timeline.prototype.renderLines = function() {
         var bar, barEnter, bar_border, drag, dragLeft, dragRight, dragmove, dragmoveLeft, dragmoveRight, selectBar, self;
         self = this;
         selectBar = function(d) {
@@ -19481,7 +19998,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         return bar;
       };
 
-      EditorTimeline.prototype.renderProperties = function(bar) {
+      Timeline.prototype.renderProperties = function(bar) {
         var propKey, propVal, self, sortKeys, subGrp;
         self = this;
         propVal = function(d, i) {
@@ -19525,7 +20042,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         return subGrp.append("line").attr("class", 'line--separator-secondary').attr("x1", -200).attr("x2", self.x(self.timer.totalDuration + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
       };
 
-      EditorTimeline.prototype.renderKeys = function() {
+      Timeline.prototype.renderKeys = function() {
         var drag, dragmove, key_size, keys, propKey, propValue, selectKey, self, sortKeys;
         self = this;
         sortKeys = function(keys) {
@@ -19583,23 +20100,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         return keys.exit().remove();
       };
 
-      EditorTimeline.prototype.formatMinutes = function(d) {
-        var hours, minutes, output, seconds;
-        d = d / 1000;
-        hours = Math.floor(d / 3600);
-        minutes = Math.floor((d - (hours * 3600)) / 60);
-        seconds = d - (minutes * 60);
-        output = seconds + "s";
-        if (minutes) {
-          output = minutes + "m " + output;
-        }
-        if (hours) {
-          output = hours + "h " + output;
-        }
-        return output;
-      };
-
-      return EditorTimeline;
+      return Timeline;
 
     })();
   });
@@ -19608,11 +20109,11 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 
 
 (function() {
-  define('cs!app/Editor',['require','jquery','text!app/templates/timeline.tpl.html','cs!app/components/EditorTimeline'],function(require) {
+  define('cs!app/Editor',['require','jquery','text!app/templates/timeline.tpl.html','cs!app/components/Timeline/Timeline'],function(require) {
     var $, Editor, EditorTimeline, tpl_timeline;
     $ = require('jquery');
     tpl_timeline = require('text!app/templates/timeline.tpl.html');
-    EditorTimeline = require('cs!app/components/EditorTimeline');
+    EditorTimeline = require('cs!app/components/Timeline/Timeline');
     return Editor = (function() {
       function Editor() {
         this.app = window.app;

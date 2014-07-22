@@ -2,12 +2,15 @@ define (require) ->
   $ = require 'jquery'
   d3 = require 'd3'
 
+  TimelineHeader = require 'cs!app/components/Timeline/TimelineHeader'
+  TimelineUtils = require 'cs!app/components/Timeline/TimelineUtils'
+
   extend = (object, properties) ->
     for key, val of properties
       object[key] = val
     object
 
-  class EditorTimeline
+  class Timeline
     constructor: () ->
       @app = window.app
       @timer = @app.timer
@@ -15,22 +18,22 @@ define (require) ->
       @initialDomain = [0, @timer.totalDuration - 220 * 1000]
 
 
+
       margin = {top: 15, right: 20, bottom: 0, left: 190}
       this.margin = margin
-      margin_mini = {top: 10, right: 20, bottom: 0, left: 190}
 
       width = window.innerWidth - margin.left - margin.right
-      mini_height = 50 - margin_mini.top - margin_mini.bottom
-      height = 270 - margin.top - margin.bottom - mini_height
+      height = 270 - margin.top - margin.bottom - 40
       @lineHeight = 20
       @label_position_x = -170
       @dy = 10 + margin.top
 
+      @timelineHeader = new TimelineHeader(@app, @timer, @initialDomain, width)
+
       @x = d3.time.scale().range([0, width])
       @x.domain(@initialDomain)
 
-      @xMini = d3.time.scale().range([0, width])
-      @xMini.domain([0, @timer.totalDuration])
+
 
 
 
@@ -38,20 +41,12 @@ define (require) ->
         .scale(@x)
         .orient("top")
         .tickSize(-height, 0)
-        .tickFormat(@formatMinutes)
-
-      xAxisMini = d3.svg.axis()
-        .scale(@xMini)
-        .orient("top")
-        .tickSize(-5, 0)
-        .tickFormat(@formatMinutes)
+        .tickFormat(TimelineUtils.formatMinutes)
 
 
-      @svgMini = d3.select('.editor__time-header').append("svg")
-        .attr("width", width + margin_mini.left + margin_mini.right)
-        .attr("height", 30)
-      @svgMiniContainer = @svgMini.append("g")
-        .attr("transform", "translate(" + margin_mini.left + "," + margin_mini.top + ")")
+
+
+
 
       @svg = d3.select('.editor__time-main').append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -78,27 +73,12 @@ define (require) ->
         .call(xAxis)
 
 
-      xAxisMiniElement = @svgMiniContainer.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + (margin_mini.top + 7) + ")")
-        .call(xAxisMini)
-
-      onBrush = () =>
-        extent0 = @brush.extent()
-        @x.domain(extent0)
+      @timelineHeader.onBrush.add (extent) =>
+        @x.domain(extent)
         xGrid.call(xAxisGrid)
         xAxisElement.call(xAxis)
 
-      @brush = d3.svg.brush()
-        .x(@xMini)
-        .extent(@initialDomain)
-        .on("brush", onBrush)
 
-      gBrush = @svgMiniContainer.append("g")
-        .attr("class", "brush")
-        .call(@brush)
-        .selectAll("rect")
-        .attr('height', 20)
       self = this
       dragTimeMove = (d) ->
         d3.event.sourceEvent.stopPropagation()
@@ -153,15 +133,17 @@ define (require) ->
       window.requestAnimationFrame(@render)
 
       window.onresize = () =>
-        width = window.innerWidth - margin.left - margin.right
+        INNER_WIDTH = window.innerWidth
+        width = INNER_WIDTH - margin.left - margin.right
         @svg.attr("width", width + margin.left + margin.right)
-        @svgMini.attr("width", width + margin_mini.left + margin_mini.right)
+
 
         @x.range([0, width])
-        @xMini.range([0, width])
+
         xGrid.call(xAxisGrid)
         xAxisElement.call(xAxis)
-        xAxisMiniElement.call(xAxisMini)
+        @timelineHeader.resize(INNER_WIDTH)
+
 
     render: () =>
       bar = @renderLines()
@@ -445,13 +427,4 @@ define (require) ->
 
       keys.exit().remove()
 
-    formatMinutes: (d) ->
-      # convert milliseconds to seconds
-      d = d / 1000
-      hours = Math.floor(d / 3600)
-      minutes = Math.floor((d - (hours * 3600)) / 60)
-      seconds = d - (minutes * 60)
-      output = seconds + "s"
-      output = minutes + "m " + output  if minutes
-      output = hours + "h " + output  if hours
-      return output
+
