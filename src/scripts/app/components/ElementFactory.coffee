@@ -14,6 +14,9 @@ define (require) ->
         default_properties: (time = 0) ->
           return [
             {name: "progression", default: 1, keys: []}
+            {name: "x", default: 0, keys: []}
+            {name: "y", default: 0, keys: []}
+            {name: "z", default: 0, keys: []}
           ]
         create: (options) ->
           # Assign default parameters if not defined

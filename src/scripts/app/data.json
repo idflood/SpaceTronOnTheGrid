@@ -1,1 +1,114 @@
-[{"id":"item1","label":"Test circles","start":0,"end":2,"options":{"numItems":12,"seed":12002,"radius":84},"properties":[{"name":"progression","keys":[{"time":0,"val":0},{"time":1,"val":1},{"time":2,"val":2}]}]}]
+[
+  {
+    "id": "item1",
+    "label": "Test circles",
+    "start": 0,
+    "end": 2,
+    "options": {
+      "numItems": 12,
+      "seed": 12002,
+      "radius": 84
+    },
+    "properties": [
+      {
+        "name": "progression",
+        "keys": [
+          {
+            "time": 0,
+            "val": 0
+          },
+          {
+            "time": 1,
+            "val": 1
+          },
+          {
+            "time": 2,
+            "val": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "item2",
+    "label": "Circles 2",
+    "start": 1.473,
+    "end": 5.034,
+    "options": {
+      "numItems": 83,
+      "seed": -27998,
+      "radius": 265,
+      "circleRadius": 3,
+      "circleRadiusMax": 50
+    },
+    "properties": [
+      {
+        "name": "progression",
+        "default": 1,
+        "keys": [
+          {
+            "time": 1.701,
+            "val": 0
+          },
+          {
+            "time": 2.4379999999999997,
+            "val": 1
+          },
+          {
+            "time": 2.701,
+            "val": 1
+          },
+          {
+            "time": 3.403,
+            "val": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "item3",
+    "label": "Circles 3",
+    "start": 4.719,
+    "end": 6.718999999999999,
+    "options": {
+      "numItems": 20,
+      "seed": 12002,
+      "radius": 80,
+      "circleRadius": 20,
+      "circleRadiusMax": 20
+    },
+    "properties": [
+      {
+        "name": "progression",
+        "default": 1,
+        "keys": []
+      },
+      {
+        "name": "x",
+        "default": 0,
+        "keys": [
+          {
+            "time": 5,
+            "val": 100
+          }
+        ]
+      },
+      {
+        "name": "y",
+        "default": 0,
+        "keys": [
+          {
+            "time": 5.315,
+            "val": 0
+          }
+        ]
+      },
+      {
+        "name": "z",
+        "default": 0,
+        "keys": []
+      }
+    ]
+  }
+]

@@ -42,6 +42,7 @@ define (require) ->
         y = @getRandomPosition()
         delay = @rngAnimation.random(0, 2400) / 1000
         duration = @rngAnimation.random(600, 800) / 1000
+        duration *= 4
         border_radius = @rngOutline.exponential()
         draw_outline = if rndtype < 0.8 then true else false
         draw_circle = if rndtype > 0.5 then true else false
@@ -66,6 +67,8 @@ define (require) ->
       @totalDuration = @timeline.duration()
 
     update: (seconds, values) ->
+      if values.x != undefined
+        @container.position.set(values.x, values.y, values.z)
       # todo.
       if values.progression != undefined
         #@container.position.x = values.progression

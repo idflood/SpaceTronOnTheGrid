@@ -45955,7 +45955,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         });
         this.timeline.add(tween);
         tween = TweenLite.to(this.animatedProperties, this.duration * 0.5, {
-          scale: 1.1,
+          scale: 1,
           ease: Cubic.easeOut
         });
         this.timeline.add(tween);
@@ -46058,6 +46058,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           y = this.getRandomPosition();
           delay = this.rngAnimation.random(0, 2400) / 1000;
           duration = this.rngAnimation.random(600, 800) / 1000;
+          duration *= 4;
           border_radius = this.rngOutline.exponential();
           draw_outline = rndtype < 0.8 ? true : false;
           draw_circle = rndtype > 0.5 ? true : false;
@@ -46083,6 +46084,9 @@ define("TimelineMax", ["TweenMax"], (function (global) {
 
       Circles.prototype.update = function(seconds, values) {
         var item, progression, _i, _len, _ref, _results;
+        if (values.x !== void 0) {
+          this.container.position.set(values.x, values.y, values.z);
+        }
         if (values.progression !== void 0) {
           progression = values.progression / 2;
           this.timeline.seek(this.totalDuration * progression);
@@ -46151,6 +46155,18 @@ define("TimelineMax", ["TweenMax"], (function (global) {
               {
                 name: "progression",
                 "default": 1,
+                keys: []
+              }, {
+                name: "x",
+                "default": 0,
+                keys: []
+              }, {
+                name: "y",
+                "default": 0,
+                keys: []
+              }, {
+                name: "z",
+                "default": 0,
                 keys: []
               }
             ];
@@ -46686,7 +46702,7 @@ define('text',['module'], function (module) {
 });
 
 
-define('text!app/data.json',[],function () { return '[{"id":"item1","label":"Test circles","start":0,"end":2,"options":{"numItems":12,"seed":12002,"radius":84},"properties":[{"name":"progression","keys":[{"time":0,"val":0},{"time":1,"val":1},{"time":2,"val":2}]}]}]\n';});
+define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\n    "label": "Test circles",\n    "start": 0,\n    "end": 2,\n    "options": {\n      "numItems": 12,\n      "seed": 12002,\n      "radius": 84\n    },\n    "properties": [\n      {\n        "name": "progression",\n        "keys": [\n          {\n            "time": 0,\n            "val": 0\n          },\n          {\n            "time": 1,\n            "val": 1\n          },\n          {\n            "time": 2,\n            "val": 2\n          }\n        ]\n      }\n    ]\n  },\n  {\n    "id": "item2",\n    "label": "Circles 2",\n    "start": 1.473,\n    "end": 5.034,\n    "options": {\n      "numItems": 83,\n      "seed": -27998,\n      "radius": 265,\n      "circleRadius": 3,\n      "circleRadiusMax": 50\n    },\n    "properties": [\n      {\n        "name": "progression",\n        "default": 1,\n        "keys": [\n          {\n            "time": 1.701,\n            "val": 0\n          },\n          {\n            "time": 2.4379999999999997,\n            "val": 1\n          },\n          {\n            "time": 2.701,\n            "val": 1\n          },\n          {\n            "time": 3.403,\n            "val": 0\n          }\n        ]\n      }\n    ]\n  },\n  {\n    "id": "item3",\n    "label": "Circles 3",\n    "start": 4.719,\n    "end": 6.718999999999999,\n    "options": {\n      "numItems": 20,\n      "seed": 12002,\n      "radius": 80,\n      "circleRadius": 20,\n      "circleRadiusMax": 20\n    },\n    "properties": [\n      {\n        "name": "progression",\n        "default": 1,\n        "keys": []\n      },\n      {\n        "name": "x",\n        "default": 0,\n        "keys": [\n          {\n            "time": 5,\n            "val": 100\n          }\n        ]\n      },\n      {\n        "name": "y",\n        "default": 0,\n        "keys": [\n          {\n            "time": 5.315,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "name": "z",\n        "default": 0,\n        "keys": []\n      }\n    ]\n  }\n]\n';});
 
 
 (function() {

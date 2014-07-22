@@ -10008,7 +10008,7 @@ define('text',['module'], function (module) {
 });
 
 
-define('text!app/templates/timeline.tpl.html',[],function () { return '<div class="editor__time">\n  <div class="editor__menu">\n    <span class="menu-item">\n      Add\n      <div class="submenu submenu--add"></div>\n    </span>\n    <a href="#" class="menu-item" data-action="export">Export</a>\n  </div>\n  <div class="editor__time-controls controls">\n    <a href="#" class="control control--first icon-first"></a>\n    <a href="#" class="control control--play-pause icon-play"></a>\n    <a href="#" class="control control--last icon-last"></a>\n  </div>\n  <div class="editor__time-header">\n\n  </div>\n  <div class="editor__time-main">\n\n  </div>\n</div>\n';});
+define('text!app/templates/timeline.tpl.html',[],function () { return '<div class="editor__time">\n  <div class="editor__menu">\n    <span class="menu-item">\n      Add\n      <div class="submenu submenu--add"></div>\n    </span>\n    <a href="#" class="menu-item" data-action="export">Export</a>\n    <a href="#" class="menu-item menu-item--toggle" data-action="toggle"><i class="icon-toggle"></i></a>\n  </div>\n  <div class="editor__time-controls controls">\n    <a href="#" class="control control--first icon-first"></a>\n    <a href="#" class="control control--play-pause icon-play"></a>\n    <a href="#" class="control control--last icon-last"></a>\n  </div>\n  <div class="editor__time-header">\n\n  </div>\n  <div class="editor__time-main">\n\n  </div>\n</div>\n';});
 
 !function() {
   var d3 = {
@@ -19292,9 +19292,9 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.xMini.domain([0, this.timer.totalDuration]);
         xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(this.formatMinutes);
         xAxisMini = d3.svg.axis().scale(this.xMini).orient("top").tickSize(-5, 0).tickFormat(this.formatMinutes);
-        this.svgMini = d3.select('.editor__time-main').append("svg").attr("width", width + margin_mini.left + margin_mini.right).attr("height", mini_height + margin_mini.top + margin_mini.bottom);
+        this.svgMini = d3.select('.editor__time-header').append("svg").attr("width", width + margin_mini.left + margin_mini.right).attr("height", 30);
         this.svgMiniContainer = this.svgMini.append("g").attr("transform", "translate(" + margin_mini.left + "," + margin_mini.top + ")");
-        this.svg = d3.select('.editor__time-main').append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom);
+        this.svg = d3.select('.editor__time-main').append("svg").attr("width", width + margin.left + margin.right).attr("height", 600);
         this.svgContainer = this.svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         xAxisGrid = d3.svg.axis().scale(this.x).ticks(100).tickSize(-height, 0).tickFormat("").orient("top");
         xGrid = this.svgContainer.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(xAxisGrid);
@@ -19341,10 +19341,12 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return function() {
             width = window.innerWidth - margin.left - margin.right;
             _this.svg.attr("width", width + margin.left + margin.right);
+            _this.svgMini.attr("width", width + margin_mini.left + margin_mini.right);
             _this.x.range([0, width]);
             _this.xMini.range([0, width]);
             xGrid.call(xAxisGrid);
-            return xAxisElement.call(xAxis);
+            xAxisElement.call(xAxis);
+            return xAxisMiniElement.call(xAxisMini);
           };
         })(this);
       }
@@ -19453,7 +19455,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           var numProperties, y;
           numProperties = d.properties ? d.properties.length : 0;
           y = self.dy;
-          self.dy += ((i + 1) + numProperties) * self.lineHeight;
+          self.dy += (numProperties + 1) * self.lineHeight;
           return "translate(0," + y + ")";
         });
         barEnter.append("rect").attr("class", "bar").attr("y", 3).attr("height", 14);
@@ -19621,7 +19623,26 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.initControls();
         this.initExport();
         this.initAdd();
+        this.initToggle();
       }
+
+      Editor.prototype.initToggle = function() {
+        var $toggleLink, timelineClosed;
+        timelineClosed = false;
+        $toggleLink = this.$timeline.find('[data-action="toggle"]');
+        return $toggleLink.click((function(_this) {
+          return function(e) {
+            e.preventDefault();
+            timelineClosed = !timelineClosed;
+            $toggleLink.toggleClass('menu-item--toggle-up', timelineClosed);
+            if (timelineClosed) {
+              return _this.$timeline.css('bottom', -200);
+            } else {
+              return _this.$timeline.css('bottom', 0);
+            }
+          };
+        })(this));
+      };
 
       Editor.prototype.initAdd = function() {
         var $container, $link, element, element_name, elements;
@@ -19681,7 +19702,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           var data, export_data;
           e.preventDefault();
           export_data = copyAndClean(window.app.data);
-          data = JSON.stringify(export_data);
+          data = JSON.stringify(export_data, null, 2);
           return console.log(data);
         });
       };

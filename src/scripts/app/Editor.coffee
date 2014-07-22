@@ -34,6 +34,19 @@ define (require) ->
       @initControls()
       @initExport()
       @initAdd()
+      @initToggle()
+
+    initToggle: () ->
+      timelineClosed = false
+      $toggleLink = @$timeline.find('[data-action="toggle"]')
+      $toggleLink.click (e) =>
+        e.preventDefault()
+        timelineClosed = !timelineClosed
+        $toggleLink.toggleClass('menu-item--toggle-up', timelineClosed)
+        if timelineClosed
+          @$timeline.css('bottom', -200)
+        else
+          @$timeline.css('bottom', 0)
 
     initAdd: () ->
       $container = @$timeline.find('.submenu--add')
@@ -85,9 +98,9 @@ define (require) ->
       @$timeline.find('[data-action="export"]').click (e) ->
         e.preventDefault()
         export_data = copyAndClean(window.app.data)
-        data = JSON.stringify(export_data)
+        #data = JSON.stringify(export_data)
         # Alternative to heave nice looking json string.
-        #data = JSON.stringify(export_data, null, 2)
+        data = JSON.stringify(export_data, null, 2)
 
         console.log data
 

@@ -47,17 +47,16 @@ define (require) ->
         .tickFormat(@formatMinutes)
 
 
-      @svgMini = d3.select('.editor__time-main').append("svg")
+      @svgMini = d3.select('.editor__time-header').append("svg")
         .attr("width", width + margin_mini.left + margin_mini.right)
-        .attr("height", mini_height + margin_mini.top + margin_mini.bottom)
+        .attr("height", 30)
       @svgMiniContainer = @svgMini.append("g")
         .attr("transform", "translate(" + margin_mini.left + "," + margin_mini.top + ")")
 
-
-
       @svg = d3.select('.editor__time-main').append("svg")
         .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("height", 600)
+        #.attr("height", height + margin.top + margin.bottom)
       @svgContainer = @svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
@@ -156,11 +155,13 @@ define (require) ->
       window.onresize = () =>
         width = window.innerWidth - margin.left - margin.right
         @svg.attr("width", width + margin.left + margin.right)
+        @svgMini.attr("width", width + margin_mini.left + margin_mini.right)
 
         @x.range([0, width])
         @xMini.range([0, width])
         xGrid.call(xAxisGrid)
         xAxisElement.call(xAxis)
+        xAxisMiniElement.call(xAxisMini)
 
     render: () =>
       bar = @renderLines()
@@ -246,7 +247,8 @@ define (require) ->
         .attr "transform", (d, i) ->
           numProperties = if d.properties then d.properties.length else 0
           y = self.dy
-          self.dy += ((i + 1) + numProperties) * self.lineHeight
+          #self.dy = ((i + 1) + numProperties) * self.lineHeight
+          self.dy += (numProperties + 1) * self.lineHeight
 
           return "translate(0," + y + ")"
 

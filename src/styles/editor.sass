@@ -42,6 +42,19 @@ a.menu-item
 .menu-item:hover > .submenu
   display: block
 
+a.menu-item--toggle
+  float: right
+  margin-right: 0
+  i
+    &:before
+      content: "\f078"
+
+  &.menu-item--toggle-up
+    i
+      &:before
+        content: "\f077"
+
+
 .controls
   position: absolute
   top: 10px
@@ -64,6 +77,14 @@ a.menu-item
 
 .graph-mask
   fill: #111
+
+.editor__time-main
+  height: 238px
+  position: absolute
+  left: 0
+  right: 0
+  bottom: 0
+  overflow-y: scroll
 
 .editor__time
   position: fixed

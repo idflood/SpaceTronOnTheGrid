@@ -42,7 +42,7 @@ define (require) ->
       @timeline.add(tween)
 
       # Stay for a while
-      tween = TweenLite.to(@animatedProperties, @duration * 0.5, {scale: 1.1, ease: Cubic.easeOut})
+      tween = TweenLite.to(@animatedProperties, @duration * 0.5, {scale: 1, ease: Cubic.easeOut})
       @timeline.add(tween)
 
       # End
