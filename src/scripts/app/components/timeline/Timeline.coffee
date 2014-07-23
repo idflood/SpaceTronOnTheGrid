@@ -73,14 +73,11 @@ define (require) ->
         INNER_WIDTH = window.innerWidth
         width = INNER_WIDTH - margin.left - margin.right
         @svg.attr("width", width + margin.left + margin.right)
-
-
         @x.range([0, width])
 
         xGrid.call(xAxisGrid)
         xAxisElement.call(xAxis)
         @timelineHeader.resize(INNER_WIDTH)
-
 
     render: () =>
       @timelineHeader.render()
@@ -119,7 +116,6 @@ define (require) ->
             key.time += diff
 
         d.isDirty = true
-
 
       dragmoveLeft = (d) ->
         d3.event.sourceEvent.stopPropagation()
@@ -162,7 +158,6 @@ define (require) ->
         .attr "transform", (d, i) ->
           numProperties = if d.properties then d.properties.length else 0
           y = self.dy
-          #self.dy = ((i + 1) + numProperties) * self.lineHeight
           self.dy += (numProperties + 1) * self.lineHeight
 
           return "translate(0," + y + ")"
@@ -171,7 +166,6 @@ define (require) ->
         .attr("class", "bar")
         .attr("y", 3)
         .attr("height", 14)
-
 
       barEnter.append("rect")
         .attr("class", "bar-anchor bar-anchor--left")
@@ -196,10 +190,8 @@ define (require) ->
       bar.selectAll('.bar')
         .attr("x", (d) -> return self.x(d.start * 1000) + bar_border)
         .attr("width", (d) ->
-          #console.log (self.x(d.end) - self.x(d.start)))
           return Math.max(0, (self.x(d.end) - self.x(d.start)) * 1000 - bar_border)
         )
-        #.attr("width", (d) -> return self.x((d.end - d.start) * 1000) - bar_border)
         .call(drag)
         .on("click", selectBar)
 
@@ -249,18 +241,13 @@ define (require) ->
         .attr('width', self.x(self.timer.totalDuration + 100))
         .attr('height', self.lineHeight)
         .on 'dblclick', (d) ->
-          #console.log d
           lineObject = this.parentNode.parentNode
           lineValue = d3.select(lineObject).datum()
-          #console.log lineObject
-          #console.log lineValue
           def = if d.default then d.default else 0
           mouse = d3.mouse(this)
           dx = self.x.invert(mouse[0])
           dx = dx.getTime() / 1000
           newKey = {time: dx, val: def}
-          #console.log "creating a key"
-          #console.log newKey
           d.keys.push(newKey)
           # Sort the keys for tweens creation
           d.keys = sortKeys(d.keys)
@@ -307,7 +294,6 @@ define (require) ->
         dx = dx.getTime()
         d.time += dx / 1000 - currentDomainStart / 1000
 
-        #console.log propertyData
         propertyData.keys = sortKeys(propertyData.keys)
         lineData.isDirty = true
 
@@ -316,19 +302,14 @@ define (require) ->
         .on("drag", dragmove)
 
       propValue = (d,i,j) -> d.keys
-      propKey = (d, k) ->
-        #return k
-        return d.time
+      propKey = (d, k) -> d.time
       keys = @properties.select('.keys--wrapper').selectAll('.key').data(propValue, propKey)
 
       selectKey = (d) ->
         propertyObject = this.parentNode.parentNode
         lineObject = propertyObject.parentNode.parentNode
         lineData = d3.select(lineObject).datum()
-        #console.log lineData
-        #propertyData = d3.select(propertyObject).datum()
-        #console.log propertyData
-        #propertyName = propertyData.name
+
         if window.gui then window.gui.destroy()
         gui = new dat.GUI()
         controller = gui.add(d, "val")

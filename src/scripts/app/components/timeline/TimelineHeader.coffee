@@ -59,7 +59,6 @@ define (require) ->
       timeSelection = @svgContainer.selectAll('.time-indicator')
       timeSelection.attr('transform', 'translate(' + (@xDisplayed(@currentTime[0]) + 0.5) + ', 25)')
 
-
     createTimeHandle: () =>
       self = this
 
