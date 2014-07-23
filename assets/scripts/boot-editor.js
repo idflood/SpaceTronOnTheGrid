@@ -19765,7 +19765,9 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return function() {
             var extent0;
             extent0 = _this.brush.extent();
-            return _this.onBrush.dispatch(extent0);
+            _this.onBrush.dispatch(extent0);
+            _this.render();
+            return _this.xDisplayed.domain(extent0);
           };
         })(this);
         this.brush = d3.svg.brush().x(this.x).extent(this.initialDomain).on("brush", onBrush);
@@ -19799,7 +19801,6 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           dx = self.xDisplayed.invert(mouse[0]);
           dx = dx.getTime();
           dx = Math.max(0, dx);
-          console.log("clickTi9me: " + dx);
           return self.currentTime[0] = dx;
         });
         timeGrp = timeSelection.enter().append("g").attr('class', "time-indicator").attr("transform", "translate(0," + 30 + ")").call(dragTime);
@@ -19843,6 +19844,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
     };
     return Timeline = (function() {
       function Timeline() {
+        this.renderTimeIndicator = __bind(this.renderTimeIndicator, this);
         this.render = __bind(this.render, this);
         var height, margin, width, xAxis, xAxisElement, xAxisGrid, xGrid;
         this.app = window.app;
@@ -19895,10 +19897,20 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       Timeline.prototype.render = function() {
         var bar;
         this.timelineHeader.render();
+        this.renderTimeIndicator();
         bar = this.renderLines();
         this.renderProperties(bar);
         this.renderKeys();
         return window.requestAnimationFrame(this.render);
+      };
+
+      Timeline.prototype.renderTimeIndicator = function() {
+        var timeGrp, timeSelection;
+        timeSelection = this.svgContainer.selectAll('.time-indicator').data(this.currentTime);
+        timeGrp = timeSelection.enter().append("g").attr('class', "time-indicator");
+        timeGrp.append('rect').attr('class', 'time-indicator__line').attr('x', -1).attr('y', 0).attr('width', 1).attr('height', 1000);
+        timeSelection = this.svgContainer.selectAll('.time-indicator');
+        return timeSelection.attr('transform', 'translate(' + (this.x(this.currentTime[0]) + 0.5) + ', -' + this.margin.top + ')');
       };
 
       Timeline.prototype.renderLines = function() {

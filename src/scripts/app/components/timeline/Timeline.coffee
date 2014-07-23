@@ -81,11 +81,30 @@ define (require) ->
 
     render: () =>
       @timelineHeader.render()
-      bar = @renderLines()
+      @renderTimeIndicator()
 
+      bar = @renderLines()
       @renderProperties(bar)
       @renderKeys()
+
+
+
       window.requestAnimationFrame(@render)
+
+    renderTimeIndicator: () =>
+      timeSelection = @svgContainer.selectAll('.time-indicator').data(@currentTime)
+      timeGrp = timeSelection.enter().append("g")
+        .attr('class', "time-indicator")
+
+      timeGrp.append('rect')
+        .attr('class', 'time-indicator__line')
+        .attr('x', -1)
+        .attr('y', 0)
+        .attr('width', 1)
+        .attr('height', 1000)
+
+      timeSelection = @svgContainer.selectAll('.time-indicator')
+      timeSelection.attr('transform', 'translate(' + (@x(@currentTime[0]) + 0.5) + ', -' + @margin.top + ')')
 
     renderLines: () ->
       self = this
@@ -335,6 +354,5 @@ define (require) ->
         .attr 'transform', (d) ->
           dx = self.x(d.time * 1000) + 3
           dy = 9
-          #console.log dx
           return "translate(" + dx + "," + dy + ")"
       keys.exit().remove()

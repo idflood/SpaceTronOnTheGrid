@@ -43,6 +43,8 @@ define (require) ->
       onBrush = () =>
         extent0 = @brush.extent()
         @onBrush.dispatch(extent0)
+        @render()
+        @xDisplayed.domain(extent0)
 
       @brush = d3.svg.brush()
         .x(@x)
@@ -87,7 +89,6 @@ define (require) ->
           dx = self.xDisplayed.invert(mouse[0])
           dx = dx.getTime()
           dx = Math.max(0, dx)
-          console.log "clickTi9me: " + dx
           self.currentTime[0] = dx
           )
 
