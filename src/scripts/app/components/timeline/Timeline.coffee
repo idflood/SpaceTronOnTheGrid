@@ -16,10 +16,7 @@ define (require) ->
       @timer = @app.timer
       @currentTime = @timer.time
       @initialDomain = [0, @timer.totalDuration - 220 * 1000]
-
-
-
-      margin = {top: 15, right: 20, bottom: 0, left: 190}
+      margin = {top: 6, right: 20, bottom: 0, left: 190}
       this.margin = margin
 
       width = window.innerWidth - margin.left - margin.right
@@ -33,20 +30,11 @@ define (require) ->
       @x = d3.time.scale().range([0, width])
       @x.domain(@initialDomain)
 
-
-
-
-
       xAxis = d3.svg.axis()
         .scale(@x)
         .orient("top")
         .tickSize(-height, 0)
         .tickFormat(TimelineUtils.formatMinutes)
-
-
-
-
-
 
       @svg = d3.select('.editor__time-main').append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -78,57 +66,6 @@ define (require) ->
         xGrid.call(xAxisGrid)
         xAxisElement.call(xAxis)
 
-
-      self = this
-      dragTimeMove = (d) ->
-        d3.event.sourceEvent.stopPropagation()
-        dx = self.x.invert(d3.event.sourceEvent.x - margin.left)
-        dx = dx.getTime()
-        dx = Math.max(0, dx)
-        self.currentTime[0] = dx
-        #self.render()
-
-      dragTime = d3.behavior.drag()
-        .origin((d) -> return d;)
-        .on("drag", dragTimeMove)
-
-      timeSelection = @svgContainer.selectAll('.time-indicator').data(@currentTime)
-
-      timeClicker = timeSelection.enter().append('rect')
-        .attr('x', 0)
-        .attr('y', -50)
-        .attr('width', self.x(self.timer.totalDuration))
-        .attr('height', 50)
-        .attr('fill-opacity', 0)
-        .on('click', (d) ->
-          mouse = d3.mouse(this)
-          dx = self.x.invert(mouse[0])
-          dx = dx.getTime()
-          dx = Math.max(0, dx)
-          self.currentTime[0] = dx
-          )
-
-      timeGrp = timeSelection.enter().append("g")
-        .attr('class', "time-indicator")
-        .call(dragTime)
-      timeGrp.append('rect')
-        .attr('class', 'time-indicator__line')
-        .attr('x', -1)
-        .attr('y', 0)
-        .attr('width', 1)
-        .attr('height', 1000)
-      timeGrp.append('path')
-        .attr('class', 'time-indicator__handle')
-        .attr('d', 'M -10 0 L 0 10 L 10 0 L -10 0')
-
-      # Mask time indicator
-      @svgContainer.append("rect")
-        .attr("class", "graph-mask")
-        .attr("x", -self.margin.left)
-        .attr("y", -self.margin.top)
-        .attr("width", self.margin.left - 20)
-        .attr("height", height)
-
       # First render
       window.requestAnimationFrame(@render)
 
@@ -146,16 +83,12 @@ define (require) ->
 
 
     render: () =>
+      @timelineHeader.render()
       bar = @renderLines()
-      @renderTimeIndicator()
+
       @renderProperties(bar)
       @renderKeys()
       window.requestAnimationFrame(@render)
-
-    renderTimeIndicator: () ->
-      timeSelection = @svgContainer.selectAll('.time-indicator')
-      timeSelection.attr('transform', 'translate(' + (@x(@currentTime[0]) + 0.5) + ', -12)')
-
 
     renderLines: () ->
       self = this
@@ -402,7 +335,6 @@ define (require) ->
         controller.onChange (v) -> lineData.isDirty = true
         window.gui = gui
 
-
       key_size = 6
       keys.enter()
         .append('g')
@@ -424,7 +356,4 @@ define (require) ->
           dy = 9
           #console.log dx
           return "translate(" + dx + "," + dy + ")"
-
       keys.exit().remove()
-
-

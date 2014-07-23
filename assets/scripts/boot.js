@@ -37699,7 +37699,7 @@ define("vendors/three.js-extras/shaders/ConvolutionShader", function(){});
       function Timer() {
         this.update = __bind(this.update, this);
         this.totalDuration = 240 * 1000;
-        this.time = [0];
+        this.time = [1000];
         this.is_playing = false;
         this.last_timeStamp = -1;
         this.updated = new Signals.Signal();

@@ -19731,10 +19731,13 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
     TimelineUtils = require('cs!app/components/Timeline/TimelineUtils');
     return TimelineHeader = (function() {
       function TimelineHeader(app, timer, initialDomain, width) {
-        var gBrush, height, onBrush;
         this.app = app;
         this.timer = timer;
+        this.initialDomain = initialDomain;
         this.resize = __bind(this.resize, this);
+        this.createTimeHandle = __bind(this.createTimeHandle, this);
+        this.render = __bind(this.render, this);
+        this.createBrushHandle = __bind(this.createBrushHandle, this);
         this.onBrush = new Signals.Signal();
         this.margin = {
           top: 10,
@@ -19742,12 +19745,21 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           bottom: 0,
           left: 190
         };
-        height = 50 - this.margin.top - this.margin.bottom;
+        this.height = 50 - this.margin.top - this.margin.bottom + 20;
+        this.currentTime = this.timer.time;
         this.x = d3.time.scale().range([0, width]);
         this.x.domain([0, this.timer.totalDuration]);
+        this.xDisplayed = d3.time.scale().range([0, width]);
+        this.xDisplayed.domain(this.initialDomain);
         this.xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-5, 0).tickFormat(TimelineUtils.formatMinutes);
-        this.svg = d3.select('.editor__time-header').append("svg").attr("width", width + this.margin.left + this.margin.right).attr("height", 30);
+        this.svg = d3.select('.editor__time-header').append("svg").attr("width", width + this.margin.left + this.margin.right).attr("height", 50);
         this.svgContainer = this.svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+        this.createBrushHandle();
+        this.createTimeHandle();
+      }
+
+      TimelineHeader.prototype.createBrushHandle = function() {
+        var gBrush, onBrush;
         this.xAxisElement = this.svgContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + (this.margin.top + 7) + ")").call(this.xAxis);
         onBrush = (function(_this) {
           return function() {
@@ -19756,14 +19768,51 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
             return _this.onBrush.dispatch(extent0);
           };
         })(this);
-        this.brush = d3.svg.brush().x(this.x).extent(initialDomain).on("brush", onBrush);
-        gBrush = this.svgContainer.append("g").attr("class", "brush").call(this.brush).selectAll("rect").attr('height', 20);
-      }
+        this.brush = d3.svg.brush().x(this.x).extent(this.initialDomain).on("brush", onBrush);
+        return gBrush = this.svgContainer.append("g").attr("class", "brush").call(this.brush).selectAll("rect").attr('height', 20);
+      };
+
+      TimelineHeader.prototype.render = function() {
+        var timeSelection;
+        timeSelection = this.svgContainer.selectAll('.time-indicator');
+        return timeSelection.attr('transform', 'translate(' + (this.xDisplayed(this.currentTime[0]) + 0.5) + ', 25)');
+      };
+
+      TimelineHeader.prototype.createTimeHandle = function() {
+        var dragTime, dragTimeMove, self, timeClicker, timeGrp, timeSelection;
+        self = this;
+        dragTimeMove = function(d) {
+          var dx;
+          d3.event.sourceEvent.stopPropagation();
+          dx = self.xDisplayed.invert(d3.event.sourceEvent.x - self.margin.left);
+          dx = dx.getTime();
+          dx = Math.max(0, dx);
+          return self.currentTime[0] = dx;
+        };
+        dragTime = d3.behavior.drag().origin(function(d) {
+          return d;
+        }).on("drag", dragTimeMove);
+        timeSelection = this.svgContainer.selectAll('.time-indicator').data(this.currentTime);
+        timeClicker = timeSelection.enter().append('rect').attr('x', 0).attr('y', 20).attr('width', self.xDisplayed(self.timer.totalDuration)).attr('height', 50).attr('fill-opacity', 0).on('click', function(d) {
+          var dx, mouse;
+          mouse = d3.mouse(this);
+          dx = self.xDisplayed.invert(mouse[0]);
+          dx = dx.getTime();
+          dx = Math.max(0, dx);
+          console.log("clickTi9me: " + dx);
+          return self.currentTime[0] = dx;
+        });
+        timeGrp = timeSelection.enter().append("g").attr('class', "time-indicator").attr("transform", "translate(0," + 30 + ")").call(dragTime);
+        timeGrp.append('rect').attr('class', 'time-indicator__line').attr('x', -1).attr('y', 0).attr('width', 1).attr('height', 1000);
+        timeGrp.append('path').attr('class', 'time-indicator__handle').attr('d', 'M -10 0 L 0 10 L 10 0 L -10 0');
+        return this.svgContainer.append("rect").attr("class", "graph-mask").attr("x", -self.margin.left).attr("y", -self.margin.top).attr("width", self.margin.left - 20).attr("height", self.height);
+      };
 
       TimelineHeader.prototype.resize = function(width) {
         width = width - this.margin.left - this.margin.right;
         this.svg.attr("width", width + this.margin.left + this.margin.right);
         this.x.range([0, width]);
+        this.xDisplayed.range([0, width]);
         return this.xAxisElement.call(this.xAxis);
       };
 
@@ -19795,13 +19844,13 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
     return Timeline = (function() {
       function Timeline() {
         this.render = __bind(this.render, this);
-        var dragTime, dragTimeMove, height, margin, self, timeClicker, timeGrp, timeSelection, width, xAxis, xAxisElement, xAxisGrid, xGrid;
+        var height, margin, width, xAxis, xAxisElement, xAxisGrid, xGrid;
         this.app = window.app;
         this.timer = this.app.timer;
         this.currentTime = this.timer.time;
         this.initialDomain = [0, this.timer.totalDuration - 220 * 1000];
         margin = {
-          top: 15,
+          top: 6,
           right: 20,
           bottom: 0,
           left: 190
@@ -19828,31 +19877,6 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
             return xAxisElement.call(xAxis);
           };
         })(this));
-        self = this;
-        dragTimeMove = function(d) {
-          var dx;
-          d3.event.sourceEvent.stopPropagation();
-          dx = self.x.invert(d3.event.sourceEvent.x - margin.left);
-          dx = dx.getTime();
-          dx = Math.max(0, dx);
-          return self.currentTime[0] = dx;
-        };
-        dragTime = d3.behavior.drag().origin(function(d) {
-          return d;
-        }).on("drag", dragTimeMove);
-        timeSelection = this.svgContainer.selectAll('.time-indicator').data(this.currentTime);
-        timeClicker = timeSelection.enter().append('rect').attr('x', 0).attr('y', -50).attr('width', self.x(self.timer.totalDuration)).attr('height', 50).attr('fill-opacity', 0).on('click', function(d) {
-          var dx, mouse;
-          mouse = d3.mouse(this);
-          dx = self.x.invert(mouse[0]);
-          dx = dx.getTime();
-          dx = Math.max(0, dx);
-          return self.currentTime[0] = dx;
-        });
-        timeGrp = timeSelection.enter().append("g").attr('class', "time-indicator").call(dragTime);
-        timeGrp.append('rect').attr('class', 'time-indicator__line').attr('x', -1).attr('y', 0).attr('width', 1).attr('height', 1000);
-        timeGrp.append('path').attr('class', 'time-indicator__handle').attr('d', 'M -10 0 L 0 10 L 10 0 L -10 0');
-        this.svgContainer.append("rect").attr("class", "graph-mask").attr("x", -self.margin.left).attr("y", -self.margin.top).attr("width", self.margin.left - 20).attr("height", height);
         window.requestAnimationFrame(this.render);
         window.onresize = (function(_this) {
           return function() {
@@ -19870,17 +19894,11 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 
       Timeline.prototype.render = function() {
         var bar;
+        this.timelineHeader.render();
         bar = this.renderLines();
-        this.renderTimeIndicator();
         this.renderProperties(bar);
         this.renderKeys();
         return window.requestAnimationFrame(this.render);
-      };
-
-      Timeline.prototype.renderTimeIndicator = function() {
-        var timeSelection;
-        timeSelection = this.svgContainer.selectAll('.time-indicator');
-        return timeSelection.attr('transform', 'translate(' + (this.x(this.currentTime[0]) + 0.5) + ', -12)');
       };
 
       Timeline.prototype.renderLines = function() {
