@@ -87,8 +87,6 @@ define (require) ->
       @renderProperties(bar)
       @renderKeys()
 
-
-
       window.requestAnimationFrame(@render)
 
     renderTimeIndicator: () =>
@@ -174,12 +172,6 @@ define (require) ->
 
       barEnter = bar.enter()
         .append('g').attr('class', 'line-grp')
-        .attr "transform", (d, i) ->
-          numProperties = if d.properties then d.properties.length else 0
-          y = self.dy
-          self.dy += (numProperties + 1) * self.lineHeight
-
-          return "translate(0," + y + ")"
 
       barEnter.append("rect")
         .attr("class", "bar")
@@ -199,6 +191,14 @@ define (require) ->
         .attr("height", 16)
         .attr("width", 6)
         .call(dragRight)
+
+      self.dy = 10 + @margin.top
+      bar.attr "transform", (d, i) ->
+        numProperties = if d.properties then d.properties.length else 0
+        y = self.dy
+        self.dy += (numProperties + 1) * self.lineHeight
+
+        return "translate(0," + y + ")"
 
       bar.selectAll('.bar-anchor--left')
         .attr("x", (d) -> return self.x(d.start * 1000) - 1)

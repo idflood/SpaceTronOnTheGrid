@@ -19998,16 +19998,18 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         bar = this.svgContainer.selectAll(".line-grp").data(this.app.data, function(d) {
           return d.id;
         });
-        barEnter = bar.enter().append('g').attr('class', 'line-grp').attr("transform", function(d, i) {
+        barEnter = bar.enter().append('g').attr('class', 'line-grp');
+        barEnter.append("rect").attr("class", "bar").attr("y", 3).attr("height", 14);
+        barEnter.append("rect").attr("class", "bar-anchor bar-anchor--left").attr("y", 2).attr("height", 16).attr("width", 6).call(dragLeft);
+        barEnter.append("rect").attr("class", "bar-anchor bar-anchor--right").attr("y", 2).attr("height", 16).attr("width", 6).call(dragRight);
+        self.dy = 10 + this.margin.top;
+        bar.attr("transform", function(d, i) {
           var numProperties, y;
           numProperties = d.properties ? d.properties.length : 0;
           y = self.dy;
           self.dy += (numProperties + 1) * self.lineHeight;
           return "translate(0," + y + ")";
         });
-        barEnter.append("rect").attr("class", "bar").attr("y", 3).attr("height", 14);
-        barEnter.append("rect").attr("class", "bar-anchor bar-anchor--left").attr("y", 2).attr("height", 16).attr("width", 6).call(dragLeft);
-        barEnter.append("rect").attr("class", "bar-anchor bar-anchor--right").attr("y", 2).attr("height", 16).attr("width", 6).call(dragRight);
         bar.selectAll('.bar-anchor--left').attr("x", function(d) {
           return self.x(d.start * 1000) - 1;
         });
