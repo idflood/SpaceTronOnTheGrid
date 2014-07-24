@@ -79,6 +79,8 @@ define (require) ->
         INNER_WIDTH = window.innerWidth
         width = INNER_WIDTH - margin.left - margin.right
         @svg.attr("width", width + margin.left + margin.right)
+        @svg.selectAll('.timeline__right-mask')
+          .attr('width', INNER_WIDTH)
         @x.range([0, width])
 
         xGrid.call(xAxisGrid)
@@ -99,18 +101,21 @@ define (require) ->
 
     renderTimeIndicator: () =>
       timeSelection = @svgContainer.selectAll('.time-indicator').data(@currentTime)
-      timeGrp = timeSelection.enter().append("g")
-        .attr('class', "time-indicator")
+      timeGrp = timeSelection.enter().append("svg")
+        .attr('class', "time-indicator timeline__right-mask")
+        .attr('width', window.innerWidth - @label_position_x)
+        .attr('height', 442)
 
-      timeGrp.append('rect')
+      timeSelection = timeGrp.append('rect')
         .attr('class', 'time-indicator__line')
         .attr('x', -1)
-        .attr('y', 0)
+        .attr('y', -@margin.top)
         .attr('width', 1)
         .attr('height', 1000)
 
-      timeSelection = @svgContainer.selectAll('.time-indicator')
-      timeSelection.attr('transform', 'translate(' + (@x(@currentTime[0]) + 0.5) + ', -' + @margin.top + ')')
+      timeSelection = @svgContainer.selectAll('.time-indicator rect')
+      timeSelection.attr('x', @x(@currentTime[0]) - 0.5)
+      #timeSelection.attr('transform', 'translate(' + (@x(@currentTime[0]) - 0.5) + ', -' + @margin.top + ')')
 
     renderLines: () ->
       self = this
@@ -184,19 +189,24 @@ define (require) ->
       barEnter = bar.enter()
         .append('g').attr('class', 'line-grp')
 
-      barEnter.append("rect")
+      barContainerRight = barEnter.append('svg')
+        .attr('class', 'timeline__right-mask')
+        .attr('width', window.innerWidth - self.label_position_x)
+        .attr('height', self.lineHeight)
+
+      barContainerRight.append("rect")
         .attr("class", "bar")
         .attr("y", 3)
         .attr("height", 14)
 
-      barEnter.append("rect")
+      barContainerRight.append("rect")
         .attr("class", "bar-anchor bar-anchor--left")
         .attr("y", 2)
         .attr("height", 16)
         .attr("width", 6)
         .call(dragLeft)
 
-      barEnter.append("rect")
+      barContainerRight.append("rect")
         .attr("class", "bar-anchor bar-anchor--right")
         .attr("y", 2)
         .attr("height", 16)
@@ -224,13 +234,6 @@ define (require) ->
         )
         .call(drag)
         .on("click", selectBar)
-
-      barEnter.append("rect")
-        .attr("class", "graph-mask")
-        .attr("x", -self.margin.left)
-        .attr("y", 1)
-        .attr("width", self.margin.left)
-        .attr("height", self.lineHeight - 2)
 
       barEnter.append("text")
         .attr("class", "line--label")
@@ -285,14 +288,11 @@ define (require) ->
           lineValue.isDirty = true
           self.renderElements()
 
-      subGrp.append('g').attr('class','keys--wrapper')
-
-      subGrp.append("rect")
-        .attr("class", "graph-mask")
-        .attr("x", -self.margin.left)
-        .attr("y", 1)
-        .attr("width", self.margin.left)
-        .attr("height", self.lineHeight - 2)
+      subGrp.append('svg')
+        .attr('class','keys--wrapper timeline__right-mask')
+        .attr('width', window.innerWidth - self.label_position_x)
+        .attr('height', self.lineHeight)
+        .attr('fill', '#f00')
 
       subGrp.append('text')
         .attr("class", "line--label line--label-small")

@@ -19752,7 +19752,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.xDisplayed = d3.time.scale().range([0, width]);
         this.xDisplayed.domain(this.initialDomain);
         this.xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-5, 0).tickFormat(TimelineUtils.formatMinutes);
-        this.svg = d3.select('.editor__time-header').append("svg").attr("width", width + this.margin.left + this.margin.right).attr("height", 50);
+        this.svg = d3.select('.editor__time-header').append("svg").attr("width", width + this.margin.left + this.margin.right).attr("height", 56);
         this.svgContainer = this.svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
         this.createBrushHandle();
         this.createTimeHandle();
@@ -19890,6 +19890,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
             INNER_WIDTH = window.innerWidth;
             width = INNER_WIDTH - margin.left - margin.right;
             _this.svg.attr("width", width + margin.left + margin.right);
+            _this.svg.selectAll('.timeline__right-mask').attr('width', INNER_WIDTH);
             _this.x.range([0, width]);
             xGrid.call(xAxisGrid);
             xAxisElement.call(xAxis);
@@ -19914,14 +19915,14 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       Timeline.prototype.renderTimeIndicator = function() {
         var timeGrp, timeSelection;
         timeSelection = this.svgContainer.selectAll('.time-indicator').data(this.currentTime);
-        timeGrp = timeSelection.enter().append("g").attr('class', "time-indicator");
-        timeGrp.append('rect').attr('class', 'time-indicator__line').attr('x', -1).attr('y', 0).attr('width', 1).attr('height', 1000);
-        timeSelection = this.svgContainer.selectAll('.time-indicator');
-        return timeSelection.attr('transform', 'translate(' + (this.x(this.currentTime[0]) + 0.5) + ', -' + this.margin.top + ')');
+        timeGrp = timeSelection.enter().append("svg").attr('class', "time-indicator timeline__right-mask").attr('width', window.innerWidth - this.label_position_x).attr('height', 442);
+        timeSelection = timeGrp.append('rect').attr('class', 'time-indicator__line').attr('x', -1).attr('y', -this.margin.top).attr('width', 1).attr('height', 1000);
+        timeSelection = this.svgContainer.selectAll('.time-indicator rect');
+        return timeSelection.attr('x', this.x(this.currentTime[0]) - 0.5);
       };
 
       Timeline.prototype.renderLines = function() {
-        var bar, barEnter, bar_border, drag, dragLeft, dragRight, dragmove, dragmoveLeft, dragmoveRight, selectBar, self;
+        var bar, barContainerRight, barEnter, bar_border, drag, dragLeft, dragRight, dragmove, dragmoveLeft, dragmoveRight, selectBar, self;
         self = this;
         selectBar = function(d) {
           var controller, el_type, factory, gui, key, value, _ref;
@@ -20009,9 +20010,10 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return d.id;
         });
         barEnter = bar.enter().append('g').attr('class', 'line-grp');
-        barEnter.append("rect").attr("class", "bar").attr("y", 3).attr("height", 14);
-        barEnter.append("rect").attr("class", "bar-anchor bar-anchor--left").attr("y", 2).attr("height", 16).attr("width", 6).call(dragLeft);
-        barEnter.append("rect").attr("class", "bar-anchor bar-anchor--right").attr("y", 2).attr("height", 16).attr("width", 6).call(dragRight);
+        barContainerRight = barEnter.append('svg').attr('class', 'timeline__right-mask').attr('width', window.innerWidth - self.label_position_x).attr('height', self.lineHeight);
+        barContainerRight.append("rect").attr("class", "bar").attr("y", 3).attr("height", 14);
+        barContainerRight.append("rect").attr("class", "bar-anchor bar-anchor--left").attr("y", 2).attr("height", 16).attr("width", 6).call(dragLeft);
+        barContainerRight.append("rect").attr("class", "bar-anchor bar-anchor--right").attr("y", 2).attr("height", 16).attr("width", 6).call(dragRight);
         self.dy = 10 + this.margin.top;
         bar.attr("transform", function(d, i) {
           var numProperties, y;
@@ -20031,7 +20033,6 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         }).attr("width", function(d) {
           return Math.max(0, (self.x(d.end) - self.x(d.start)) * 1000 - bar_border);
         }).call(drag).on("click", selectBar);
-        barEnter.append("rect").attr("class", "graph-mask").attr("x", -self.margin.left).attr("y", 1).attr("width", self.margin.left).attr("height", self.lineHeight - 2);
         barEnter.append("text").attr("class", "line--label").attr("x", self.label_position_x).attr("y", 16).text(function(d) {
           return d.label;
         });
@@ -20077,8 +20078,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           lineValue.isDirty = true;
           return self.renderElements();
         });
-        subGrp.append('g').attr('class', 'keys--wrapper');
-        subGrp.append("rect").attr("class", "graph-mask").attr("x", -self.margin.left).attr("y", 1).attr("width", self.margin.left).attr("height", self.lineHeight - 2);
+        subGrp.append('svg').attr('class', 'keys--wrapper timeline__right-mask').attr('width', window.innerWidth - self.label_position_x).attr('height', self.lineHeight).attr('fill', '#f00');
         subGrp.append('text').attr("class", "line--label line--label-small").attr("x", self.label_position_x).attr("y", 15).text(function(d) {
           return d.name;
         });
