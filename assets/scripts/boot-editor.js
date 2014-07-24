@@ -19870,6 +19870,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(TimelineUtils.formatMinutes);
         this.svg = d3.select('.editor__time-main').append("svg").attr("width", width + margin.left + margin.right).attr("height", 600);
         this.svgContainer = this.svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        this.linesContainer = this.svg.append("g").attr("transform", "translate(" + margin.left + "," + (margin.top + 10) + ")");
         xAxisGrid = d3.svg.axis().scale(this.x).ticks(100).tickSize(-height, 0).tickFormat("").orient("top");
         xGrid = this.svgContainer.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(xAxisGrid);
         xAxisElement = this.svgContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxis);
@@ -20004,7 +20005,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           };
         }).on("drag", dragmove);
         bar_border = 1;
-        bar = this.svgContainer.selectAll(".line-grp").data(this.app.data, function(d) {
+        bar = this.linesContainer.selectAll(".line-grp").data(this.app.data, function(d) {
           return d.id;
         });
         barEnter = bar.enter().append('g').attr('class', 'line-grp');

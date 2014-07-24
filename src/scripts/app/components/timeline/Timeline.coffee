@@ -43,6 +43,10 @@ define (require) ->
       @svgContainer = @svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
+      @linesContainer = @svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + (margin.top + 10) + ")")
+
+
       xAxisGrid = d3.svg.axis()
         .scale(@x)
         .ticks(100)
@@ -174,7 +178,7 @@ define (require) ->
         .on("drag", dragmove)
 
       bar_border = 1
-      bar = @svgContainer.selectAll(".line-grp")
+      bar = @linesContainer.selectAll(".line-grp")
         .data(@app.data, (d) -> d.id)
 
       barEnter = bar.enter()
