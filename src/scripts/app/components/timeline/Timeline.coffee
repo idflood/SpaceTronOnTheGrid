@@ -65,8 +65,10 @@ define (require) ->
         @x.domain(extent)
         xGrid.call(xAxisGrid)
         xAxisElement.call(xAxis)
+        @renderElements()
 
       # First render
+      @renderElements()
       window.requestAnimationFrame(@render)
 
       window.onresize = () =>
@@ -83,11 +85,13 @@ define (require) ->
       @timelineHeader.render()
       @renderTimeIndicator()
 
+      window.requestAnimationFrame(@render)
+
+    renderElements: () =>
+      # No need to call this on each frames, but only on brush, key drag, ...
       bar = @renderLines()
       @renderProperties(bar)
       @renderKeys()
-
-      window.requestAnimationFrame(@render)
 
     renderTimeIndicator: () =>
       timeSelection = @svgContainer.selectAll('.time-indicator').data(@currentTime)
@@ -133,6 +137,7 @@ define (require) ->
             key.time += diff
 
         d.isDirty = true
+        self.renderElements()
 
       dragmoveLeft = (d) ->
         d3.event.sourceEvent.stopPropagation()
@@ -140,6 +145,7 @@ define (require) ->
         diff = (dx - d.start)
         d.start += diff
         d.isDirty = true
+        self.renderElements()
 
       dragmoveRight = (d) ->
         d3.event.sourceEvent.stopPropagation()
@@ -147,6 +153,7 @@ define (require) ->
         diff = (dx - d.end)
         d.end += diff
         d.isDirty = true
+        self.renderElements()
 
       dragLeft = d3.behavior.drag()
         .origin((d) ->
@@ -272,6 +279,7 @@ define (require) ->
           d.keys = sortKeys(d.keys)
 
           lineValue.isDirty = true
+          self.renderElements()
 
       subGrp.append('g').attr('class','keys--wrapper')
 
@@ -315,6 +323,7 @@ define (require) ->
 
         propertyData.keys = sortKeys(propertyData.keys)
         lineData.isDirty = true
+        self.renderElements()
 
       drag = d3.behavior.drag()
         .origin((d) -> return d;)

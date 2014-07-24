@@ -19845,6 +19845,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
     return Timeline = (function() {
       function Timeline() {
         this.renderTimeIndicator = __bind(this.renderTimeIndicator, this);
+        this.renderElements = __bind(this.renderElements, this);
         this.render = __bind(this.render, this);
         var height, margin, width, xAxis, xAxisElement, xAxisGrid, xGrid;
         this.app = window.app;
@@ -19876,9 +19877,11 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return function(extent) {
             _this.x.domain(extent);
             xGrid.call(xAxisGrid);
-            return xAxisElement.call(xAxis);
+            xAxisElement.call(xAxis);
+            return _this.renderElements();
           };
         })(this));
+        this.renderElements();
         window.requestAnimationFrame(this.render);
         window.onresize = (function(_this) {
           return function() {
@@ -19895,13 +19898,16 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       }
 
       Timeline.prototype.render = function() {
-        var bar;
         this.timelineHeader.render();
         this.renderTimeIndicator();
+        return window.requestAnimationFrame(this.render);
+      };
+
+      Timeline.prototype.renderElements = function() {
+        var bar;
         bar = this.renderLines();
         this.renderProperties(bar);
-        this.renderKeys();
-        return window.requestAnimationFrame(this.render);
+        return this.renderKeys();
       };
 
       Timeline.prototype.renderTimeIndicator = function() {
@@ -19952,7 +19958,8 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
               key.time += diff;
             }
           }
-          return d.isDirty = true;
+          d.isDirty = true;
+          return self.renderElements();
         };
         dragmoveLeft = function(d) {
           var diff, dx;
@@ -19960,7 +19967,8 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           dx = self.x.invert(d3.event.x).getTime() / 1000;
           diff = dx - d.start;
           d.start += diff;
-          return d.isDirty = true;
+          d.isDirty = true;
+          return self.renderElements();
         };
         dragmoveRight = function(d) {
           var diff, dx;
@@ -19968,7 +19976,8 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           dx = self.x.invert(d3.event.x).getTime() / 1000;
           diff = dx - d.end;
           d.end += diff;
-          return d.isDirty = true;
+          d.isDirty = true;
+          return self.renderElements();
         };
         dragLeft = d3.behavior.drag().origin(function(d) {
           var t;
@@ -20064,7 +20073,8 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           };
           d.keys.push(newKey);
           d.keys = sortKeys(d.keys);
-          return lineValue.isDirty = true;
+          lineValue.isDirty = true;
+          return self.renderElements();
         });
         subGrp.append('g').attr('class', 'keys--wrapper');
         subGrp.append("rect").attr("class", "graph-mask").attr("x", -self.margin.left).attr("y", 1).attr("width", self.margin.left).attr("height", self.lineHeight - 2);
@@ -20094,7 +20104,8 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           dx = dx.getTime();
           d.time += dx / 1000 - currentDomainStart / 1000;
           propertyData.keys = sortKeys(propertyData.keys);
-          return lineData.isDirty = true;
+          lineData.isDirty = true;
+          return self.renderElements();
         };
         drag = d3.behavior.drag().origin(function(d) {
           return d;
