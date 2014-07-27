@@ -19826,14 +19826,89 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 
 
 (function() {
+  define('cs!app/components/Timeline/TimelineProperties',['require','d3','Signal'],function(require) {
+    var Signals, TimelineProperties, d3;
+    d3 = require('d3');
+    Signals = require('Signal');
+    return TimelineProperties = (function() {
+      function TimelineProperties(timeline) {
+        this.timeline = timeline;
+        this.onKeyAdded = new Signals.Signal();
+      }
+
+      TimelineProperties.prototype.render = function(bar) {
+        var propKey, propVal, properties, self, sortKeys, subGrp;
+        self = this;
+        propVal = function(d, i) {
+          return d.properties;
+        };
+        propKey = function(d) {
+          return d.name;
+        };
+        properties = bar.selectAll('.line--sub').data(propVal, propKey);
+        subGrp = properties.enter().append('g').attr("class", 'line--sub').attr("transform", function(d, i) {
+          var sub_height;
+          sub_height = (i + 1) * self.timeline.lineHeight;
+          return "translate(0," + sub_height + ")";
+        });
+        sortKeys = function(keys) {
+          return keys.sort(function(a, b) {
+            return d3.ascending(a.time, b.time);
+          });
+        };
+        subGrp.append('rect').attr('class', 'click-handler click-handler--property').attr('x', 0).attr('y', 0).attr('width', self.timeline.x(self.timeline.timer.totalDuration + 100)).attr('height', self.timeline.lineHeight).on('dblclick', function(d) {
+          var def, dx, lineObject, lineValue, mouse, newKey;
+          lineObject = this.parentNode.parentNode;
+          lineValue = d3.select(lineObject).datum();
+          def = d["default"] ? d["default"] : 0;
+          mouse = d3.mouse(this);
+          dx = self.timeline.x.invert(mouse[0]);
+          dx = dx.getTime() / 1000;
+          newKey = {
+            time: dx,
+            val: def
+          };
+          d.keys.push(newKey);
+          d.keys = sortKeys(d.keys);
+          lineValue.isDirty = true;
+          return self.onKeyAdded.dispatch();
+        });
+        subGrp.append('svg').attr('class', 'keys--wrapper timeline__right-mask').attr('width', window.innerWidth - self.timeline.label_position_x).attr('height', self.timeline.lineHeight).attr('fill', '#f00');
+        subGrp.append('text').attr("class", "line--label line--label-small").attr("x", self.timeline.label_position_x + 30).attr("y", 15).text(function(d) {
+          return d.name;
+        });
+        subGrp.append("line").attr("class", 'line--separator-secondary').attr("x1", -200).attr("x2", self.timeline.x(self.timeline.timer.totalDuration + 100)).attr("y1", self.timeline.lineHeight).attr("y2", self.timeline.lineHeight);
+        bar.selectAll('.line--sub').attr('display', function(d) {
+          var lineObject, lineValue;
+          lineObject = this.parentNode;
+          lineValue = d3.select(lineObject).datum();
+          if (!lineValue.collapsed) {
+            return "block";
+          } else {
+            return "none";
+          }
+        });
+        return properties;
+      };
+
+      return TimelineProperties;
+
+    })();
+  });
+
+}).call(this);
+
+
+(function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/components/Timeline/Timeline',['require','jquery','d3','cs!app/components/Timeline/TimelineHeader','cs!app/components/Timeline/TimelineUtils'],function(require) {
-    var $, Timeline, TimelineHeader, TimelineUtils, d3, extend;
+  define('cs!app/components/Timeline/Timeline',['require','jquery','d3','cs!app/components/Timeline/TimelineHeader','cs!app/components/Timeline/TimelineUtils','cs!app/components/Timeline/TimelineProperties'],function(require) {
+    var $, Timeline, TimelineHeader, TimelineProperties, TimelineUtils, d3, extend;
     $ = require('jquery');
     d3 = require('d3');
     TimelineHeader = require('cs!app/components/Timeline/TimelineHeader');
     TimelineUtils = require('cs!app/components/Timeline/TimelineUtils');
+    TimelineProperties = require('cs!app/components/Timeline/TimelineProperties');
     extend = function(object, properties) {
       var key, val;
       for (key in properties) {
@@ -19865,6 +19940,8 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.label_position_x = -170;
         this.dy = 10 + margin.top;
         this.timelineHeader = new TimelineHeader(this.app, this.timer, this.initialDomain, width);
+        this.timelineProperties = new TimelineProperties(this);
+        this.timelineProperties.onKeyAdded.add(this.renderElements);
         this.x = d3.time.scale().range([0, width]);
         this.x.domain(this.initialDomain);
         xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(TimelineUtils.formatMinutes);
@@ -19906,10 +19983,10 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       };
 
       Timeline.prototype.renderElements = function() {
-        var bar;
+        var bar, properties;
         bar = this.renderLines();
-        this.renderProperties(bar);
-        return this.renderKeys();
+        properties = this.timelineProperties.render(bar);
+        return this.renderKeys(properties);
       };
 
       Timeline.prototype.renderTimeIndicator = function() {
@@ -20056,63 +20133,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         return bar;
       };
 
-      Timeline.prototype.renderProperties = function(bar) {
-        var propKey, propVal, self, sortKeys, subGrp;
-        self = this;
-        propVal = function(d, i) {
-          return d.properties;
-        };
-        propKey = function(d) {
-          return d.name;
-        };
-        self.properties = bar.selectAll('.line--sub').data(propVal, propKey);
-        console.log("render properties");
-        subGrp = self.properties.enter().append('g').attr("class", 'line--sub').attr("transform", function(d, i) {
-          var sub_height;
-          sub_height = (i + 1) * self.lineHeight;
-          return "translate(0," + sub_height + ")";
-        });
-        sortKeys = function(keys) {
-          return keys.sort(function(a, b) {
-            return d3.ascending(a.time, b.time);
-          });
-        };
-        subGrp.append('rect').attr('class', 'click-handler click-handler--property').attr('x', 0).attr('y', 0).attr('width', self.x(self.timer.totalDuration + 100)).attr('height', self.lineHeight).on('dblclick', function(d) {
-          var def, dx, lineObject, lineValue, mouse, newKey;
-          lineObject = this.parentNode.parentNode;
-          lineValue = d3.select(lineObject).datum();
-          def = d["default"] ? d["default"] : 0;
-          mouse = d3.mouse(this);
-          dx = self.x.invert(mouse[0]);
-          dx = dx.getTime() / 1000;
-          newKey = {
-            time: dx,
-            val: def
-          };
-          d.keys.push(newKey);
-          d.keys = sortKeys(d.keys);
-          lineValue.isDirty = true;
-          return self.renderElements();
-        });
-        subGrp.append('svg').attr('class', 'keys--wrapper timeline__right-mask').attr('width', window.innerWidth - self.label_position_x).attr('height', self.lineHeight).attr('fill', '#f00');
-        subGrp.append('text').attr("class", "line--label line--label-small").attr("x", self.label_position_x + 30).attr("y", 15).text(function(d) {
-          return d.name;
-        });
-        subGrp.append("line").attr("class", 'line--separator-secondary').attr("x1", -200).attr("x2", self.x(self.timer.totalDuration + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
-        return bar.selectAll('.line--sub').attr('display', function(d) {
-          var lineObject, lineValue;
-          lineObject = this.parentNode;
-          console.log(lineObject);
-          lineValue = d3.select(lineObject).datum();
-          if (!lineValue.collapsed) {
-            return "block";
-          } else {
-            return "none";
-          }
-        });
-      };
-
-      Timeline.prototype.renderKeys = function() {
+      Timeline.prototype.renderKeys = function(properties) {
         var drag, dragmove, key_size, keys, propKey, propValue, selectKey, self, sortKeys;
         self = this;
         sortKeys = function(keys) {
@@ -20144,7 +20165,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         propKey = function(d, k) {
           return d.time;
         };
-        keys = this.properties.select('.keys--wrapper').selectAll('.key').data(propValue, propKey);
+        keys = properties.select('.keys--wrapper').selectAll('.key').data(propValue, propKey);
         selectKey = function(d) {
           var controller, gui, lineData, lineObject, propertyObject;
           propertyObject = this.parentNode.parentNode;

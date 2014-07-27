@@ -5,6 +5,8 @@ define (require) ->
   TimelineHeader = require 'cs!app/components/Timeline/TimelineHeader'
   TimelineUtils = require 'cs!app/components/Timeline/TimelineUtils'
 
+  TimelineProperties = require 'cs!app/components/Timeline/TimelineProperties'
+
   extend = (object, properties) ->
     for key, val of properties
       object[key] = val
@@ -26,6 +28,8 @@ define (require) ->
       @dy = 10 + margin.top
 
       @timelineHeader = new TimelineHeader(@app, @timer, @initialDomain, width)
+      @timelineProperties = new TimelineProperties(this)
+      @timelineProperties.onKeyAdded.add(@renderElements)
 
       @x = d3.time.scale().range([0, width])
       @x.domain(@initialDomain)
@@ -96,8 +100,9 @@ define (require) ->
     renderElements: () =>
       # No need to call this on each frames, but only on brush, key drag, ...
       bar = @renderLines()
-      @renderProperties(bar)
-      @renderKeys()
+      #@renderProperties(bar)
+      properties = @timelineProperties.render(bar)
+      @renderKeys(properties)
 
     renderTimeIndicator: () =>
       timeSelection = @svgContainer.selectAll('.time-indicator').data(@currentTime)
@@ -266,72 +271,7 @@ define (require) ->
 
       return bar
 
-    renderProperties: (bar) ->
-      self = this
-      # Properties
-      propVal = (d,i) -> d.properties
-      propKey = (d) -> d.name
-      self.properties = bar.selectAll('.line--sub').data(propVal, propKey)
-      console.log "render properties"
-
-
-      subGrp = self.properties.enter().append('g')
-        .attr("class", 'line--sub')
-        .attr "transform", (d, i) ->
-          sub_height = (i + 1) * self.lineHeight
-          return "translate(0," + sub_height + ")"
-
-      sortKeys = (keys) -> keys.sort((a, b) -> d3.ascending(a.time, b.time))
-
-      subGrp.append('rect')
-        .attr('class', 'click-handler click-handler--property')
-        .attr('x', 0)
-        .attr('y', 0)
-        .attr('width', self.x(self.timer.totalDuration + 100))
-        .attr('height', self.lineHeight)
-        .on 'dblclick', (d) ->
-          lineObject = this.parentNode.parentNode
-          lineValue = d3.select(lineObject).datum()
-          def = if d.default then d.default else 0
-          mouse = d3.mouse(this)
-          dx = self.x.invert(mouse[0])
-          dx = dx.getTime() / 1000
-          newKey = {time: dx, val: def}
-          d.keys.push(newKey)
-          # Sort the keys for tweens creation
-          d.keys = sortKeys(d.keys)
-
-          lineValue.isDirty = true
-          self.renderElements()
-
-      subGrp.append('svg')
-        .attr('class','keys--wrapper timeline__right-mask')
-        .attr('width', window.innerWidth - self.label_position_x)
-        .attr('height', self.lineHeight)
-        .attr('fill', '#f00')
-
-      subGrp.append('text')
-        .attr("class", "line--label line--label-small")
-        .attr("x", self.label_position_x + 30)
-        .attr("y", 15)
-        .text (d) ->
-          d.name
-
-      subGrp.append("line")
-        .attr("class", 'line--separator-secondary')
-        .attr("x1", -200)
-        .attr("x2", self.x(self.timer.totalDuration + 100))
-        .attr("y1", self.lineHeight)
-        .attr("y2", self.lineHeight)
-
-      bar.selectAll('.line--sub').attr('display', (d) ->
-          lineObject = this.parentNode
-          console.log lineObject
-          lineValue = d3.select(lineObject).datum()
-          return if !lineValue.collapsed then "block" else "none"
-        )
-
-    renderKeys: () ->
+    renderKeys: (properties) ->
       self = this
 
       sortKeys = (keys) -> keys.sort((a, b) -> d3.ascending(a.time, b.time))
@@ -358,7 +298,7 @@ define (require) ->
 
       propValue = (d,i,j) -> d.keys
       propKey = (d, k) -> d.time
-      keys = @properties.select('.keys--wrapper').selectAll('.key').data(propValue, propKey)
+      keys = properties.select('.keys--wrapper').selectAll('.key').data(propValue, propKey)
 
       selectKey = (d) ->
         propertyObject = this.parentNode.parentNode
@@ -392,3 +332,4 @@ define (require) ->
           dy = 9
           return "translate(" + dx + "," + dy + ")"
       keys.exit().remove()
+
