@@ -215,9 +215,11 @@ define (require) ->
 
       self.dy = 10 + @margin.top
       bar.attr "transform", (d, i) ->
-        numProperties = if d.properties then d.properties.length else 0
         y = self.dy
-        self.dy += (numProperties + 1) * self.lineHeight
+        self.dy += self.lineHeight
+        if !d.collapsed
+          numProperties = if d.properties then d.properties.length else 0
+          self.dy += numProperties * self.lineHeight
 
         return "translate(0," + y + ")"
 
@@ -237,9 +239,21 @@ define (require) ->
 
       barEnter.append("text")
         .attr("class", "line--label")
-        .attr("x", self.label_position_x)
+        .attr("x", self.label_position_x + 10)
         .attr("y", 16)
         .text((d) -> d.label)
+
+      self = this
+      barEnter.append("text")
+        .attr("class", "line__toggle")
+        .attr("x", self.label_position_x - 10)
+        .attr("y", 16)
+        .on 'click', (d) ->
+          d.collapsed = !d.collapsed
+          self.renderElements()
+
+      bar.selectAll(".line__toggle")
+        .text((d) -> if d.collapsed then "▸" else"▾")
 
       barEnter.append("line")
         .attr("class", 'line--separator')
@@ -258,6 +272,8 @@ define (require) ->
       propVal = (d,i) -> d.properties
       propKey = (d) -> d.name
       self.properties = bar.selectAll('.line--sub').data(propVal, propKey)
+      console.log "render properties"
+
 
       subGrp = self.properties.enter().append('g')
         .attr("class", 'line--sub')
@@ -296,7 +312,7 @@ define (require) ->
 
       subGrp.append('text')
         .attr("class", "line--label line--label-small")
-        .attr("x", self.label_position_x)
+        .attr("x", self.label_position_x + 30)
         .attr("y", 15)
         .text (d) ->
           d.name
@@ -307,6 +323,13 @@ define (require) ->
         .attr("x2", self.x(self.timer.totalDuration + 100))
         .attr("y1", self.lineHeight)
         .attr("y2", self.lineHeight)
+
+      bar.selectAll('.line--sub').attr('display', (d) ->
+          lineObject = this.parentNode
+          console.log lineObject
+          lineValue = d3.select(lineObject).datum()
+          return if !lineValue.collapsed then "block" else "none"
+        )
 
     renderKeys: () ->
       self = this

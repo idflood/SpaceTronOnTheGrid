@@ -4,6 +4,7 @@
     "label": "Test circles",
     "start": 0,
     "end": 2,
+    "collapsed": true,
     "options": {
       "numItems": 12,
       "seed": 12002,

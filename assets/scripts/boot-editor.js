@@ -20017,9 +20017,12 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         self.dy = 10 + this.margin.top;
         bar.attr("transform", function(d, i) {
           var numProperties, y;
-          numProperties = d.properties ? d.properties.length : 0;
           y = self.dy;
-          self.dy += (numProperties + 1) * self.lineHeight;
+          self.dy += self.lineHeight;
+          if (!d.collapsed) {
+            numProperties = d.properties ? d.properties.length : 0;
+            self.dy += numProperties * self.lineHeight;
+          }
           return "translate(0," + y + ")";
         });
         bar.selectAll('.bar-anchor--left').attr("x", function(d) {
@@ -20033,8 +20036,20 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         }).attr("width", function(d) {
           return Math.max(0, (self.x(d.end) - self.x(d.start)) * 1000 - bar_border);
         }).call(drag).on("click", selectBar);
-        barEnter.append("text").attr("class", "line--label").attr("x", self.label_position_x).attr("y", 16).text(function(d) {
+        barEnter.append("text").attr("class", "line--label").attr("x", self.label_position_x + 10).attr("y", 16).text(function(d) {
           return d.label;
+        });
+        self = this;
+        barEnter.append("text").attr("class", "line__toggle").attr("x", self.label_position_x - 10).attr("y", 16).on('click', function(d) {
+          d.collapsed = !d.collapsed;
+          return self.renderElements();
+        });
+        bar.selectAll(".line__toggle").text(function(d) {
+          if (d.collapsed) {
+            return "▸";
+          } else {
+            return "▾";
+          }
         });
         barEnter.append("line").attr("class", 'line--separator').attr("x1", -200).attr("x2", self.x(self.timer.totalDuration + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
         bar.exit().remove();
@@ -20051,6 +20066,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return d.name;
         };
         self.properties = bar.selectAll('.line--sub').data(propVal, propKey);
+        console.log("render properties");
         subGrp = self.properties.enter().append('g').attr("class", 'line--sub').attr("transform", function(d, i) {
           var sub_height;
           sub_height = (i + 1) * self.lineHeight;
@@ -20079,10 +20095,21 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return self.renderElements();
         });
         subGrp.append('svg').attr('class', 'keys--wrapper timeline__right-mask').attr('width', window.innerWidth - self.label_position_x).attr('height', self.lineHeight).attr('fill', '#f00');
-        subGrp.append('text').attr("class", "line--label line--label-small").attr("x", self.label_position_x).attr("y", 15).text(function(d) {
+        subGrp.append('text').attr("class", "line--label line--label-small").attr("x", self.label_position_x + 30).attr("y", 15).text(function(d) {
           return d.name;
         });
-        return subGrp.append("line").attr("class", 'line--separator-secondary').attr("x1", -200).attr("x2", self.x(self.timer.totalDuration + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
+        subGrp.append("line").attr("class", 'line--separator-secondary').attr("x1", -200).attr("x2", self.x(self.timer.totalDuration + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
+        return bar.selectAll('.line--sub').attr('display', function(d) {
+          var lineObject, lineValue;
+          lineObject = this.parentNode;
+          console.log(lineObject);
+          lineValue = d3.select(lineObject).datum();
+          if (!lineValue.collapsed) {
+            return "block";
+          } else {
+            return "none";
+          }
+        });
       };
 
       Timeline.prototype.renderKeys = function() {

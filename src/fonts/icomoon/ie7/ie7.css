@@ -1,3 +1,6 @@
+.icon-chevron-right {
+	*zoom: expression(this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf054;');
+}
 .icon-chevron-up {
 	*zoom: expression(this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf077;');
 }
