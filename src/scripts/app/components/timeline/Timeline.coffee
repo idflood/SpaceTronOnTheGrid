@@ -5,6 +5,7 @@ define (require) ->
   TimelineHeader = require 'cs!app/components/Timeline/TimelineHeader'
   TimelineUtils = require 'cs!app/components/Timeline/TimelineUtils'
 
+  TimelineItems = require 'cs!app/components/Timeline/TimelineItems'
   TimelineProperties = require 'cs!app/components/Timeline/TimelineProperties'
   TimelineKeys = require 'cs!app/components/Timeline/TimelineKeys'
 
@@ -26,14 +27,6 @@ define (require) ->
       height = 270 - margin.top - margin.bottom - 40
       @lineHeight = 20
       @label_position_x = -170
-      @dy = 10 + margin.top
-
-      @timelineHeader = new TimelineHeader(@app, @timer, @initialDomain, width)
-      @timelineProperties = new TimelineProperties(this)
-      @timelineProperties.onKeyAdded.add(@renderElements)
-
-      @timelineKeys = new TimelineKeys(this)
-      @timelineKeys.onKeyUpdated.add(@renderElements)
 
       @x = d3.time.scale().range([0, width])
       @x.domain(@initialDomain)
@@ -54,6 +47,14 @@ define (require) ->
       @linesContainer = @svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + (margin.top + 10) + ")")
 
+      @timelineHeader = new TimelineHeader(@app, @timer, @initialDomain, width)
+
+      @timelineItems = new TimelineItems(this, @linesContainer)
+      @timelineItems.onUpdate.add(@renderElements)
+      @timelineProperties = new TimelineProperties(this)
+      @timelineProperties.onKeyAdded.add(@renderElements)
+      @timelineKeys = new TimelineKeys(this)
+      @timelineKeys.onKeyUpdated.add(@renderElements)
 
       xAxisGrid = d3.svg.axis()
         .scale(@x)
@@ -103,7 +104,7 @@ define (require) ->
 
     renderElements: () =>
       # No need to call this on each frames, but only on brush, key drag, ...
-      bar = @renderLines()
+      bar = @timelineItems.render()
       properties = @timelineProperties.render(bar)
       @timelineKeys.render(properties)
 
@@ -124,152 +125,3 @@ define (require) ->
       timeSelection = @svgContainer.selectAll('.time-indicator rect')
       timeSelection.attr('x', @x(@currentTime[0]) - 0.5)
       #timeSelection.attr('transform', 'translate(' + (@x(@currentTime[0]) - 0.5) + ', -' + @margin.top + ')')
-
-    renderLines: () ->
-      self = this
-
-      selectBar = (d) ->
-        # Merge attributes with existing ones on click, so if we add
-        # an attribute we don't have to edit the json manually to allow
-        # existing object to use it.
-        # todo: find a way to get the value as current time (at time between previous and next key)
-        factory = window.ElementFactory
-        el_type = factory.elements[d.type]
-        if el_type
-          d.options = extend(el_type.default_attributes(), d.options)
-        if window.gui then window.gui.destroy()
-        gui = new dat.GUI()
-        for key, value of d.options
-          controller = gui.add(d.options, key)
-          controller.onChange (v) -> d.isDirtyObject = true
-        window.gui = gui
-
-      dragmove = (d) ->
-        dx = self.x.invert(d3.event.x).getTime() / 1000
-        diff = (dx - d.start)
-        d.start += diff
-        d.end += diff
-        for prop in d.properties
-          for key in prop.keys
-            key.time += diff
-
-        d.isDirty = true
-        self.renderElements()
-
-      dragmoveLeft = (d) ->
-        d3.event.sourceEvent.stopPropagation()
-        dx = self.x.invert(d3.event.x).getTime() / 1000
-        diff = (dx - d.start)
-        d.start += diff
-        d.isDirty = true
-        self.renderElements()
-
-      dragmoveRight = (d) ->
-        d3.event.sourceEvent.stopPropagation()
-        dx = self.x.invert(d3.event.x).getTime() / 1000
-        diff = (dx - d.end)
-        d.end += diff
-        d.isDirty = true
-        self.renderElements()
-
-      dragLeft = d3.behavior.drag()
-        .origin((d) ->
-          t = d3.select(this)
-          return {x: t.attr('x'), y: t.attr('y')})
-        .on("drag", dragmoveLeft)
-
-      dragRight = d3.behavior.drag()
-        .origin((d) ->
-          t = d3.select(this)
-          return {x: t.attr('x'), y: t.attr('y')})
-        .on("drag", dragmoveRight)
-
-      drag = d3.behavior.drag()
-        .origin((d) ->
-          t = d3.select(this)
-          return {x: t.attr('x'), y: t.attr('y')})
-        .on("drag", dragmove)
-
-      bar_border = 1
-      bar = @linesContainer.selectAll(".line-grp")
-        .data(@app.data, (d) -> d.id)
-
-      barEnter = bar.enter()
-        .append('g').attr('class', 'line-grp')
-
-      barContainerRight = barEnter.append('svg')
-        .attr('class', 'timeline__right-mask')
-        .attr('width', window.innerWidth - self.label_position_x)
-        .attr('height', self.lineHeight)
-
-      barContainerRight.append("rect")
-        .attr("class", "bar")
-        .attr("y", 3)
-        .attr("height", 14)
-
-      barContainerRight.append("rect")
-        .attr("class", "bar-anchor bar-anchor--left")
-        .attr("y", 2)
-        .attr("height", 16)
-        .attr("width", 6)
-        .call(dragLeft)
-
-      barContainerRight.append("rect")
-        .attr("class", "bar-anchor bar-anchor--right")
-        .attr("y", 2)
-        .attr("height", 16)
-        .attr("width", 6)
-        .call(dragRight)
-
-      self.dy = 10 + @margin.top
-      bar.attr "transform", (d, i) ->
-        y = self.dy
-        self.dy += self.lineHeight
-        if !d.collapsed
-          numProperties = if d.properties then d.properties.length else 0
-          self.dy += numProperties * self.lineHeight
-
-        return "translate(0," + y + ")"
-
-      bar.selectAll('.bar-anchor--left')
-        .attr("x", (d) -> return self.x(d.start * 1000) - 1)
-
-      bar.selectAll('.bar-anchor--right')
-        .attr("x", (d) -> return self.x(d.end * 1000) - 1)
-
-      bar.selectAll('.bar')
-        .attr("x", (d) -> return self.x(d.start * 1000) + bar_border)
-        .attr("width", (d) ->
-          return Math.max(0, (self.x(d.end) - self.x(d.start)) * 1000 - bar_border)
-        )
-        .call(drag)
-        .on("click", selectBar)
-
-      barEnter.append("text")
-        .attr("class", "line--label")
-        .attr("x", self.label_position_x + 10)
-        .attr("y", 16)
-        .text((d) -> d.label)
-
-      self = this
-      barEnter.append("text")
-        .attr("class", "line__toggle")
-        .attr("x", self.label_position_x - 10)
-        .attr("y", 16)
-        .on 'click', (d) ->
-          d.collapsed = !d.collapsed
-          self.renderElements()
-
-      bar.selectAll(".line__toggle")
-        .text((d) -> if d.collapsed then "▸" else"▾")
-
-      barEnter.append("line")
-        .attr("class", 'line--separator')
-        .attr("x1", -200)
-        .attr("x2", self.x(self.timer.totalDuration + 100))
-        .attr("y1", self.lineHeight)
-        .attr("y2", self.lineHeight)
-
-      bar.exit().remove()
-
-      return bar

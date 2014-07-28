@@ -19826,6 +19826,165 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 
 
 (function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  define('cs!app/components/Timeline/TimelineItems',['require','d3','Signal'],function(require) {
+    var Signals, TimelineItems, d3;
+    d3 = require('d3');
+    Signals = require('Signal');
+    return TimelineItems = (function() {
+      function TimelineItems(timeline, container) {
+        this.timeline = timeline;
+        this.container = container;
+        this.render = __bind(this.render, this);
+        this.dy = 10 + this.timeline.margin.top;
+        this.onUpdate = new Signals.Signal();
+      }
+
+      TimelineItems.prototype.render = function() {
+        var bar, barContainerRight, barEnter, bar_border, drag, dragLeft, dragRight, dragmove, dragmoveLeft, dragmoveRight, selectBar, self;
+        self = this;
+        selectBar = function(d) {
+          var controller, el_type, factory, gui, key, value, _ref;
+          factory = window.ElementFactory;
+          el_type = factory.elements[d.type];
+          if (el_type) {
+            d.options = extend(el_type.default_attributes(), d.options);
+          }
+          if (window.gui) {
+            window.gui.destroy();
+          }
+          gui = new dat.GUI();
+          _ref = d.options;
+          for (key in _ref) {
+            value = _ref[key];
+            controller = gui.add(d.options, key);
+            controller.onChange(function(v) {
+              return d.isDirtyObject = true;
+            });
+          }
+          return window.gui = gui;
+        };
+        dragmove = function(d) {
+          var diff, dx, key, prop, _i, _j, _len, _len1, _ref, _ref1;
+          dx = self.timeline.x.invert(d3.event.x).getTime() / 1000;
+          diff = dx - d.start;
+          d.start += diff;
+          d.end += diff;
+          _ref = d.properties;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            prop = _ref[_i];
+            _ref1 = prop.keys;
+            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+              key = _ref1[_j];
+              key.time += diff;
+            }
+          }
+          d.isDirty = true;
+          return self.onUpdate.dispatch();
+        };
+        dragmoveLeft = function(d) {
+          var diff, dx;
+          d3.event.sourceEvent.stopPropagation();
+          dx = self.timeline.x.invert(d3.event.x).getTime() / 1000;
+          diff = dx - d.start;
+          d.start += diff;
+          d.isDirty = true;
+          return self.onUpdate.dispatch();
+        };
+        dragmoveRight = function(d) {
+          var diff, dx;
+          d3.event.sourceEvent.stopPropagation();
+          dx = self.timeline.x.invert(d3.event.x).getTime() / 1000;
+          diff = dx - d.end;
+          d.end += diff;
+          d.isDirty = true;
+          return self.onUpdate.dispatch();
+        };
+        dragLeft = d3.behavior.drag().origin(function(d) {
+          var t;
+          t = d3.select(this);
+          return {
+            x: t.attr('x'),
+            y: t.attr('y')
+          };
+        }).on("drag", dragmoveLeft);
+        dragRight = d3.behavior.drag().origin(function(d) {
+          var t;
+          t = d3.select(this);
+          return {
+            x: t.attr('x'),
+            y: t.attr('y')
+          };
+        }).on("drag", dragmoveRight);
+        drag = d3.behavior.drag().origin(function(d) {
+          var t;
+          t = d3.select(this);
+          return {
+            x: t.attr('x'),
+            y: t.attr('y')
+          };
+        }).on("drag", dragmove);
+        bar_border = 1;
+        bar = this.container.selectAll(".line-grp").data(this.timeline.app.data, function(d) {
+          return d.id;
+        });
+        barEnter = bar.enter().append('g').attr('class', 'line-grp');
+        barContainerRight = barEnter.append('svg').attr('class', 'timeline__right-mask').attr('width', window.innerWidth - self.timeline.label_position_x).attr('height', self.timeline.lineHeight);
+        barContainerRight.append("rect").attr("class", "bar").attr("y", 3).attr("height", 14);
+        barContainerRight.append("rect").attr("class", "bar-anchor bar-anchor--left").attr("y", 2).attr("height", 16).attr("width", 6).call(dragLeft);
+        barContainerRight.append("rect").attr("class", "bar-anchor bar-anchor--right").attr("y", 2).attr("height", 16).attr("width", 6).call(dragRight);
+        self.dy = 10 + this.timeline.margin.top;
+        bar.attr("transform", function(d, i) {
+          var numProperties, y;
+          y = self.dy;
+          self.dy += self.timeline.lineHeight;
+          if (!d.collapsed) {
+            numProperties = d.properties ? d.properties.length : 0;
+            self.dy += numProperties * self.timeline.lineHeight;
+          }
+          return "translate(0," + y + ")";
+        });
+        bar.selectAll('.bar-anchor--left').attr("x", function(d) {
+          return self.timeline.x(d.start * 1000) - 1;
+        });
+        bar.selectAll('.bar-anchor--right').attr("x", function(d) {
+          return self.timeline.x(d.end * 1000) - 1;
+        });
+        bar.selectAll('.bar').attr("x", function(d) {
+          return self.timeline.x(d.start * 1000) + bar_border;
+        }).attr("width", function(d) {
+          return Math.max(0, (self.timeline.x(d.end) - self.timeline.x(d.start)) * 1000 - bar_border);
+        }).call(drag).on("click", selectBar);
+        barEnter.append("text").attr("class", "line--label").attr("x", self.timeline.label_position_x + 10).attr("y", 16).text(function(d) {
+          return d.label;
+        });
+        self = this;
+        barEnter.append("text").attr("class", "line__toggle").attr("x", self.timeline.label_position_x - 10).attr("y", 16).on('click', function(d) {
+          d.collapsed = !d.collapsed;
+          return self.onUpdate.dispatch();
+        });
+        bar.selectAll(".line__toggle").text(function(d) {
+          if (d.collapsed) {
+            return "▸";
+          } else {
+            return "▾";
+          }
+        });
+        barEnter.append("line").attr("class", 'line--separator').attr("x1", -200).attr("x2", self.timeline.x(self.timeline.timer.totalDuration + 100)).attr("y1", self.timeline.lineHeight).attr("y2", self.timeline.lineHeight);
+        bar.exit().remove();
+        return bar;
+      };
+
+      return TimelineItems;
+
+    })();
+  });
+
+}).call(this);
+
+
+(function() {
   define('cs!app/components/Timeline/TimelineProperties',['require','d3','Signal'],function(require) {
     var Signals, TimelineProperties, d3;
     d3 = require('d3');
@@ -19980,12 +20139,13 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/components/Timeline/Timeline',['require','jquery','d3','cs!app/components/Timeline/TimelineHeader','cs!app/components/Timeline/TimelineUtils','cs!app/components/Timeline/TimelineProperties','cs!app/components/Timeline/TimelineKeys'],function(require) {
-    var $, Timeline, TimelineHeader, TimelineKeys, TimelineProperties, TimelineUtils, d3, extend;
+  define('cs!app/components/Timeline/Timeline',['require','jquery','d3','cs!app/components/Timeline/TimelineHeader','cs!app/components/Timeline/TimelineUtils','cs!app/components/Timeline/TimelineItems','cs!app/components/Timeline/TimelineProperties','cs!app/components/Timeline/TimelineKeys'],function(require) {
+    var $, Timeline, TimelineHeader, TimelineItems, TimelineKeys, TimelineProperties, TimelineUtils, d3, extend;
     $ = require('jquery');
     d3 = require('d3');
     TimelineHeader = require('cs!app/components/Timeline/TimelineHeader');
     TimelineUtils = require('cs!app/components/Timeline/TimelineUtils');
+    TimelineItems = require('cs!app/components/Timeline/TimelineItems');
     TimelineProperties = require('cs!app/components/Timeline/TimelineProperties');
     TimelineKeys = require('cs!app/components/Timeline/TimelineKeys');
     extend = function(object, properties) {
@@ -20017,18 +20177,19 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         height = 270 - margin.top - margin.bottom - 40;
         this.lineHeight = 20;
         this.label_position_x = -170;
-        this.dy = 10 + margin.top;
-        this.timelineHeader = new TimelineHeader(this.app, this.timer, this.initialDomain, width);
-        this.timelineProperties = new TimelineProperties(this);
-        this.timelineProperties.onKeyAdded.add(this.renderElements);
-        this.timelineKeys = new TimelineKeys(this);
-        this.timelineKeys.onKeyUpdated.add(this.renderElements);
         this.x = d3.time.scale().range([0, width]);
         this.x.domain(this.initialDomain);
         xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(TimelineUtils.formatMinutes);
         this.svg = d3.select('.editor__time-main').append("svg").attr("width", width + margin.left + margin.right).attr("height", 600);
         this.svgContainer = this.svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         this.linesContainer = this.svg.append("g").attr("transform", "translate(" + margin.left + "," + (margin.top + 10) + ")");
+        this.timelineHeader = new TimelineHeader(this.app, this.timer, this.initialDomain, width);
+        this.timelineItems = new TimelineItems(this, this.linesContainer);
+        this.timelineItems.onUpdate.add(this.renderElements);
+        this.timelineProperties = new TimelineProperties(this);
+        this.timelineProperties.onKeyAdded.add(this.renderElements);
+        this.timelineKeys = new TimelineKeys(this);
+        this.timelineKeys.onKeyUpdated.add(this.renderElements);
         xAxisGrid = d3.svg.axis().scale(this.x).ticks(100).tickSize(-height, 0).tickFormat("").orient("top");
         xGrid = this.svgContainer.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(xAxisGrid);
         xAxisElement = this.svgContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxis);
@@ -20065,7 +20226,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 
       Timeline.prototype.renderElements = function() {
         var bar, properties;
-        bar = this.renderLines();
+        bar = this.timelineItems.render();
         properties = this.timelineProperties.render(bar);
         return this.timelineKeys.render(properties);
       };
@@ -20077,141 +20238,6 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         timeSelection = timeGrp.append('rect').attr('class', 'time-indicator__line').attr('x', -1).attr('y', -this.margin.top).attr('width', 1).attr('height', 1000);
         timeSelection = this.svgContainer.selectAll('.time-indicator rect');
         return timeSelection.attr('x', this.x(this.currentTime[0]) - 0.5);
-      };
-
-      Timeline.prototype.renderLines = function() {
-        var bar, barContainerRight, barEnter, bar_border, drag, dragLeft, dragRight, dragmove, dragmoveLeft, dragmoveRight, selectBar, self;
-        self = this;
-        selectBar = function(d) {
-          var controller, el_type, factory, gui, key, value, _ref;
-          factory = window.ElementFactory;
-          el_type = factory.elements[d.type];
-          if (el_type) {
-            d.options = extend(el_type.default_attributes(), d.options);
-          }
-          if (window.gui) {
-            window.gui.destroy();
-          }
-          gui = new dat.GUI();
-          _ref = d.options;
-          for (key in _ref) {
-            value = _ref[key];
-            controller = gui.add(d.options, key);
-            controller.onChange(function(v) {
-              return d.isDirtyObject = true;
-            });
-          }
-          return window.gui = gui;
-        };
-        dragmove = function(d) {
-          var diff, dx, key, prop, _i, _j, _len, _len1, _ref, _ref1;
-          dx = self.x.invert(d3.event.x).getTime() / 1000;
-          diff = dx - d.start;
-          d.start += diff;
-          d.end += diff;
-          _ref = d.properties;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            prop = _ref[_i];
-            _ref1 = prop.keys;
-            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-              key = _ref1[_j];
-              key.time += diff;
-            }
-          }
-          d.isDirty = true;
-          return self.renderElements();
-        };
-        dragmoveLeft = function(d) {
-          var diff, dx;
-          d3.event.sourceEvent.stopPropagation();
-          dx = self.x.invert(d3.event.x).getTime() / 1000;
-          diff = dx - d.start;
-          d.start += diff;
-          d.isDirty = true;
-          return self.renderElements();
-        };
-        dragmoveRight = function(d) {
-          var diff, dx;
-          d3.event.sourceEvent.stopPropagation();
-          dx = self.x.invert(d3.event.x).getTime() / 1000;
-          diff = dx - d.end;
-          d.end += diff;
-          d.isDirty = true;
-          return self.renderElements();
-        };
-        dragLeft = d3.behavior.drag().origin(function(d) {
-          var t;
-          t = d3.select(this);
-          return {
-            x: t.attr('x'),
-            y: t.attr('y')
-          };
-        }).on("drag", dragmoveLeft);
-        dragRight = d3.behavior.drag().origin(function(d) {
-          var t;
-          t = d3.select(this);
-          return {
-            x: t.attr('x'),
-            y: t.attr('y')
-          };
-        }).on("drag", dragmoveRight);
-        drag = d3.behavior.drag().origin(function(d) {
-          var t;
-          t = d3.select(this);
-          return {
-            x: t.attr('x'),
-            y: t.attr('y')
-          };
-        }).on("drag", dragmove);
-        bar_border = 1;
-        bar = this.linesContainer.selectAll(".line-grp").data(this.app.data, function(d) {
-          return d.id;
-        });
-        barEnter = bar.enter().append('g').attr('class', 'line-grp');
-        barContainerRight = barEnter.append('svg').attr('class', 'timeline__right-mask').attr('width', window.innerWidth - self.label_position_x).attr('height', self.lineHeight);
-        barContainerRight.append("rect").attr("class", "bar").attr("y", 3).attr("height", 14);
-        barContainerRight.append("rect").attr("class", "bar-anchor bar-anchor--left").attr("y", 2).attr("height", 16).attr("width", 6).call(dragLeft);
-        barContainerRight.append("rect").attr("class", "bar-anchor bar-anchor--right").attr("y", 2).attr("height", 16).attr("width", 6).call(dragRight);
-        self.dy = 10 + this.margin.top;
-        bar.attr("transform", function(d, i) {
-          var numProperties, y;
-          y = self.dy;
-          self.dy += self.lineHeight;
-          if (!d.collapsed) {
-            numProperties = d.properties ? d.properties.length : 0;
-            self.dy += numProperties * self.lineHeight;
-          }
-          return "translate(0," + y + ")";
-        });
-        bar.selectAll('.bar-anchor--left').attr("x", function(d) {
-          return self.x(d.start * 1000) - 1;
-        });
-        bar.selectAll('.bar-anchor--right').attr("x", function(d) {
-          return self.x(d.end * 1000) - 1;
-        });
-        bar.selectAll('.bar').attr("x", function(d) {
-          return self.x(d.start * 1000) + bar_border;
-        }).attr("width", function(d) {
-          return Math.max(0, (self.x(d.end) - self.x(d.start)) * 1000 - bar_border);
-        }).call(drag).on("click", selectBar);
-        barEnter.append("text").attr("class", "line--label").attr("x", self.label_position_x + 10).attr("y", 16).text(function(d) {
-          return d.label;
-        });
-        self = this;
-        barEnter.append("text").attr("class", "line__toggle").attr("x", self.label_position_x - 10).attr("y", 16).on('click', function(d) {
-          d.collapsed = !d.collapsed;
-          return self.renderElements();
-        });
-        bar.selectAll(".line__toggle").text(function(d) {
-          if (d.collapsed) {
-            return "▸";
-          } else {
-            return "▾";
-          }
-        });
-        barEnter.append("line").attr("class", 'line--separator').attr("x1", -200).attr("x2", self.x(self.timer.totalDuration + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
-        bar.exit().remove();
-        return bar;
       };
 
       return Timeline;
