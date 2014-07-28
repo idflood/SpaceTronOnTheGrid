@@ -73,7 +73,6 @@ define (require) ->
         .attr("transform", "translate(0," + margin.top + ")")
         .call(xAxis)
 
-
       @timelineHeader.onBrush.add (extent) =>
         @x.domain(extent)
         xGrid.call(xAxisGrid)

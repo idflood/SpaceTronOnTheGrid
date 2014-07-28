@@ -92,7 +92,6 @@ define (require) ->
           self.currentTime[0] = dx
           )
 
-
       timeGrp = timeSelection.enter().append("g")
         .attr('class', "time-indicator")
         .attr("transform", "translate(0," + 30 + ")")
@@ -122,4 +121,3 @@ define (require) ->
       @x.range([0, width])
       @xDisplayed.range([0, width])
       @xAxisElement.call(@xAxis)
-
