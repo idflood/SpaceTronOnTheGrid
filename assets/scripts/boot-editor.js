@@ -19828,6 +19828,38 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
+  define('cs!app/components/Timeline/TimelineTimeIndicator',['require','jquery','d3','Signal'],function(require) {
+    var $, Signals, TimelineTimeIndicator, d3;
+    $ = require('jquery');
+    d3 = require('d3');
+    Signals = require('Signal');
+    return TimelineTimeIndicator = (function() {
+      function TimelineTimeIndicator(timeline, container) {
+        this.timeline = timeline;
+        this.container = container;
+        this.render = __bind(this.render, this);
+      }
+
+      TimelineTimeIndicator.prototype.render = function() {
+        var timeGrp, timeSelection;
+        timeSelection = this.container.selectAll('.time-indicator').data(this.timeline.currentTime);
+        timeGrp = timeSelection.enter().append("svg").attr('class', "time-indicator timeline__right-mask").attr('width', window.innerWidth - this.timeline.label_position_x).attr('height', 442);
+        timeSelection = timeGrp.append('rect').attr('class', 'time-indicator__line').attr('x', -1).attr('y', -this.timeline.margin.top).attr('width', 1).attr('height', 1000);
+        timeSelection = this.container.selectAll('.time-indicator rect');
+        return timeSelection.attr('x', this.timeline.x(this.timeline.currentTime[0]) - 0.5);
+      };
+
+      return TimelineTimeIndicator;
+
+    })();
+  });
+
+}).call(this);
+
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
   define('cs!app/components/Timeline/TimelineItems',['require','d3','Signal'],function(require) {
     var Signals, TimelineItems, d3;
     d3 = require('d3');
@@ -20139,12 +20171,13 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/components/Timeline/Timeline',['require','jquery','d3','cs!app/components/Timeline/TimelineHeader','cs!app/components/Timeline/TimelineUtils','cs!app/components/Timeline/TimelineItems','cs!app/components/Timeline/TimelineProperties','cs!app/components/Timeline/TimelineKeys'],function(require) {
-    var $, Timeline, TimelineHeader, TimelineItems, TimelineKeys, TimelineProperties, TimelineUtils, d3, extend;
+  define('cs!app/components/Timeline/Timeline',['require','jquery','d3','cs!app/components/Timeline/TimelineHeader','cs!app/components/Timeline/TimelineUtils','cs!app/components/Timeline/TimelineTimeIndicator','cs!app/components/Timeline/TimelineItems','cs!app/components/Timeline/TimelineProperties','cs!app/components/Timeline/TimelineKeys'],function(require) {
+    var $, Timeline, TimelineHeader, TimelineItems, TimelineKeys, TimelineProperties, TimelineTimeIndicator, TimelineUtils, d3, extend;
     $ = require('jquery');
     d3 = require('d3');
     TimelineHeader = require('cs!app/components/Timeline/TimelineHeader');
     TimelineUtils = require('cs!app/components/Timeline/TimelineUtils');
+    TimelineTimeIndicator = require('cs!app/components/Timeline/TimelineTimeIndicator');
     TimelineItems = require('cs!app/components/Timeline/TimelineItems');
     TimelineProperties = require('cs!app/components/Timeline/TimelineProperties');
     TimelineKeys = require('cs!app/components/Timeline/TimelineKeys');
@@ -20158,7 +20191,6 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
     };
     return Timeline = (function() {
       function Timeline() {
-        this.renderTimeIndicator = __bind(this.renderTimeIndicator, this);
         this.renderElements = __bind(this.renderElements, this);
         this.render = __bind(this.render, this);
         var height, margin, width, xAxis, xAxisElement, xAxisGrid, xGrid;
@@ -20184,6 +20216,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.svgContainer = this.svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         this.linesContainer = this.svg.append("g").attr("transform", "translate(" + margin.left + "," + (margin.top + 10) + ")");
         this.timelineHeader = new TimelineHeader(this.app, this.timer, this.initialDomain, width);
+        this.timeIndicator = new TimelineTimeIndicator(this, this.svgContainer);
         this.timelineItems = new TimelineItems(this, this.linesContainer);
         this.timelineItems.onUpdate.add(this.renderElements);
         this.timelineProperties = new TimelineProperties(this);
@@ -20220,7 +20253,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 
       Timeline.prototype.render = function() {
         this.timelineHeader.render();
-        this.renderTimeIndicator();
+        this.timeIndicator.render();
         return window.requestAnimationFrame(this.render);
       };
 
@@ -20229,15 +20262,6 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         bar = this.timelineItems.render();
         properties = this.timelineProperties.render(bar);
         return this.timelineKeys.render(properties);
-      };
-
-      Timeline.prototype.renderTimeIndicator = function() {
-        var timeGrp, timeSelection;
-        timeSelection = this.svgContainer.selectAll('.time-indicator').data(this.currentTime);
-        timeGrp = timeSelection.enter().append("svg").attr('class', "time-indicator timeline__right-mask").attr('width', window.innerWidth - this.label_position_x).attr('height', 442);
-        timeSelection = timeGrp.append('rect').attr('class', 'time-indicator__line').attr('x', -1).attr('y', -this.margin.top).attr('width', 1).attr('height', 1000);
-        timeSelection = this.svgContainer.selectAll('.time-indicator rect');
-        return timeSelection.attr('x', this.x(this.currentTime[0]) - 0.5);
       };
 
       return Timeline;

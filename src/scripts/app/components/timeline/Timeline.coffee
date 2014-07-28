@@ -4,6 +4,7 @@ define (require) ->
 
   TimelineHeader = require 'cs!app/components/Timeline/TimelineHeader'
   TimelineUtils = require 'cs!app/components/Timeline/TimelineUtils'
+  TimelineTimeIndicator = require 'cs!app/components/Timeline/TimelineTimeIndicator'
 
   TimelineItems = require 'cs!app/components/Timeline/TimelineItems'
   TimelineProperties = require 'cs!app/components/Timeline/TimelineProperties'
@@ -48,6 +49,7 @@ define (require) ->
         .attr("transform", "translate(" + margin.left + "," + (margin.top + 10) + ")")
 
       @timelineHeader = new TimelineHeader(@app, @timer, @initialDomain, width)
+      @timeIndicator = new TimelineTimeIndicator(this, @svgContainer)
 
       @timelineItems = new TimelineItems(this, @linesContainer)
       @timelineItems.onUpdate.add(@renderElements)
@@ -97,7 +99,7 @@ define (require) ->
 
     render: () =>
       @timelineHeader.render()
-      @renderTimeIndicator()
+      @timeIndicator.render()
 
       window.requestAnimationFrame(@render)
 
@@ -106,21 +108,3 @@ define (require) ->
       bar = @timelineItems.render()
       properties = @timelineProperties.render(bar)
       @timelineKeys.render(properties)
-
-    renderTimeIndicator: () =>
-      timeSelection = @svgContainer.selectAll('.time-indicator').data(@currentTime)
-      timeGrp = timeSelection.enter().append("svg")
-        .attr('class', "time-indicator timeline__right-mask")
-        .attr('width', window.innerWidth - @label_position_x)
-        .attr('height', 442)
-
-      timeSelection = timeGrp.append('rect')
-        .attr('class', 'time-indicator__line')
-        .attr('x', -1)
-        .attr('y', -@margin.top)
-        .attr('width', 1)
-        .attr('height', 1000)
-
-      timeSelection = @svgContainer.selectAll('.time-indicator rect')
-      timeSelection.attr('x', @x(@currentTime[0]) - 0.5)
-      #timeSelection.attr('transform', 'translate(' + (@x(@currentTime[0]) - 0.5) + ', -' + @margin.top + ')')
