@@ -6,6 +6,7 @@ define (require) ->
   TimelineUtils = require 'cs!app/components/Timeline/TimelineUtils'
 
   TimelineProperties = require 'cs!app/components/Timeline/TimelineProperties'
+  TimelineKeys = require 'cs!app/components/Timeline/TimelineKeys'
 
   extend = (object, properties) ->
     for key, val of properties
@@ -30,6 +31,9 @@ define (require) ->
       @timelineHeader = new TimelineHeader(@app, @timer, @initialDomain, width)
       @timelineProperties = new TimelineProperties(this)
       @timelineProperties.onKeyAdded.add(@renderElements)
+
+      @timelineKeys = new TimelineKeys(this)
+      @timelineKeys.onKeyUpdated.add(@renderElements)
 
       @x = d3.time.scale().range([0, width])
       @x.domain(@initialDomain)
@@ -100,9 +104,8 @@ define (require) ->
     renderElements: () =>
       # No need to call this on each frames, but only on brush, key drag, ...
       bar = @renderLines()
-      #@renderProperties(bar)
       properties = @timelineProperties.render(bar)
-      @renderKeys(properties)
+      @timelineKeys.render(properties)
 
     renderTimeIndicator: () =>
       timeSelection = @svgContainer.selectAll('.time-indicator').data(@currentTime)
@@ -270,66 +273,3 @@ define (require) ->
       bar.exit().remove()
 
       return bar
-
-    renderKeys: (properties) ->
-      self = this
-
-      sortKeys = (keys) -> keys.sort((a, b) -> d3.ascending(a.time, b.time))
-
-      dragmove = (d) ->
-        propertyObject = this.parentNode.parentNode
-        lineObject = propertyObject.parentNode.parentNode
-        propertyData = d3.select(propertyObject).datum()
-        lineData = d3.select(lineObject).datum()
-
-        currentDomainStart = self.x.domain()[0]
-        mouse = d3.mouse(this)
-        dx = self.x.invert(mouse[0])
-        dx = dx.getTime()
-        d.time += dx / 1000 - currentDomainStart / 1000
-
-        propertyData.keys = sortKeys(propertyData.keys)
-        lineData.isDirty = true
-        self.renderElements()
-
-      drag = d3.behavior.drag()
-        .origin((d) -> return d;)
-        .on("drag", dragmove)
-
-      propValue = (d,i,j) -> d.keys
-      propKey = (d, k) -> d.time
-      keys = properties.select('.keys--wrapper').selectAll('.key').data(propValue, propKey)
-
-      selectKey = (d) ->
-        propertyObject = this.parentNode.parentNode
-        lineObject = propertyObject.parentNode.parentNode
-        lineData = d3.select(lineObject).datum()
-
-        if window.gui then window.gui.destroy()
-        gui = new dat.GUI()
-        controller = gui.add(d, "val")
-        controller.onChange (v) -> lineData.isDirty = true
-        window.gui = gui
-
-      key_size = 6
-      keys.enter()
-        .append('g')
-        .attr('class', 'key')
-        .append('g')
-        .attr('class', 'key__item')
-        .call(drag)
-        .on('click', selectKey)
-        .append('rect')
-        .attr('x', -3)
-        .attr('width', key_size)
-        .attr('height', key_size)
-        .attr('class', 'line--key')
-        .attr('transform', 'rotate(45)')
-
-      keys.selectAll('.key__item')
-        .attr 'transform', (d) ->
-          dx = self.x(d.time * 1000) + 3
-          dy = 9
-          return "translate(" + dx + "," + dy + ")"
-      keys.exit().remove()
-

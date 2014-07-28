@@ -19900,15 +19900,94 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 
 
 (function() {
+  define('cs!app/components/Timeline/TimelineKeys',['require','d3','Signal'],function(require) {
+    var Signals, TimelineKeys, d3;
+    d3 = require('d3');
+    Signals = require('Signal');
+    return TimelineKeys = (function() {
+      function TimelineKeys(timeline) {
+        this.timeline = timeline;
+        this.onKeyUpdated = new Signals.Signal();
+      }
+
+      TimelineKeys.prototype.render = function(properties) {
+        var drag, dragmove, key_size, keys, propKey, propValue, selectKey, self, sortKeys;
+        self = this;
+        sortKeys = function(keys) {
+          return keys.sort(function(a, b) {
+            return d3.ascending(a.time, b.time);
+          });
+        };
+        dragmove = function(d) {
+          var currentDomainStart, dx, lineData, lineObject, mouse, propertyData, propertyObject;
+          propertyObject = this.parentNode.parentNode;
+          lineObject = propertyObject.parentNode.parentNode;
+          propertyData = d3.select(propertyObject).datum();
+          lineData = d3.select(lineObject).datum();
+          currentDomainStart = self.timeline.x.domain()[0];
+          mouse = d3.mouse(this);
+          dx = self.timeline.x.invert(mouse[0]);
+          dx = dx.getTime();
+          d.time += dx / 1000 - currentDomainStart / 1000;
+          propertyData.keys = sortKeys(propertyData.keys);
+          lineData.isDirty = true;
+          return self.onKeyUpdated.dispatch();
+        };
+        drag = d3.behavior.drag().origin(function(d) {
+          return d;
+        }).on("drag", dragmove);
+        propValue = function(d, i, j) {
+          return d.keys;
+        };
+        propKey = function(d, k) {
+          return d.time;
+        };
+        keys = properties.select('.keys--wrapper').selectAll('.key').data(propValue, propKey);
+        selectKey = function(d) {
+          var controller, gui, lineData, lineObject, propertyObject;
+          propertyObject = this.parentNode.parentNode;
+          lineObject = propertyObject.parentNode.parentNode;
+          lineData = d3.select(lineObject).datum();
+          if (window.gui) {
+            window.gui.destroy();
+          }
+          gui = new dat.GUI();
+          controller = gui.add(d, "val");
+          controller.onChange(function(v) {
+            return lineData.isDirty = true;
+          });
+          return window.gui = gui;
+        };
+        key_size = 6;
+        keys.enter().append('g').attr('class', 'key').append('g').attr('class', 'key__item').call(drag).on('click', selectKey).append('rect').attr('x', -3).attr('width', key_size).attr('height', key_size).attr('class', 'line--key').attr('transform', 'rotate(45)');
+        keys.selectAll('.key__item').attr('transform', function(d) {
+          var dx, dy;
+          dx = self.timeline.x(d.time * 1000) + 3;
+          dy = 9;
+          return "translate(" + dx + "," + dy + ")";
+        });
+        return keys.exit().remove();
+      };
+
+      return TimelineKeys;
+
+    })();
+  });
+
+}).call(this);
+
+
+(function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/components/Timeline/Timeline',['require','jquery','d3','cs!app/components/Timeline/TimelineHeader','cs!app/components/Timeline/TimelineUtils','cs!app/components/Timeline/TimelineProperties'],function(require) {
-    var $, Timeline, TimelineHeader, TimelineProperties, TimelineUtils, d3, extend;
+  define('cs!app/components/Timeline/Timeline',['require','jquery','d3','cs!app/components/Timeline/TimelineHeader','cs!app/components/Timeline/TimelineUtils','cs!app/components/Timeline/TimelineProperties','cs!app/components/Timeline/TimelineKeys'],function(require) {
+    var $, Timeline, TimelineHeader, TimelineKeys, TimelineProperties, TimelineUtils, d3, extend;
     $ = require('jquery');
     d3 = require('d3');
     TimelineHeader = require('cs!app/components/Timeline/TimelineHeader');
     TimelineUtils = require('cs!app/components/Timeline/TimelineUtils');
     TimelineProperties = require('cs!app/components/Timeline/TimelineProperties');
+    TimelineKeys = require('cs!app/components/Timeline/TimelineKeys');
     extend = function(object, properties) {
       var key, val;
       for (key in properties) {
@@ -19942,6 +20021,8 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.timelineHeader = new TimelineHeader(this.app, this.timer, this.initialDomain, width);
         this.timelineProperties = new TimelineProperties(this);
         this.timelineProperties.onKeyAdded.add(this.renderElements);
+        this.timelineKeys = new TimelineKeys(this);
+        this.timelineKeys.onKeyUpdated.add(this.renderElements);
         this.x = d3.time.scale().range([0, width]);
         this.x.domain(this.initialDomain);
         xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(TimelineUtils.formatMinutes);
@@ -19986,7 +20067,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         var bar, properties;
         bar = this.renderLines();
         properties = this.timelineProperties.render(bar);
-        return this.renderKeys(properties);
+        return this.timelineKeys.render(properties);
       };
 
       Timeline.prototype.renderTimeIndicator = function() {
@@ -20131,65 +20212,6 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         barEnter.append("line").attr("class", 'line--separator').attr("x1", -200).attr("x2", self.x(self.timer.totalDuration + 100)).attr("y1", self.lineHeight).attr("y2", self.lineHeight);
         bar.exit().remove();
         return bar;
-      };
-
-      Timeline.prototype.renderKeys = function(properties) {
-        var drag, dragmove, key_size, keys, propKey, propValue, selectKey, self, sortKeys;
-        self = this;
-        sortKeys = function(keys) {
-          return keys.sort(function(a, b) {
-            return d3.ascending(a.time, b.time);
-          });
-        };
-        dragmove = function(d) {
-          var currentDomainStart, dx, lineData, lineObject, mouse, propertyData, propertyObject;
-          propertyObject = this.parentNode.parentNode;
-          lineObject = propertyObject.parentNode.parentNode;
-          propertyData = d3.select(propertyObject).datum();
-          lineData = d3.select(lineObject).datum();
-          currentDomainStart = self.x.domain()[0];
-          mouse = d3.mouse(this);
-          dx = self.x.invert(mouse[0]);
-          dx = dx.getTime();
-          d.time += dx / 1000 - currentDomainStart / 1000;
-          propertyData.keys = sortKeys(propertyData.keys);
-          lineData.isDirty = true;
-          return self.renderElements();
-        };
-        drag = d3.behavior.drag().origin(function(d) {
-          return d;
-        }).on("drag", dragmove);
-        propValue = function(d, i, j) {
-          return d.keys;
-        };
-        propKey = function(d, k) {
-          return d.time;
-        };
-        keys = properties.select('.keys--wrapper').selectAll('.key').data(propValue, propKey);
-        selectKey = function(d) {
-          var controller, gui, lineData, lineObject, propertyObject;
-          propertyObject = this.parentNode.parentNode;
-          lineObject = propertyObject.parentNode.parentNode;
-          lineData = d3.select(lineObject).datum();
-          if (window.gui) {
-            window.gui.destroy();
-          }
-          gui = new dat.GUI();
-          controller = gui.add(d, "val");
-          controller.onChange(function(v) {
-            return lineData.isDirty = true;
-          });
-          return window.gui = gui;
-        };
-        key_size = 6;
-        keys.enter().append('g').attr('class', 'key').append('g').attr('class', 'key__item').call(drag).on('click', selectKey).append('rect').attr('x', -3).attr('width', key_size).attr('height', key_size).attr('class', 'line--key').attr('transform', 'rotate(45)');
-        keys.selectAll('.key__item').attr('transform', function(d) {
-          var dx, dy;
-          dx = self.x(d.time * 1000) + 3;
-          dy = 9;
-          return "translate(" + dx + "," + dy + ")";
-        });
-        return keys.exit().remove();
       };
 
       return Timeline;
