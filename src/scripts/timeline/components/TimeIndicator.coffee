@@ -4,7 +4,7 @@ define (require) ->
 
   Signals = require 'Signal'
 
-  class TimelineTimeIndicator
+  class TimeIndicator
     constructor: (@timeline, @container) ->
 
     render: () =>

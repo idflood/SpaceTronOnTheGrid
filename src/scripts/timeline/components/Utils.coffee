@@ -1,5 +1,5 @@
 define (require) ->
-  class TimelineUtils
+  class Utils
     @formatMinutes: (d) ->
       # convert milliseconds to seconds
       d = d / 1000

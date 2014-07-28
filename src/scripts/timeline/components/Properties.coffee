@@ -2,7 +2,7 @@ define (require) ->
   d3 = require 'd3'
   Signals = require 'Signal'
 
-  class TimelineProperties
+  class Properties
     constructor: (@timeline) ->
       # console.log "test"
       @onKeyAdded = new Signals.Signal()

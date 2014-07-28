@@ -19243,6 +19243,36 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
   if (typeof define === "function" && define.amd) define('d3',d3); else if (typeof module === "object" && module.exports) module.exports = d3;
   this.d3 = d3;
 }();
+
+(function() {
+  define('cs!timeline/components/Utils',['require'],function(require) {
+    var Utils;
+    return Utils = (function() {
+      function Utils() {}
+
+      Utils.formatMinutes = function(d) {
+        var hours, minutes, output, seconds;
+        d = d / 1000;
+        hours = Math.floor(d / 3600);
+        minutes = Math.floor((d - (hours * 3600)) / 60);
+        seconds = d - (minutes * 60);
+        output = seconds + "s";
+        if (minutes) {
+          output = minutes + "m " + output;
+        }
+        if (hours) {
+          output = hours + "h " + output;
+        }
+        return output;
+      };
+
+      return Utils;
+
+    })();
+  });
+
+}).call(this);
+
 /*jslint onevar:true, undef:true, newcap:true, regexp:true, bitwise:true, maxerr:50, indent:4, white:false, nomen:false, plusplus:false */
 /*global define:false, require:false, exports:false, module:false, signals:false */
 
@@ -19691,46 +19721,16 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 
 
 (function() {
-  define('cs!app/components/Timeline/TimelineUtils',['require'],function(require) {
-    var TimelineUtils;
-    return TimelineUtils = (function() {
-      function TimelineUtils() {}
-
-      TimelineUtils.formatMinutes = function(d) {
-        var hours, minutes, output, seconds;
-        d = d / 1000;
-        hours = Math.floor(d / 3600);
-        minutes = Math.floor((d - (hours * 3600)) / 60);
-        seconds = d - (minutes * 60);
-        output = seconds + "s";
-        if (minutes) {
-          output = minutes + "m " + output;
-        }
-        if (hours) {
-          output = hours + "h " + output;
-        }
-        return output;
-      };
-
-      return TimelineUtils;
-
-    })();
-  });
-
-}).call(this);
-
-
-(function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/components/Timeline/TimelineHeader',['require','jquery','d3','Signal','cs!app/components/Timeline/TimelineUtils'],function(require) {
-    var $, Signals, TimelineHeader, TimelineUtils, d3;
+  define('cs!timeline/components/Header',['require','jquery','d3','Signal','cs!timeline/components/Utils'],function(require) {
+    var $, Header, Signals, Utils, d3;
     $ = require('jquery');
     d3 = require('d3');
     Signals = require('Signal');
-    TimelineUtils = require('cs!app/components/Timeline/TimelineUtils');
-    return TimelineHeader = (function() {
-      function TimelineHeader(app, timer, initialDomain, width) {
+    Utils = require('cs!timeline/components/Utils');
+    return Header = (function() {
+      function Header(app, timer, initialDomain, width) {
         this.app = app;
         this.timer = timer;
         this.initialDomain = initialDomain;
@@ -19751,14 +19751,14 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.x.domain([0, this.timer.totalDuration]);
         this.xDisplayed = d3.time.scale().range([0, width]);
         this.xDisplayed.domain(this.initialDomain);
-        this.xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-5, 0).tickFormat(TimelineUtils.formatMinutes);
+        this.xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-5, 0).tickFormat(Utils.formatMinutes);
         this.svg = d3.select('.editor__time-header').append("svg").attr("width", width + this.margin.left + this.margin.right).attr("height", 56);
         this.svgContainer = this.svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
         this.createBrushHandle();
         this.createTimeHandle();
       }
 
-      TimelineHeader.prototype.createBrushHandle = function() {
+      Header.prototype.createBrushHandle = function() {
         var gBrush, onBrush;
         this.xAxisElement = this.svgContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + (this.margin.top + 7) + ")").call(this.xAxis);
         onBrush = (function(_this) {
@@ -19774,13 +19774,13 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         return gBrush = this.svgContainer.append("g").attr("class", "brush").call(this.brush).selectAll("rect").attr('height', 20);
       };
 
-      TimelineHeader.prototype.render = function() {
+      Header.prototype.render = function() {
         var timeSelection;
         timeSelection = this.svgContainer.selectAll('.time-indicator');
         return timeSelection.attr('transform', 'translate(' + (this.xDisplayed(this.currentTime[0]) + 0.5) + ', 25)');
       };
 
-      TimelineHeader.prototype.createTimeHandle = function() {
+      Header.prototype.createTimeHandle = function() {
         var dragTime, dragTimeMove, self, timeClicker, timeGrp, timeSelection;
         self = this;
         dragTimeMove = function(d) {
@@ -19809,7 +19809,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         return this.svgContainer.append("rect").attr("class", "graph-mask").attr("x", -self.margin.left).attr("y", -self.margin.top).attr("width", self.margin.left - 20).attr("height", self.height);
       };
 
-      TimelineHeader.prototype.resize = function(width) {
+      Header.prototype.resize = function(width) {
         width = width - this.margin.left - this.margin.right;
         this.svg.attr("width", width + this.margin.left + this.margin.right);
         this.x.range([0, width]);
@@ -19817,7 +19817,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         return this.xAxisElement.call(this.xAxis);
       };
 
-      return TimelineHeader;
+      return Header;
 
     })();
   });
@@ -19828,19 +19828,19 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/components/Timeline/TimelineTimeIndicator',['require','jquery','d3','Signal'],function(require) {
-    var $, Signals, TimelineTimeIndicator, d3;
+  define('cs!timeline/components/TimeIndicator',['require','jquery','d3','Signal'],function(require) {
+    var $, Signals, TimeIndicator, d3;
     $ = require('jquery');
     d3 = require('d3');
     Signals = require('Signal');
-    return TimelineTimeIndicator = (function() {
-      function TimelineTimeIndicator(timeline, container) {
+    return TimeIndicator = (function() {
+      function TimeIndicator(timeline, container) {
         this.timeline = timeline;
         this.container = container;
         this.render = __bind(this.render, this);
       }
 
-      TimelineTimeIndicator.prototype.render = function() {
+      TimeIndicator.prototype.render = function() {
         var timeGrp, timeSelection;
         timeSelection = this.container.selectAll('.time-indicator').data(this.timeline.currentTime);
         timeGrp = timeSelection.enter().append("svg").attr('class', "time-indicator timeline__right-mask").attr('width', window.innerWidth - this.timeline.label_position_x).attr('height', 442);
@@ -19849,7 +19849,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         return timeSelection.attr('x', this.timeline.x(this.timeline.currentTime[0]) - 0.5);
       };
 
-      return TimelineTimeIndicator;
+      return TimeIndicator;
 
     })();
   });
@@ -19860,12 +19860,12 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/components/Timeline/TimelineItems',['require','d3','Signal'],function(require) {
-    var Signals, TimelineItems, d3;
+  define('cs!timeline/components/Items',['require','d3','Signal'],function(require) {
+    var Items, Signals, d3;
     d3 = require('d3');
     Signals = require('Signal');
-    return TimelineItems = (function() {
-      function TimelineItems(timeline, container) {
+    return Items = (function() {
+      function Items(timeline, container) {
         this.timeline = timeline;
         this.container = container;
         this.render = __bind(this.render, this);
@@ -19873,7 +19873,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.onUpdate = new Signals.Signal();
       }
 
-      TimelineItems.prototype.render = function() {
+      Items.prototype.render = function() {
         var bar, barContainerRight, barEnter, bar_border, drag, dragLeft, dragRight, dragmove, dragmoveLeft, dragmoveRight, selectBar, self;
         self = this;
         selectBar = function(d) {
@@ -20008,7 +20008,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         return bar;
       };
 
-      return TimelineItems;
+      return Items;
 
     })();
   });
@@ -20017,17 +20017,17 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 
 
 (function() {
-  define('cs!app/components/Timeline/TimelineProperties',['require','d3','Signal'],function(require) {
-    var Signals, TimelineProperties, d3;
+  define('cs!timeline/components/Properties',['require','d3','Signal'],function(require) {
+    var Properties, Signals, d3;
     d3 = require('d3');
     Signals = require('Signal');
-    return TimelineProperties = (function() {
-      function TimelineProperties(timeline) {
+    return Properties = (function() {
+      function Properties(timeline) {
         this.timeline = timeline;
         this.onKeyAdded = new Signals.Signal();
       }
 
-      TimelineProperties.prototype.render = function(bar) {
+      Properties.prototype.render = function(bar) {
         var propKey, propVal, properties, self, sortKeys, subGrp;
         self = this;
         propVal = function(d, i) {
@@ -20082,7 +20082,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         return properties;
       };
 
-      return TimelineProperties;
+      return Properties;
 
     })();
   });
@@ -20091,17 +20091,17 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 
 
 (function() {
-  define('cs!app/components/Timeline/TimelineKeys',['require','d3','Signal'],function(require) {
-    var Signals, TimelineKeys, d3;
+  define('cs!timeline/components/Keys',['require','d3','Signal'],function(require) {
+    var Keys, Signals, d3;
     d3 = require('d3');
     Signals = require('Signal');
-    return TimelineKeys = (function() {
-      function TimelineKeys(timeline) {
+    return Keys = (function() {
+      function Keys(timeline) {
         this.timeline = timeline;
         this.onKeyUpdated = new Signals.Signal();
       }
 
-      TimelineKeys.prototype.render = function(properties) {
+      Keys.prototype.render = function(properties) {
         var drag, dragmove, key_size, keys, propKey, propValue, selectKey, self, sortKeys;
         self = this;
         sortKeys = function(keys) {
@@ -20160,7 +20160,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         return keys.exit().remove();
       };
 
-      return TimelineKeys;
+      return Keys;
 
     })();
   });
@@ -20171,16 +20171,16 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/components/Timeline/Timeline',['require','jquery','d3','cs!app/components/Timeline/TimelineHeader','cs!app/components/Timeline/TimelineUtils','cs!app/components/Timeline/TimelineTimeIndicator','cs!app/components/Timeline/TimelineItems','cs!app/components/Timeline/TimelineProperties','cs!app/components/Timeline/TimelineKeys'],function(require) {
-    var $, Timeline, TimelineHeader, TimelineItems, TimelineKeys, TimelineProperties, TimelineTimeIndicator, TimelineUtils, d3, extend;
+  define('cs!timeline/Timeline',['require','jquery','d3','cs!timeline/components/Utils','cs!timeline/components/Header','cs!timeline/components/TimeIndicator','cs!timeline/components/Items','cs!timeline/components/Properties','cs!timeline/components/Keys'],function(require) {
+    var $, Header, Items, Keys, Properties, TimeIndicator, Timeline, Utils, d3, extend;
     $ = require('jquery');
     d3 = require('d3');
-    TimelineHeader = require('cs!app/components/Timeline/TimelineHeader');
-    TimelineUtils = require('cs!app/components/Timeline/TimelineUtils');
-    TimelineTimeIndicator = require('cs!app/components/Timeline/TimelineTimeIndicator');
-    TimelineItems = require('cs!app/components/Timeline/TimelineItems');
-    TimelineProperties = require('cs!app/components/Timeline/TimelineProperties');
-    TimelineKeys = require('cs!app/components/Timeline/TimelineKeys');
+    Utils = require('cs!timeline/components/Utils');
+    Header = require('cs!timeline/components/Header');
+    TimeIndicator = require('cs!timeline/components/TimeIndicator');
+    Items = require('cs!timeline/components/Items');
+    Properties = require('cs!timeline/components/Properties');
+    Keys = require('cs!timeline/components/Keys');
     extend = function(object, properties) {
       var key, val;
       for (key in properties) {
@@ -20211,22 +20211,22 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.label_position_x = -170;
         this.x = d3.time.scale().range([0, width]);
         this.x.domain(this.initialDomain);
-        xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(TimelineUtils.formatMinutes);
+        xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(Utils.formatMinutes);
         this.svg = d3.select('.editor__time-main').append("svg").attr("width", width + margin.left + margin.right).attr("height", 600);
         this.svgContainer = this.svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         this.linesContainer = this.svg.append("g").attr("transform", "translate(" + margin.left + "," + (margin.top + 10) + ")");
-        this.timelineHeader = new TimelineHeader(this.app, this.timer, this.initialDomain, width);
-        this.timeIndicator = new TimelineTimeIndicator(this, this.svgContainer);
-        this.timelineItems = new TimelineItems(this, this.linesContainer);
-        this.timelineItems.onUpdate.add(this.renderElements);
-        this.timelineProperties = new TimelineProperties(this);
-        this.timelineProperties.onKeyAdded.add(this.renderElements);
-        this.timelineKeys = new TimelineKeys(this);
-        this.timelineKeys.onKeyUpdated.add(this.renderElements);
+        this.header = new Header(this.app, this.timer, this.initialDomain, width);
+        this.timeIndicator = new TimeIndicator(this, this.svgContainer);
+        this.items = new Items(this, this.linesContainer);
+        this.items.onUpdate.add(this.renderElements);
+        this.properties = new Properties(this);
+        this.properties.onKeyAdded.add(this.renderElements);
+        this.keys = new Keys(this);
+        this.keys.onKeyUpdated.add(this.renderElements);
         xAxisGrid = d3.svg.axis().scale(this.x).ticks(100).tickSize(-height, 0).tickFormat("").orient("top");
         xGrid = this.svgContainer.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(xAxisGrid);
         xAxisElement = this.svgContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxis);
-        this.timelineHeader.onBrush.add((function(_this) {
+        this.header.onBrush.add((function(_this) {
           return function(extent) {
             _this.x.domain(extent);
             xGrid.call(xAxisGrid);
@@ -20246,22 +20246,22 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
             _this.x.range([0, width]);
             xGrid.call(xAxisGrid);
             xAxisElement.call(xAxis);
-            return _this.timelineHeader.resize(INNER_WIDTH);
+            return _this.header.resize(INNER_WIDTH);
           };
         })(this);
       }
 
       Timeline.prototype.render = function() {
-        this.timelineHeader.render();
+        this.header.render();
         this.timeIndicator.render();
         return window.requestAnimationFrame(this.render);
       };
 
       Timeline.prototype.renderElements = function() {
         var bar, properties;
-        bar = this.timelineItems.render();
-        properties = this.timelineProperties.render(bar);
-        return this.timelineKeys.render(properties);
+        bar = this.items.render();
+        properties = this.properties.render(bar);
+        return this.keys.render(properties);
       };
 
       return Timeline;
@@ -20273,11 +20273,11 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 
 
 (function() {
-  define('cs!app/Editor',['require','jquery','text!app/templates/timeline.tpl.html','cs!app/components/Timeline/Timeline'],function(require) {
+  define('cs!app/Editor',['require','jquery','text!app/templates/timeline.tpl.html','cs!timeline/Timeline'],function(require) {
     var $, Editor, EditorTimeline, tpl_timeline;
     $ = require('jquery');
     tpl_timeline = require('text!app/templates/timeline.tpl.html');
-    EditorTimeline = require('cs!app/components/Timeline/Timeline');
+    EditorTimeline = require('cs!timeline/Timeline');
     return Editor = (function() {
       function Editor() {
         this.app = window.app;

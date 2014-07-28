@@ -3,9 +3,9 @@ define (require) ->
   d3 = require 'd3'
 
   Signals = require 'Signal'
-  TimelineUtils = require 'cs!app/components/Timeline/TimelineUtils'
+  Utils = require 'cs!timeline/components/Utils'
 
-  class TimelineHeader
+  class Header
     constructor: (@app, @timer, @initialDomain, width) ->
       @onBrush = new Signals.Signal()
       @margin = {top: 10, right: 20, bottom: 0, left: 190}
@@ -23,7 +23,7 @@ define (require) ->
         .scale(@x)
         .orient("top")
         .tickSize(-5, 0)
-        .tickFormat(TimelineUtils.formatMinutes)
+        .tickFormat(Utils.formatMinutes)
 
       @svg = d3.select('.editor__time-header').append("svg")
         .attr("width", width + @margin.left + @margin.right)

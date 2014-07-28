@@ -2,7 +2,7 @@ define (require) ->
   d3 = require 'd3'
   Signals = require 'Signal'
 
-  class TimelineItems
+  class Items
     constructor: (@timeline, @container) ->
       @dy = 10 + @timeline.margin.top
       @onUpdate = new Signals.Signal()

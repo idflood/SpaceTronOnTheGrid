@@ -2,13 +2,13 @@ define (require) ->
   $ = require 'jquery'
   d3 = require 'd3'
 
-  TimelineHeader = require 'cs!app/components/Timeline/TimelineHeader'
-  TimelineUtils = require 'cs!app/components/Timeline/TimelineUtils'
-  TimelineTimeIndicator = require 'cs!app/components/Timeline/TimelineTimeIndicator'
+  Utils = require 'cs!timeline/components/Utils'
+  Header = require 'cs!timeline/components/Header'
+  TimeIndicator = require 'cs!timeline/components/TimeIndicator'
 
-  TimelineItems = require 'cs!app/components/Timeline/TimelineItems'
-  TimelineProperties = require 'cs!app/components/Timeline/TimelineProperties'
-  TimelineKeys = require 'cs!app/components/Timeline/TimelineKeys'
+  Items = require 'cs!timeline/components/Items'
+  Properties = require 'cs!timeline/components/Properties'
+  Keys = require 'cs!timeline/components/Keys'
 
   extend = (object, properties) ->
     for key, val of properties
@@ -36,7 +36,7 @@ define (require) ->
         .scale(@x)
         .orient("top")
         .tickSize(-height, 0)
-        .tickFormat(TimelineUtils.formatMinutes)
+        .tickFormat(Utils.formatMinutes)
 
       @svg = d3.select('.editor__time-main').append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -48,15 +48,15 @@ define (require) ->
       @linesContainer = @svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + (margin.top + 10) + ")")
 
-      @timelineHeader = new TimelineHeader(@app, @timer, @initialDomain, width)
-      @timeIndicator = new TimelineTimeIndicator(this, @svgContainer)
+      @header = new Header(@app, @timer, @initialDomain, width)
+      @timeIndicator = new TimeIndicator(this, @svgContainer)
 
-      @timelineItems = new TimelineItems(this, @linesContainer)
-      @timelineItems.onUpdate.add(@renderElements)
-      @timelineProperties = new TimelineProperties(this)
-      @timelineProperties.onKeyAdded.add(@renderElements)
-      @timelineKeys = new TimelineKeys(this)
-      @timelineKeys.onKeyUpdated.add(@renderElements)
+      @items = new Items(this, @linesContainer)
+      @items.onUpdate.add(@renderElements)
+      @properties = new Properties(this)
+      @properties.onKeyAdded.add(@renderElements)
+      @keys = new Keys(this)
+      @keys.onKeyUpdated.add(@renderElements)
 
       xAxisGrid = d3.svg.axis()
         .scale(@x)
@@ -75,7 +75,7 @@ define (require) ->
         .attr("transform", "translate(0," + margin.top + ")")
         .call(xAxis)
 
-      @timelineHeader.onBrush.add (extent) =>
+      @header.onBrush.add (extent) =>
         @x.domain(extent)
         xGrid.call(xAxisGrid)
         xAxisElement.call(xAxis)
@@ -95,16 +95,16 @@ define (require) ->
 
         xGrid.call(xAxisGrid)
         xAxisElement.call(xAxis)
-        @timelineHeader.resize(INNER_WIDTH)
+        @header.resize(INNER_WIDTH)
 
     render: () =>
-      @timelineHeader.render()
+      @header.render()
       @timeIndicator.render()
 
       window.requestAnimationFrame(@render)
 
     renderElements: () =>
       # No need to call this on each frames, but only on brush, key drag, ...
-      bar = @timelineItems.render()
-      properties = @timelineProperties.render(bar)
-      @timelineKeys.render(properties)
+      bar = @items.render()
+      properties = @properties.render(bar)
+      @keys.render(properties)
