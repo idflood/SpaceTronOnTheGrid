@@ -20310,9 +20310,10 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       };
 
       Editor.prototype.initAdd = function() {
-        var $container, $link, element, element_name, elements;
+        var $container, $link, element, element_name, elements, self;
         $container = this.$timeline.find('.submenu--add');
         elements = window.ElementFactory.elements;
+        self = this;
         for (element_name in elements) {
           element = elements[element_name];
           $link = $('<a href="#" data-key="' + element_name + '">' + element_name + '</a>');
@@ -20339,6 +20340,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
               properties: window.ElementFactory.elements[element_name].default_properties(current_time)
             };
             window.app.data.push(data);
+            self.timeline.renderElements();
             return console.log(window.app.data);
           }
         });

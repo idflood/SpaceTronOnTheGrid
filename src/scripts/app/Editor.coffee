@@ -21,7 +21,6 @@ define (require) ->
   tpl_timeline = require 'text!app/templates/timeline.tpl.html'
   EditorTimeline = require 'cs!timeline/Timeline'
 
-
   class Editor
     constructor: () ->
       @app = window.app
@@ -51,6 +50,7 @@ define (require) ->
     initAdd: () ->
       $container = @$timeline.find('.submenu--add')
       elements = window.ElementFactory.elements
+      self = this
 
       for element_name, element of elements
         # body...
@@ -77,6 +77,7 @@ define (require) ->
             #options: window.ElementFactory.elements[element_name].default_attributes()
             properties: window.ElementFactory.elements[element_name].default_properties(current_time)
           window.app.data.push(data)
+          self.timeline.renderElements()
           console.log window.app.data
 
     initExport: () ->
