@@ -26,7 +26,6 @@ define (require) ->
 
         propertyData.keys = sortKeys(propertyData.keys)
         lineData.isDirty = true
-        #self.renderElements()
         self.onKeyUpdated.dispatch()
 
       drag = d3.behavior.drag()

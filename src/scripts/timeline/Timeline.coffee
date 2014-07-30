@@ -18,6 +18,7 @@ define (require) ->
   class Timeline
     constructor: () ->
       @app = window.app
+      @isDirty = true
       @timer = @app.timer
       @currentTime = @timer.time
       @initialDomain = [0, @timer.totalDuration - 220 * 1000]
@@ -52,11 +53,11 @@ define (require) ->
       @timeIndicator = new TimeIndicator(this, @svgContainer)
 
       @items = new Items(this, @linesContainer)
-      @items.onUpdate.add(@renderElements)
+      @items.onUpdate.add () => @isDirty = true
       @properties = new Properties(this)
-      @properties.onKeyAdded.add(@renderElements)
+      @properties.onKeyAdded.add () => @isDirty = true
       @keys = new Keys(this)
-      @keys.onKeyUpdated.add(@renderElements)
+      @keys.onKeyUpdated.add () => @isDirty = true
 
       xAxisGrid = d3.svg.axis()
         .scale(@x)
@@ -79,10 +80,9 @@ define (require) ->
         @x.domain(extent)
         xGrid.call(xAxisGrid)
         xAxisElement.call(xAxis)
-        @renderElements()
+        @isDirty = true
 
       # First render
-      @renderElements()
       window.requestAnimationFrame(@render)
 
       window.onresize = () =>
@@ -101,10 +101,11 @@ define (require) ->
       @header.render()
       @timeIndicator.render()
 
-      window.requestAnimationFrame(@render)
+      if @isDirty
+        # No need to call this on each frames, but only on brush, key drag, ...
+        bar = @items.render()
+        properties = @properties.render(bar)
+        @keys.render(properties)
+        @isDirty = false
 
-    renderElements: () =>
-      # No need to call this on each frames, but only on brush, key drag, ...
-      bar = @items.render()
-      properties = @properties.render(bar)
-      @keys.render(properties)
+      window.requestAnimationFrame(@render)

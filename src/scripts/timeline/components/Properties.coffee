@@ -41,7 +41,6 @@ define (require) ->
           d.keys = sortKeys(d.keys)
 
           lineValue.isDirty = true
-          #self.renderElements()
           self.onKeyAdded.dispatch()
 
       subGrp.append('svg')

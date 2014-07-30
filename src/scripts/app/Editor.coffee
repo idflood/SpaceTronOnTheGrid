@@ -77,7 +77,7 @@ define (require) ->
             #options: window.ElementFactory.elements[element_name].default_attributes()
             properties: window.ElementFactory.elements[element_name].default_properties(current_time)
           window.app.data.push(data)
-          self.timeline.renderElements()
+          self.timeline.isDirty = true
           console.log window.app.data
 
     initExport: () ->

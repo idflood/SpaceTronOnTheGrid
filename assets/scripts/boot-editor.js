@@ -20191,10 +20191,10 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
     };
     return Timeline = (function() {
       function Timeline() {
-        this.renderElements = __bind(this.renderElements, this);
         this.render = __bind(this.render, this);
         var height, margin, width, xAxis, xAxisElement, xAxisGrid, xGrid;
         this.app = window.app;
+        this.isDirty = true;
         this.timer = this.app.timer;
         this.currentTime = this.timer.time;
         this.initialDomain = [0, this.timer.totalDuration - 220 * 1000];
@@ -20218,11 +20218,23 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.header = new Header(this.app, this.timer, this.initialDomain, width);
         this.timeIndicator = new TimeIndicator(this, this.svgContainer);
         this.items = new Items(this, this.linesContainer);
-        this.items.onUpdate.add(this.renderElements);
+        this.items.onUpdate.add((function(_this) {
+          return function() {
+            return _this.isDirty = true;
+          };
+        })(this));
         this.properties = new Properties(this);
-        this.properties.onKeyAdded.add(this.renderElements);
+        this.properties.onKeyAdded.add((function(_this) {
+          return function() {
+            return _this.isDirty = true;
+          };
+        })(this));
         this.keys = new Keys(this);
-        this.keys.onKeyUpdated.add(this.renderElements);
+        this.keys.onKeyUpdated.add((function(_this) {
+          return function() {
+            return _this.isDirty = true;
+          };
+        })(this));
         xAxisGrid = d3.svg.axis().scale(this.x).ticks(100).tickSize(-height, 0).tickFormat("").orient("top");
         xGrid = this.svgContainer.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(xAxisGrid);
         xAxisElement = this.svgContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxis);
@@ -20231,10 +20243,9 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
             _this.x.domain(extent);
             xGrid.call(xAxisGrid);
             xAxisElement.call(xAxis);
-            return _this.renderElements();
+            return _this.isDirty = true;
           };
         })(this));
-        this.renderElements();
         window.requestAnimationFrame(this.render);
         window.onresize = (function(_this) {
           return function() {
@@ -20252,16 +20263,16 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       }
 
       Timeline.prototype.render = function() {
+        var bar, properties;
         this.header.render();
         this.timeIndicator.render();
+        if (this.isDirty) {
+          bar = this.items.render();
+          properties = this.properties.render(bar);
+          this.keys.render(properties);
+          this.isDirty = false;
+        }
         return window.requestAnimationFrame(this.render);
-      };
-
-      Timeline.prototype.renderElements = function() {
-        var bar, properties;
-        bar = this.items.render();
-        properties = this.properties.render(bar);
-        return this.keys.render(properties);
       };
 
       return Timeline;
@@ -20340,7 +20351,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
               properties: window.ElementFactory.elements[element_name].default_properties(current_time)
             };
             window.app.data.push(data);
-            self.timeline.renderElements();
+            self.timeline.isDirty = true;
             return console.log(window.app.data);
           }
         });
