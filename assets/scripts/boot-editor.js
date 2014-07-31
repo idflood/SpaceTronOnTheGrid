@@ -20283,12 +20283,36 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 }).call(this);
 
 
+define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<div class="prop-editor">\n  <div class="prop-editor__main"></div>\n</div>\n';});
+
+
 (function() {
-  define('cs!app/Editor',['require','jquery','text!app/templates/timeline.tpl.html','cs!timeline/Timeline'],function(require) {
-    var $, Editor, EditorTimeline, tpl_timeline;
+  define('cs!timeline/components/PropertiesEditor',['require','jquery','text!app/templates/propertiesEditor.tpl.html'],function(require) {
+    var $, PropertiesEditor, tpl_propertiesEditor;
+    $ = require('jquery');
+    tpl_propertiesEditor = require('text!app/templates/propertiesEditor.tpl.html');
+    return PropertiesEditor = (function() {
+      function PropertiesEditor(timeline) {
+        this.timeline = timeline;
+        this.$el = $(tpl_propertiesEditor);
+        $('body').append(this.$el);
+      }
+
+      return PropertiesEditor;
+
+    })();
+  });
+
+}).call(this);
+
+
+(function() {
+  define('cs!app/Editor',['require','jquery','text!app/templates/timeline.tpl.html','cs!timeline/Timeline','cs!timeline/components/PropertiesEditor'],function(require) {
+    var $, Editor, EditorTimeline, PropertiesEditor, tpl_timeline;
     $ = require('jquery');
     tpl_timeline = require('text!app/templates/timeline.tpl.html');
     EditorTimeline = require('cs!timeline/Timeline');
+    PropertiesEditor = require('cs!timeline/components/PropertiesEditor');
     return Editor = (function() {
       function Editor() {
         this.app = window.app;
@@ -20300,6 +20324,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.initExport();
         this.initAdd();
         this.initToggle();
+        this.initPropertiesEditor();
       }
 
       Editor.prototype.initToggle = function() {
@@ -20318,6 +20343,10 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
             }
           };
         })(this));
+      };
+
+      Editor.prototype.initPropertiesEditor = function() {
+        return this.propertiesEditor = new PropertiesEditor(this.timeline);
       };
 
       Editor.prototype.initAdd = function() {

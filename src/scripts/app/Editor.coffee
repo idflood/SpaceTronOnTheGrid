@@ -20,6 +20,7 @@ define (require) ->
 
   tpl_timeline = require 'text!app/templates/timeline.tpl.html'
   EditorTimeline = require 'cs!timeline/Timeline'
+  PropertiesEditor = require 'cs!timeline/components/PropertiesEditor'
 
   class Editor
     constructor: () ->
@@ -34,6 +35,7 @@ define (require) ->
       @initExport()
       @initAdd()
       @initToggle()
+      @initPropertiesEditor()
 
     initToggle: () ->
       timelineClosed = false
@@ -46,6 +48,9 @@ define (require) ->
           @$timeline.css('bottom', -200)
         else
           @$timeline.css('bottom', 0)
+
+    initPropertiesEditor: () ->
+      @propertiesEditor = new PropertiesEditor(@timeline)
 
     initAdd: () ->
       $container = @$timeline.find('.submenu--add')
