@@ -1,0 +1,94 @@
+.editor__time-main
+  height: 220px
+  position: absolute
+  left: 0
+  right: 0
+  bottom: 0
+  overflow-y: scroll
+
+.brush .extent
+  stroke: #fff
+  stroke-opacity: 0.1
+  fill: #fff
+  fill-opacity: .05
+
+.line__toggle
+  font-size: 14px
+  cursor: pointer
+
+.editor__time
+  position: fixed
+  bottom: 0
+  left: 0
+  right: 0
+  height: 270px
+  border-top: 1px solid #333
+  background: #111
+  z-index: 9000
+
+  text
+    fill: #fff
+
+  rect, path, line
+    shape-rendering: crispEdges
+
+  .line--separator
+    stroke: #444
+
+  .line--separator-secondary
+    stroke: #222
+
+  .line--label
+    font-size: 11px
+
+  .line--label-small
+    font-size: 10px
+    fill: #999
+
+  .line--key
+    fill: #999
+    cursor: move
+
+  .axis
+    path, line
+      fill: none
+      stroke: #fff
+
+
+  .x.axis
+    path
+      display: none
+    line
+      stroke: #444
+    text
+      font-size: 10px
+      fill: #ccc
+
+  .x.grid
+    text
+      display: none
+    line
+      stroke: #1a1a1a
+
+  .line
+    fill: none
+    stroke: steelblue
+    stroke-width: 1.5px
+
+  .bar
+    fill: #333
+    stroke: #666
+    cursor: move
+
+  .bar-anchor
+    fill-opacity: 0
+    cursor: ew-resize
+
+
+  .click-handler
+    fill-opacity: 0
+
+  .time-indicator__line
+    fill: #666
+  .time-indicator__handle
+    fill: #666
