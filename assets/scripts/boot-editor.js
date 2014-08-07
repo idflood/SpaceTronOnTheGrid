@@ -20033,7 +20033,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       }
 
       Properties.prototype.render = function(bar) {
-        var propKey, propVal, properties, self, sortKeys, subGrp;
+        var propKey, propVal, properties, self, sortKeys, subGrp, visibleProperties;
         self = this;
         propVal = function(d, i) {
           if (d.properties) {
@@ -20045,8 +20045,11 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         propKey = function(d) {
           return d.name;
         };
+        visibleProperties = function(d) {
+          return d.keys.length;
+        };
         properties = bar.selectAll('.line--sub').data(propVal, propKey);
-        subGrp = properties.enter().append('g').attr("class", 'line--sub').attr("transform", function(d, i) {
+        subGrp = properties.enter().append('g').filter(visibleProperties).attr("class", 'line--sub').attr("transform", function(d, i) {
           var sub_height;
           sub_height = (i + 1) * self.timeline.lineHeight;
           return "translate(0," + sub_height + ")";

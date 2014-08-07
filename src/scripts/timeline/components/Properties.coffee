@@ -10,12 +10,19 @@ define (require) ->
     render: (bar) ->
       self = this
       # Properties
+
       propVal = (d,i) ->
         if d.properties then d.properties else []
       propKey = (d) -> d.name
+      visibleProperties = (d) ->
+        return d.keys.length
       properties = bar.selectAll('.line--sub').data(propVal, propKey)
 
-      subGrp = properties.enter().append('g')
+
+      subGrp = properties.enter()
+
+        .append('g')
+        .filter(visibleProperties)
         .attr("class", 'line--sub')
         .attr "transform", (d, i) ->
           sub_height = (i + 1) * self.timeline.lineHeight
