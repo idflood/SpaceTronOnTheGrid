@@ -1,6 +1,7 @@
 define (require) ->
   $ = require 'jquery'
   d3 = require 'd3'
+  Signals = require 'Signal'
 
   Utils = require 'cs!timeline/components/Utils'
   Header = require 'cs!timeline/components/Header'
@@ -19,6 +20,7 @@ define (require) ->
     constructor: () ->
       @app = window.app
       @isDirty = true
+      @onSelect = new Signals.Signal()
       @timer = @app.timer
       @currentTime = @timer.time
       @initialDomain = [0, @timer.totalDuration - 220 * 1000]
@@ -54,6 +56,8 @@ define (require) ->
 
       @items = new Items(this, @linesContainer)
       @items.onUpdate.add () => @isDirty = true
+      # Propagate onSelect event.
+      @items.onSelect.add (d) => @onSelect.dispatch(d)
       @properties = new Properties(this)
       @properties.onKeyAdded.add () => @isDirty = true
       @keys = new Keys(this)

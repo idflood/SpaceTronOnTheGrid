@@ -28,20 +28,21 @@ define (require) ->
         should_exist = if seconds >= item.start && seconds <= item.end then true else false
 
         # create the values object to contain all properties
-        if !item.values && item.properties.length
+        if !item.values && item.properties
           item.values = {}
           #item.isDirty = true
           #if item.values && item.isDirty
-          for property in item.properties
+          for key, property of item.properties
+            console.log property
             if property.keys.length
               # Take the value of the first key as initial value.
               # @todo: update this when the value of the first key change. (when rebuilding the timeline, simply delete item.values before item.timeline)
               item.values[property.name] = property.keys[0].val
             else if property.default
-              item.values[property.name] = property.default
+              item.values[property.name] = property.val
             else
               item.values[property.name] = 0
-          #console.log item
+          console.log item
 
         # Handle adding keys to previously emptry properties
         #if item.isDirty && item.values
@@ -55,12 +56,12 @@ define (require) ->
           @mainTimeline.add(item.timeline, 0)
           item.isDirty = true
 
-        if item.timeline and item.isDirty
+        if item.timeline and item.isDirty and item.properties
           #console.log "dirty timeline"
           #console.log item
           item.isDirty = false
           item.timeline.clear()
-
+          #console.log item
           for property in item.properties
             propertyTimeline = new TimelineMax()
             propName = property.name

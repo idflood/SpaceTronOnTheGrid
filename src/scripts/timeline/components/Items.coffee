@@ -6,6 +6,7 @@ define (require) ->
     constructor: (@timeline, @container) ->
       @dy = 10 + @timeline.margin.top
       @onUpdate = new Signals.Signal()
+      @onSelect = new Signals.Signal()
 
     render: () =>
       self = this
@@ -31,9 +32,10 @@ define (require) ->
         diff = (dx - d.start)
         d.start += diff
         d.end += diff
-        for prop in d.properties
-          for key in prop.keys
-            key.time += diff
+        if d.properties
+          for prop in d.properties
+            for key in prop.keys
+              key.time += diff
 
         d.isDirty = true
         self.onUpdate.dispatch()
@@ -132,6 +134,8 @@ define (require) ->
         .attr("x", self.timeline.label_position_x + 10)
         .attr("y", 16)
         .text((d) -> d.label)
+        .on 'click', (d) ->
+          self.onSelect.dispatch(d)
 
       self = this
       barEnter.append("text")

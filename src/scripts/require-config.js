@@ -9,9 +9,11 @@ require.config({
     threejs: "bower_components/three.js/three",
     rng: "bower_components/rng-js/rng",
     d3: "bower_components/d3/d3",
+    Mustache: "bower_components/mustache.js/mustache",
     Signal: "bower_components/js-signals/dist/signals",
     TweenMax: "bower_components/gsap/src/uncompressed/TweenMax",
     TimelineMax: "bower_components/gsap/src/uncompressed/TimelineMax",
+    lodash: "bower_components/lodash/dist/lodash"
   },
   shim: {
     TimelineMax: {

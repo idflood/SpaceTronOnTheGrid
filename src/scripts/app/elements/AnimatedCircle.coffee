@@ -1,56 +1,56 @@
 define (require) ->
+  _ = require 'lodash'
   THREE = require 'threejs'
   RNG = require 'rng'
-
-  Colors = require 'cs!app/components/Colors'
-
   TweenMax = require 'TweenMax'
   TimelineMax = require 'TimelineMax'
 
-  class AnimatedCircle
-    @defaults:
-      size: 80
-      outlineWidth: 2
-      drawOutline: true
-      drawCircle: false
-      color: false
-      fillColor: false
-      delay: 0
-      duration: 0.5
+  Colors = require 'cs!app/components/Colors'
 
-    constructor: (options = {}, values = {x: 0, y: 0}) ->
-      @size = options.size || AnimatedCircle.defaults.size
-      @outlineWidth = options.outlineWidth || AnimatedCircle.defaults.outlineWidth
-      @drawOutline = options.drawOutline || AnimatedCircle.defaults.drawOutline
-      @drawCircle = options.drawCircle || AnimatedCircle.defaults.drawCircle
-      @color = options.color || Colors.get(0)
-      @fillColor = options.fillColor || Colors.get(0).clone().multiplyScalar(0.5)
-      @delay = options.delay || AnimatedCircle.defaults.delay
-      @duration = options.duration || AnimatedCircle.defaults.duration
+  class AnimatedCircle
+    @properties:
+      size: {name: 'size', val: 80}
+      outlineWidth: {name: 'outline width', val: 2}
+      drawOutline: {name: 'draw outline', val: true}
+      drawCircle: {name: 'draw circle', val: false}
+      color: {name: 'color', val: false}
+      fillColor: {name: 'fill color', val: false}
+      delay: {name: 'delay', val: 0}
+      duration: {name: 'duration', val: 0.5}
+      x: {name: 'x', val: 0}
+      y: {name: 'y', val: 0}
+      z: {name: 'z', val: 0}
+
+    constructor: (@properties = {}) ->
+      for key, prop of AnimatedCircle.properties
+        if !@properties[key]?
+          @properties[key] = prop.val
+      #@properties = _.cloneDeep(AnimatedCircle.properties)
+      #@properties = _.merge(@properties, properties)
 
       @container = new THREE.Object3D()
-      @container.scale.set(0,0,0)
-      @container.position.set(values.x, values.y, 0)
+      @container.scale.set(0.001,0.001,0.001)
+      @container.position.set(@properties.x, @properties.y, @properties.z)
       @animatedProperties =
-        scale: 0
+        scale: 0.001
       @timeline = new TimelineMax()
       # First value
       tween = TweenLite.to(@animatedProperties, 0, {scale: 0.00001, ease: Linear.easeNone})
       @timeline.add(tween, 0)
       # Middle
-      tween = TweenLite.to(@animatedProperties, @duration, {scale: 1, delay: @delay, ease: Cubic.easeOut})
+      tween = TweenLite.to(@animatedProperties, @properties.duration, {scale: 1, delay: @properties.delay, ease: Cubic.easeOut})
       @timeline.add(tween)
 
       # Stay for a while
-      tween = TweenLite.to(@animatedProperties, @duration * 0.5, {scale: 1, ease: Cubic.easeOut})
+      tween = TweenLite.to(@animatedProperties, @properties.duration * 0.5, {scale: 1, ease: Cubic.easeOut})
       @timeline.add(tween)
 
       # End
-      tween = TweenLite.to(@animatedProperties, @duration, {scale: 0.00001, ease: Cubic.easeIn})
+      tween = TweenLite.to(@animatedProperties, @properties.duration, {scale: 0.00001, ease: Cubic.easeIn})
       @timeline.add(tween)
 
-      if @drawOutline then @renderOutline(@size, @color, @outlineWidth)
-      if @drawCircle then @renderCircle(@size, @fillColor)
+      if @properties.drawOutline then @renderOutline(@properties.size, @properties.color, @properties.outlineWidth)
+      if @properties.drawCircle then @renderCircle(@properties.size, @properties.fillColor)
 
 
       #@update(0, values)

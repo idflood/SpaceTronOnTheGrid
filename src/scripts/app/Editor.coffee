@@ -80,7 +80,7 @@ define (require) ->
             end: current_time + 2
             options: {}
             #options: window.ElementFactory.elements[element_name].default_attributes()
-            properties: window.ElementFactory.elements[element_name].default_properties(current_time)
+            #properties: window.ElementFactory.elements[element_name].default_properties(current_time)
           window.app.data.push(data)
           self.timeline.isDirty = true
           console.log window.app.data

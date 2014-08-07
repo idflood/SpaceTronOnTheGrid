@@ -13,6 +13,7 @@
     "properties": [
       {
         "name": "progression",
+        "val": 0,
         "keys": [
           {
             "time": 0,
@@ -45,7 +46,7 @@
     "properties": [
       {
         "name": "progression",
-        "default": 1,
+        "val": 1,
         "keys": [
           {
             "time": 1.701,
@@ -82,12 +83,12 @@
     "properties": [
       {
         "name": "progression",
-        "default": 1,
+        "val": 1,
         "keys": []
       },
       {
         "name": "x",
-        "default": 0,
+        "val": 0,
         "keys": [
           {
             "time": 5,
@@ -97,7 +98,7 @@
       },
       {
         "name": "y",
-        "default": 0,
+        "val": 0,
         "keys": [
           {
             "time": 5.315,
@@ -107,7 +108,7 @@
       },
       {
         "name": "z",
-        "default": 0,
+        "val": 0,
         "keys": []
       }
     ]

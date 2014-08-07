@@ -10,7 +10,8 @@ define (require) ->
     render: (bar) ->
       self = this
       # Properties
-      propVal = (d,i) -> d.properties
+      propVal = (d,i) ->
+        if d.properties then d.properties else []
       propKey = (d) -> d.name
       properties = bar.selectAll('.line--sub').data(propVal, propKey)
 
