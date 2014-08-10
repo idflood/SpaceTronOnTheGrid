@@ -1,6 +1,7 @@
 [
   {
     "id": "item1",
+    "type": "Circles",
     "label": "Test circles",
     "start": 0,
     "end": 2,
@@ -33,6 +34,7 @@
   },
   {
     "id": "item2",
+    "type": "Circles",
     "label": "Circles 2",
     "start": 1.473,
     "end": 5.034,
@@ -70,6 +72,7 @@
   },
   {
     "id": "item3",
+    "type": "Circles",
     "label": "Circles 3",
     "start": 4.719,
     "end": 6.718999999999999,

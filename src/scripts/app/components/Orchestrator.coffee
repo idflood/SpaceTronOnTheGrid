@@ -33,7 +33,7 @@ define (require) ->
           #item.isDirty = true
           #if item.values && item.isDirty
           for key, property of item.properties
-            console.log property
+            #console.log property
             if property.keys.length
               # Take the value of the first key as initial value.
               # @todo: update this when the value of the first key change. (when rebuilding the timeline, simply delete item.values before item.timeline)
@@ -42,7 +42,7 @@ define (require) ->
               item.values[property.name] = property.val
             else
               item.values[property.name] = 0
-          console.log item
+          #console.log item
 
         # Handle adding keys to previously emptry properties
         #if item.isDirty && item.values

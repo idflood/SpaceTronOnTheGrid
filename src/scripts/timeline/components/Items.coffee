@@ -1,6 +1,7 @@
 define (require) ->
   d3 = require 'd3'
   Signals = require 'Signal'
+  _ = require 'lodash'
 
   class Items
     constructor: (@timeline, @container) ->
@@ -17,15 +18,31 @@ define (require) ->
         # existing object to use it.
         # todo: find a way to get the value as current time (at time between previous and next key)
         factory = window.ElementFactory
-        el_type = factory.elements[d.type]
-        if el_type
-          d.options = extend(el_type.default_attributes(), d.options)
-        if window.gui then window.gui.destroy()
-        gui = new dat.GUI()
-        for key, value of d.options
-          controller = gui.add(d.options, key)
-          controller.onChange (v) -> d.isDirtyObject = true
-        window.gui = gui
+        type_properties = {}
+        if d.object then type_properties = d.object.constructor.properties
+
+        existing_options = _.map(d.properties, (prop) -> prop.name)
+        #console.log existing_options
+        #console.log type_properties
+        for key, property of type_properties
+          has_prop = if existing_options.indexOf(key) != -1 then true else false
+          # if prorperty doesn't exists in the d.options array create it
+          # and assign the default value. {keys: [], name: "n", val: 1}
+          if has_prop == false
+            d.properties.push({keys: [], name: key, val: property.val})
+
+        self.onSelect.dispatch(d)
+        #if el_type
+        #  d.options = extend(el_type.default_attributes(), d.options)
+        #if window.gui then window.gui.destroy()
+        #gui = new dat.GUI()
+
+        #for key, value in d.properties
+        #  controller = gui.add(d.properties, key)
+        #  controller.onChange (v) -> d.isDirtyObject = true
+        #for key, prop in d.properties
+        #  controller = gui.add(d.properties, key)
+        #window.gui = gui
 
       dragmove = (d) ->
         dx = self.timeline.x.invert(d3.event.x).getTime() / 1000
@@ -134,8 +151,7 @@ define (require) ->
         .attr("x", self.timeline.label_position_x + 10)
         .attr("y", 16)
         .text((d) -> d.label)
-        .on 'click', (d) ->
-          self.onSelect.dispatch(d)
+        .on 'click', selectBar
 
       self = this
       barEnter.append("text")

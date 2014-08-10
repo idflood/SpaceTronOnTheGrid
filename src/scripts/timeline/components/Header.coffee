@@ -107,6 +107,7 @@ define (require) ->
         .attr('d', 'M -10 0 L 0 10 L 10 0 L -10 0')
 
       # Mask time indicator
+      # todo: remove the mask.
       @svgContainer.append("rect")
         .attr("class", "graph-mask")
         .attr("x", -self.margin.left)

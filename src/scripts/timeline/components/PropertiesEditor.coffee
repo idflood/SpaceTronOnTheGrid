@@ -1,5 +1,6 @@
 define (require) ->
   $ = require 'jquery'
+  _ = require 'lodash'
   PropertyNumber = require 'cs!timeline/components/PropertyNumber'
 
   tpl_propertiesEditor = require 'text!app/templates/propertiesEditor.tpl.html'
@@ -18,8 +19,13 @@ define (require) ->
 
       #for key, option of selectedObject.options
       #  # body...
-
-      prop = new PropertyNumber({test: "ok"})
-      @$container.append(prop.$el)
+      console.log "selected:"
+      console.log selectedObject
+      type_properties = selectedObject.object.constructor.properties
+      #console.log type_properties
+      for key, prop of type_properties
+        instance_prop = _.find(selectedObject.properties, (d) -> d.name == key)
+        prop = new PropertyNumber(prop, instance_prop)
+        @$container.append(prop.$el)
 
 
