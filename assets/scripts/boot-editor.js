@@ -27724,7 +27724,7 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
       };
 
       PropertyIndicator.prototype.getInputVal = function() {
-        return this.$el.find('input').val();
+        return parseFloat(this.$el.find('input').val(), 10);
       };
 
       PropertyIndicator.prototype.getCurrentVal = function() {

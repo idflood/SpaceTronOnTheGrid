@@ -29,7 +29,7 @@ define (require) ->
       @keyAdded.dispatch()
 
     getInputVal: () =>
-      @$el.find('input').val()
+      parseFloat(@$el.find('input').val(), 10)
 
     getCurrentVal: () =>
       val = @property.val
