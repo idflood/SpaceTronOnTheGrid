@@ -10,7 +10,7 @@ define (require) ->
   class ElementFactory
     @elements:
       Circles:
-        default_attributes: () -> extend({}, Circles.defaults)
+        classObject: Circles
 
         create: (options) ->
           # Assign default parameters if not defined
@@ -18,6 +18,9 @@ define (require) ->
           options = extend (extend {}, defaults), options
           item = new Circles(options)
           return item
+
+    getTypeClass: (itemType) =>
+      ElementFactory.elements[itemType].classObject
 
 
     create: (itemName, data) ->

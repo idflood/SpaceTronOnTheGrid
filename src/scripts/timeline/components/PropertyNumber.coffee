@@ -22,14 +22,14 @@ define (require) ->
       if @values[@property.name]?
         # If defined in the instance values use that instead (keys)
         val = @values[@property.name]
-      else if @instance_property.val?
+      else if @instance_property and @instance_property.val?
         # Use the instance property if defined (value changed but no key)
         val = @instance_property.val
 
       data =
-        id: @instance_property.name # "circleRadius" instead of "circle radius"
-        label: @property.name
-        has_keys: if @instance_property.keys then true else false
+        id: @property.name # "circleRadius" instead of "circle radius"
+        label: @property.label
+        #has_keys: if @instance_property.keys then true else false
         val: val
 
 

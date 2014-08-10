@@ -27690,13 +27690,12 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
         val = this.property.val;
         if (this.values[this.property.name] != null) {
           val = this.values[this.property.name];
-        } else if (this.instance_property.val != null) {
+        } else if (this.instance_property && (this.instance_property.val != null)) {
           val = this.instance_property.val;
         }
         data = {
-          id: this.instance_property.name,
-          label: this.property.name,
-          has_keys: this.instance_property.keys ? true : false,
+          id: this.property.name,
+          label: this.property.label,
           val: val
         };
         view = Mustache.render(tpl_property, data);
@@ -27738,7 +27737,7 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
         this.$container.empty();
         console.log("selected:");
         console.log(selectedObject);
-        type_properties = selectedObject.object.constructor.properties;
+        type_properties = selectedObject.classObject.properties;
         _results = [];
         for (key in type_properties) {
           prop = type_properties[key];

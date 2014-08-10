@@ -21,7 +21,8 @@ define (require) ->
       #  # body...
       console.log "selected:"
       console.log selectedObject
-      type_properties = selectedObject.object.constructor.properties
+      type_properties = selectedObject.classObject.properties
+
       #console.log type_properties
       for key, prop of type_properties
         instance_prop = _.find(selectedObject.properties, (d) -> d.name == key)

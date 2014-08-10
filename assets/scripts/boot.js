@@ -53000,6 +53000,8 @@ define("TimelineMax", ["TweenMax"], (function (global) {
 
 
 (function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
   define('cs!app/components/ElementFactory',['require','cs!app/elements/Circles'],function(require) {
     var Circles, ElementFactory, extend;
     Circles = require('cs!app/elements/Circles');
@@ -53012,13 +53014,13 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       return object;
     };
     ElementFactory = (function() {
-      function ElementFactory() {}
+      function ElementFactory() {
+        this.getTypeClass = __bind(this.getTypeClass, this);
+      }
 
       ElementFactory.elements = {
         Circles: {
-          default_attributes: function() {
-            return extend({}, Circles.defaults);
-          },
+          classObject: Circles,
           create: function(options) {
             var defaults, item;
             defaults = Circles.defaults;
@@ -53027,6 +53029,10 @@ define("TimelineMax", ["TweenMax"], (function (global) {
             return item;
           }
         }
+      };
+
+      ElementFactory.prototype.getTypeClass = function(itemType) {
+        return ElementFactory.elements[itemType].classObject;
       };
 
       ElementFactory.prototype.create = function(itemName, data) {
@@ -53074,12 +53080,15 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       }
 
       Orchestrator.prototype.update = function(timestamp) {
-        var el, item, key, key_index, next_key, propName, property, propertyTimeline, seconds, should_exist, tween, tween_duration, tween_time, val, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3;
+        var el, item, key, key_index, next_key, propName, property, propertyTimeline, seconds, should_exist, tween, tween_duration, tween_time, type, val, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3;
         seconds = timestamp / 1000;
         _ref = this.data;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           item = _ref[_i];
           should_exist = seconds >= item.start && seconds <= item.end ? true : false;
+          if (!item.classObject) {
+            item.classObject = this.factory.getTypeClass(item.type);
+          }
           if (!item.values && item.properties) {
             item.values = {};
             _ref1 = item.properties;
@@ -53140,7 +53149,8 @@ define("TimelineMax", ["TweenMax"], (function (global) {
             }
           }
           if (should_exist && !item.object) {
-            el = this.factory.create('Circles', item.options);
+            type = item.type;
+            el = this.factory.create(type, item.options);
             this.scene.add(el.container);
             item.object = el;
           }

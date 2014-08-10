@@ -27,6 +27,9 @@ define (require) ->
       for item in @data
         should_exist = if seconds >= item.start && seconds <= item.end then true else false
 
+        # Assign the object class to be able to access all object properties in propertiesEditor
+        if !item.classObject then item.classObject = @factory.getTypeClass(item.type)
+
         # create the values object to contain all properties
         if !item.values && item.properties
           item.values = {}
@@ -103,7 +106,8 @@ define (require) ->
 
         # Create the item
         if should_exist && !item.object
-          el = @factory.create('Circles', item.options)
+          type = item.type
+          el = @factory.create(type, item.options)
           @scene.add(el.container)
           item.object = el
 
