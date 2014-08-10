@@ -1,6 +1,7 @@
 define (require) ->
   $ = require 'jquery'
   Signals = require 'Signal'
+  _ = require 'lodash'
 
   Mustache = require 'Mustache'
   tpl_property = require 'text!app/templates/propertyNumber.tpl.html'
@@ -13,13 +14,22 @@ define (require) ->
 
     onKeyClick: (e) =>
       e.preventDefault()
+      properties = @object.properties
+      property = _.find(properties, (prop) => prop.name == @property.name)
+      if !property
+        property = {keys: [], name: @property.name, val: @getInputVal()}
+        properties.push(property)
       currentValue = @getCurrentVal()
       # We want seconds for keys and not milliseconds.
       currentTime = @timer.getCurrentTime() / 1000
 
-      key = {time: currentTime, val: currentValue}
-      @instance_property.keys.push(key)
+      key = {time: currentTime, val: @getInputVal()}
+      #@instance_property.keys.push(key)
+      property.keys.push(key)
       @keyAdded.dispatch()
+
+    getInputVal: () =>
+      @$el.find('input').val()
 
     getCurrentVal: () =>
       val = @property.val

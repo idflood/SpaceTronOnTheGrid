@@ -27677,10 +27677,11 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!timeline/components/PropertyNumber',['require','jquery','Signal','Mustache','text!app/templates/propertyNumber.tpl.html'],function(require) {
-    var $, Mustache, PropertyIndicator, Signals, tpl_property;
+  define('cs!timeline/components/PropertyNumber',['require','jquery','Signal','lodash','Mustache','text!app/templates/propertyNumber.tpl.html'],function(require) {
+    var $, Mustache, PropertyIndicator, Signals, tpl_property, _;
     $ = require('jquery');
     Signals = require('Signal');
+    _ = require('lodash');
     Mustache = require('Mustache');
     tpl_property = require('text!app/templates/propertyNumber.tpl.html');
     return PropertyIndicator = (function() {
@@ -27691,6 +27692,7 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
         this.timer = timer;
         this.render = __bind(this.render, this);
         this.getCurrentVal = __bind(this.getCurrentVal, this);
+        this.getInputVal = __bind(this.getInputVal, this);
         this.onKeyClick = __bind(this.onKeyClick, this);
         this.$el = $(tpl_property);
         this.keyAdded = new Signals.Signal();
@@ -27698,16 +27700,34 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
       }
 
       PropertyIndicator.prototype.onKeyClick = function(e) {
-        var currentTime, currentValue, key;
+        var currentTime, currentValue, key, properties, property;
         e.preventDefault();
+        properties = this.object.properties;
+        property = _.find(properties, (function(_this) {
+          return function(prop) {
+            return prop.name === _this.property.name;
+          };
+        })(this));
+        if (!property) {
+          property = {
+            keys: [],
+            name: this.property.name,
+            val: this.getInputVal()
+          };
+          properties.push(property);
+        }
         currentValue = this.getCurrentVal();
         currentTime = this.timer.getCurrentTime() / 1000;
         key = {
           time: currentTime,
-          val: currentValue
+          val: this.getInputVal()
         };
-        this.instance_property.keys.push(key);
+        property.keys.push(key);
         return this.keyAdded.dispatch();
+      };
+
+      PropertyIndicator.prototype.getInputVal = function() {
+        return this.$el.find('input').val();
       };
 
       PropertyIndicator.prototype.getCurrentVal = function() {
