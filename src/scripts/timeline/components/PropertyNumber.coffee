@@ -18,8 +18,14 @@ define (require) ->
       @values = if @object.values? then @object.values else {}
       # By default assign the property default value
       val = @property.val
-      # If defined in the instance values use that instead (keys)
-      #if @values[@property.name]
+
+      if @values[@property.name]?
+        # If defined in the instance values use that instead (keys)
+        val = @values[@property.name]
+      else if @instance_property.val?
+        # Use the instance property if defined (value changed but no key)
+        val = @instance_property.val
+
       data =
         id: @instance_property.name # "circleRadius" instead of "circle radius"
         label: @property.name

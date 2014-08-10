@@ -27688,6 +27688,11 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
         var data, val, view;
         this.values = this.object.values != null ? this.object.values : {};
         val = this.property.val;
+        if (this.values[this.property.name] != null) {
+          val = this.values[this.property.name];
+        } else if (this.instance_property.val != null) {
+          val = this.instance_property.val;
+        }
         data = {
           id: this.instance_property.name,
           label: this.property.name,
