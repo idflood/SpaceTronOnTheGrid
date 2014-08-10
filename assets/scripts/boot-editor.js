@@ -26846,9 +26846,6 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         subGrp = properties.enter().append('g').filter(visibleProperties).attr("class", 'line--sub');
         properties.filter(visibleProperties).attr("transform", function(d, i) {
           var sub_height;
-          console.log("propval");
-          console.log(d);
-          console.log(i);
           sub_height = (i + 1) * self.timeline.lineHeight;
           return "translate(0," + sub_height + ")";
         });

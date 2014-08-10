@@ -28,9 +28,6 @@ define (require) ->
 
       properties.filter(visibleProperties)
         .attr "transform", (d, i) ->
-          console.log "propval"
-          console.log d
-          console.log i
           sub_height = (i + 1) * self.timeline.lineHeight
           return "translate(0," + sub_height + ")"
 
