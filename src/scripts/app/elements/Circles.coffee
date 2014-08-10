@@ -9,15 +9,15 @@ define (require) ->
 
   class Circles
     @properties:
-      numItems: {name: 'num items', val: 20}
-      seed: {name: 'seed', val: 12002}
-      radius: {name: 'radius', val: 80}
-      circleRadius: {name: 'circle radius', val: 20}
-      circleRadiusMax: {name: 'circle radius max', val: 20}
-      progression: {name: 'progression', val: 1}
-      x: {name: 'x', val: 0}
-      y: {name: 'y', val: 0}
-      z: {name: 'z', val: 0}
+      numItems: {name: 'numItems', label: 'num items', val: 20}
+      seed: {name: 'seed', label: 'seed', val: 12002}
+      radius: {name: 'radius', label: 'radius', val: 80}
+      circleRadius: {name: 'circleRadius', label: 'circle radius', val: 20}
+      circleRadiusMax: {name: 'circleRadiusMax', label: 'circle radius max', val: 20}
+      progression: {name: 'progression', label: 'progression', val: 1}
+      x: {name: 'x', label: 'x', val: 0}
+      y: {name: 'y', label: 'y', val: 0}
+      z: {name: 'z', label: 'z', val: 0}
 
     constructor: (@properties = {}) ->
       # Set the default value of instance properties.

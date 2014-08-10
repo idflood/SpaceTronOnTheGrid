@@ -9,17 +9,17 @@ define (require) ->
 
   class AnimatedCircle
     @properties:
-      size: {name: 'size', val: 80}
-      outlineWidth: {name: 'outline width', val: 2}
-      drawOutline: {name: 'draw outline', val: true}
-      drawCircle: {name: 'draw circle', val: false}
-      color: {name: 'color', val: false}
-      fillColor: {name: 'fill color', val: false}
-      delay: {name: 'delay', val: 0}
-      duration: {name: 'duration', val: 0.5}
-      x: {name: 'x', val: 0}
-      y: {name: 'y', val: 0}
-      z: {name: 'z', val: 0}
+      size: {name: 'size', label: 'size', val: 80}
+      outlineWidth: {name: 'outlineWidth', label: 'outline width', val: 2}
+      drawOutline: {name: 'drawOutline', label: 'draw outline', val: true}
+      drawCircle: {name: 'drawCircle', label: 'draw circle', val: false}
+      color: {name: 'color', label: 'color', val: false}
+      fillColor: {name: 'fillColor', label: 'fill color', val: false}
+      delay: {name: 'delay', label: 'delay', val: 0}
+      duration: {name: 'duration', label: 'duration', val: 0.5}
+      x: {name: 'x', label: 'x', val: 0}
+      y: {name: 'y', label: 'y', val: 0}
+      z: {name: 'z', label: 'z', val: 0}
 
     constructor: (@properties = {}) ->
       for key, prop of AnimatedCircle.properties

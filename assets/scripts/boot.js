@@ -52694,46 +52694,57 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       AnimatedCircle.properties = {
         size: {
           name: 'size',
+          label: 'size',
           val: 80
         },
         outlineWidth: {
-          name: 'outline width',
+          name: 'outlineWidth',
+          label: 'outline width',
           val: 2
         },
         drawOutline: {
-          name: 'draw outline',
+          name: 'drawOutline',
+          label: 'draw outline',
           val: true
         },
         drawCircle: {
-          name: 'draw circle',
+          name: 'drawCircle',
+          label: 'draw circle',
           val: false
         },
         color: {
           name: 'color',
+          label: 'color',
           val: false
         },
         fillColor: {
-          name: 'fill color',
+          name: 'fillColor',
+          label: 'fill color',
           val: false
         },
         delay: {
           name: 'delay',
+          label: 'delay',
           val: 0
         },
         duration: {
           name: 'duration',
+          label: 'duration',
           val: 0.5
         },
         x: {
           name: 'x',
+          label: 'x',
           val: 0
         },
         y: {
           name: 'y',
+          label: 'y',
           val: 0
         },
         z: {
           name: 'z',
+          label: 'z',
           val: 0
         }
       };
@@ -52839,39 +52850,48 @@ define("TimelineMax", ["TweenMax"], (function (global) {
     return Circles = (function() {
       Circles.properties = {
         numItems: {
-          name: 'num items',
+          name: 'numItems',
+          label: 'num items',
           val: 20
         },
         seed: {
           name: 'seed',
+          label: 'seed',
           val: 12002
         },
         radius: {
           name: 'radius',
+          label: 'radius',
           val: 80
         },
         circleRadius: {
-          name: 'circle radius',
+          name: 'circleRadius',
+          label: 'circle radius',
           val: 20
         },
         circleRadiusMax: {
-          name: 'circle radius max',
+          name: 'circleRadiusMax',
+          label: 'circle radius max',
           val: 20
         },
         progression: {
           name: 'progression',
+          label: 'progression',
           val: 1
         },
         x: {
           name: 'x',
+          label: 'x',
           val: 0
         },
         y: {
           name: 'y',
+          label: 'y',
           val: 0
         },
         z: {
           name: 'z',
+          label: 'z',
           val: 0
         }
       };
