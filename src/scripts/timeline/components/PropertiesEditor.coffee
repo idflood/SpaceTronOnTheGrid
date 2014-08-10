@@ -6,7 +6,7 @@ define (require) ->
   tpl_propertiesEditor = require 'text!app/templates/propertiesEditor.tpl.html'
 
   class PropertiesEditor
-    constructor: (@timeline) ->
+    constructor: (@timeline, @timer) ->
       @$el = $(tpl_propertiesEditor)
       @$container = @$el.find('.properties-editor__main')
 
@@ -26,7 +26,7 @@ define (require) ->
       #console.log type_properties
       for key, prop of type_properties
         instance_prop = _.find(selectedObject.properties, (d) -> d.name == key)
-        prop = new PropertyNumber(prop, instance_prop, selectedObject)
+        prop = new PropertyNumber(prop, instance_prop, selectedObject, @timer)
         @$container.append(prop.$el)
 
 

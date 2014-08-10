@@ -12,6 +12,8 @@ define (require) ->
       @updated = new Signals.Signal()
       window.requestAnimationFrame(@update)
 
+    getCurrentTime: () => @time[0]
+
     play: () ->
       @is_playing = true
 

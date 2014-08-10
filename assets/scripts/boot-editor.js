@@ -27672,11 +27672,14 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
     Mustache = require('Mustache');
     tpl_property = require('text!app/templates/propertyNumber.tpl.html');
     return PropertyIndicator = (function() {
-      function PropertyIndicator(property, instance_property, object) {
+      function PropertyIndicator(property, instance_property, object, timer) {
         this.property = property;
         this.instance_property = instance_property;
         this.object = object;
+        this.timer = timer;
         this.render = __bind(this.render, this);
+        this.getCurrentVal = __bind(this.getCurrentVal, this);
+        this.onKeyClick = __bind(this.onKeyClick, this);
         this.$el = $(tpl_property);
         console.log("...");
         console.log(this.property);
@@ -27684,22 +27687,41 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
         this.render();
       }
 
-      PropertyIndicator.prototype.render = function() {
-        var data, val, view;
-        this.values = this.object.values != null ? this.object.values : {};
+      PropertyIndicator.prototype.onKeyClick = function(e) {
+        var currentTime, currentValue, key;
+        e.preventDefault();
+        currentValue = this.getCurrentVal();
+        currentTime = this.timer.getCurrentTime() / 1000;
+        key = {
+          time: currentTime,
+          val: currentValue
+        };
+        return this.instance_property.keys.push(key);
+      };
+
+      PropertyIndicator.prototype.getCurrentVal = function() {
+        var val;
         val = this.property.val;
         if (this.values[this.property.name] != null) {
           val = this.values[this.property.name];
         } else if (this.instance_property && (this.instance_property.val != null)) {
           val = this.instance_property.val;
         }
+        return val;
+      };
+
+      PropertyIndicator.prototype.render = function() {
+        var data, val, view;
+        this.values = this.object.values != null ? this.object.values : {};
+        val = this.getCurrentVal();
         data = {
           id: this.property.name,
           label: this.property.label,
           val: val
         };
         view = Mustache.render(tpl_property, data);
-        return this.$el.html(view);
+        this.$el.html(view);
+        return this.$el.find('.property__key').click(this.onKeyClick);
       };
 
       return PropertyIndicator;
@@ -27723,8 +27745,9 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
     PropertyNumber = require('cs!timeline/components/PropertyNumber');
     tpl_propertiesEditor = require('text!app/templates/propertiesEditor.tpl.html');
     return PropertiesEditor = (function() {
-      function PropertiesEditor(timeline) {
+      function PropertiesEditor(timeline, timer) {
         this.timeline = timeline;
+        this.timer = timer;
         this.onSelect = __bind(this.onSelect, this);
         this.$el = $(tpl_propertiesEditor);
         this.$container = this.$el.find('.properties-editor__main');
@@ -27744,7 +27767,7 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
           instance_prop = _.find(selectedObject.properties, function(d) {
             return d.name === key;
           });
-          prop = new PropertyNumber(prop, instance_prop, selectedObject);
+          prop = new PropertyNumber(prop, instance_prop, selectedObject, this.timer);
           _results.push(this.$container.append(prop.$el));
         }
         return _results;
@@ -27798,7 +27821,7 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
       };
 
       Editor.prototype.initPropertiesEditor = function() {
-        return this.propertiesEditor = new PropertiesEditor(this.timeline);
+        return this.propertiesEditor = new PropertiesEditor(this.timeline, this.timer);
       };
 
       Editor.prototype.initAdd = function() {

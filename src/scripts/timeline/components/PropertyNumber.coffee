@@ -5,7 +5,7 @@ define (require) ->
   tpl_property = require 'text!app/templates/propertyNumber.tpl.html'
 
   class PropertyIndicator
-    constructor: (@property, @instance_property, @object) ->
+    constructor: (@property, @instance_property, @object, @timer) ->
       @$el = $(tpl_property)
       console.log "..."
       console.log @property
@@ -13,10 +13,16 @@ define (require) ->
 
       @render()
 
-    render: () =>
-      # current values are defined in @object.values
-      @values = if @object.values? then @object.values else {}
-      # By default assign the property default value
+    onKeyClick: (e) =>
+      e.preventDefault()
+      currentValue = @getCurrentVal()
+      # We want seconds for keys and not milliseconds.
+      currentTime = @timer.getCurrentTime() / 1000
+
+      key = {time: currentTime, val: currentValue}
+      @instance_property.keys.push(key)
+
+    getCurrentVal: () =>
       val = @property.val
 
       if @values[@property.name]?
@@ -25,6 +31,13 @@ define (require) ->
       else if @instance_property and @instance_property.val?
         # Use the instance property if defined (value changed but no key)
         val = @instance_property.val
+      return val
+
+    render: () =>
+      # current values are defined in @object.values
+      @values = if @object.values? then @object.values else {}
+      # By default assign the property default value
+      val = @getCurrentVal()
 
       data =
         id: @property.name # "circleRadius" instead of "circle radius"
@@ -35,3 +48,4 @@ define (require) ->
 
       view = Mustache.render(tpl_property, data)
       @$el.html(view)
+      @$el.find('.property__key').click(@onKeyClick)

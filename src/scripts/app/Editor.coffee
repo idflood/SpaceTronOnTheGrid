@@ -50,7 +50,7 @@ define (require) ->
           @$timeline.css('bottom', 0)
 
     initPropertiesEditor: () ->
-      @propertiesEditor = new PropertiesEditor(@timeline)
+      @propertiesEditor = new PropertiesEditor(@timeline, @timer)
 
     initAdd: () ->
       $container = @$timeline.find('.submenu--add')

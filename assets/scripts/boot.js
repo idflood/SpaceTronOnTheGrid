@@ -37698,6 +37698,7 @@ define("vendors/three.js-extras/shaders/ConvolutionShader", function(){});
     return Timer = (function() {
       function Timer() {
         this.update = __bind(this.update, this);
+        this.getCurrentTime = __bind(this.getCurrentTime, this);
         this.totalDuration = 240 * 1000;
         this.time = [2400];
         this.is_playing = false;
@@ -37705,6 +37706,10 @@ define("vendors/three.js-extras/shaders/ConvolutionShader", function(){});
         this.updated = new Signals.Signal();
         window.requestAnimationFrame(this.update);
       }
+
+      Timer.prototype.getCurrentTime = function() {
+        return this.time[0];
+      };
 
       Timer.prototype.play = function() {
         return this.is_playing = true;
