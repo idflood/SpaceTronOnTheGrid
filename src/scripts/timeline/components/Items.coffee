@@ -127,7 +127,11 @@ define (require) ->
         y = self.dy
         self.dy += self.timeline.lineHeight
         if !d.collapsed
-          numProperties = if d.properties then d.properties.length else 0
+          numProperties = 0
+          if d.properties
+            # only show properties with keys
+            visibleProperties = _.filter(d.properties, (prop) -> prop.keys.length)
+            numProperties = visibleProperties.length
           self.dy += numProperties * self.timeline.lineHeight
 
         return "translate(0," + y + ")"

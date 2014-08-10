@@ -18,13 +18,19 @@ define (require) ->
         return d.keys.length
       properties = bar.selectAll('.line--sub').data(propVal, propKey)
 
-
+      dy = 0
       subGrp = properties.enter()
 
         .append('g')
         .filter(visibleProperties)
         .attr("class", 'line--sub')
+
+
+      properties.filter(visibleProperties)
         .attr "transform", (d, i) ->
+          console.log "propval"
+          console.log d
+          console.log i
           sub_height = (i + 1) * self.timeline.lineHeight
           return "translate(0," + sub_height + ")"
 

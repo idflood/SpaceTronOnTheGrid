@@ -26760,11 +26760,17 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         barContainerRight.append("rect").attr("class", "bar-anchor bar-anchor--right").attr("y", 2).attr("height", 16).attr("width", 6).call(dragRight);
         self.dy = 10 + this.timeline.margin.top;
         bar.attr("transform", function(d, i) {
-          var numProperties, y;
+          var numProperties, visibleProperties, y;
           y = self.dy;
           self.dy += self.timeline.lineHeight;
           if (!d.collapsed) {
-            numProperties = d.properties ? d.properties.length : 0;
+            numProperties = 0;
+            if (d.properties) {
+              visibleProperties = _.filter(d.properties, function(prop) {
+                return prop.keys.length;
+              });
+              numProperties = visibleProperties.length;
+            }
             self.dy += numProperties * self.timeline.lineHeight;
           }
           return "translate(0," + y + ")";
@@ -26820,7 +26826,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       }
 
       Properties.prototype.render = function(bar) {
-        var propKey, propVal, properties, self, sortKeys, subGrp, visibleProperties;
+        var dy, propKey, propVal, properties, self, sortKeys, subGrp, visibleProperties;
         self = this;
         propVal = function(d, i) {
           if (d.properties) {
@@ -26836,8 +26842,13 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           return d.keys.length;
         };
         properties = bar.selectAll('.line--sub').data(propVal, propKey);
-        subGrp = properties.enter().append('g').filter(visibleProperties).attr("class", 'line--sub').attr("transform", function(d, i) {
+        dy = 0;
+        subGrp = properties.enter().append('g').filter(visibleProperties).attr("class", 'line--sub');
+        properties.filter(visibleProperties).attr("transform", function(d, i) {
           var sub_height;
+          console.log("propval");
+          console.log(d);
+          console.log(i);
           sub_height = (i + 1) * self.timeline.lineHeight;
           return "translate(0," + sub_height + ")";
         });
