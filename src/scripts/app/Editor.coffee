@@ -49,8 +49,12 @@ define (require) ->
         else
           @$timeline.css('bottom', 0)
 
+    onKeyAdded: () =>
+      @timeline.isDirty = true
+
     initPropertiesEditor: () ->
       @propertiesEditor = new PropertiesEditor(@timeline, @timer)
+      @propertiesEditor.keyAdded.add(@onKeyAdded)
 
     initAdd: () ->
       $container = @$timeline.find('.submenu--add')

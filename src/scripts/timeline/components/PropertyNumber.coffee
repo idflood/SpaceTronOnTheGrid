@@ -1,5 +1,6 @@
 define (require) ->
   $ = require 'jquery'
+  Signals = require 'Signal'
 
   Mustache = require 'Mustache'
   tpl_property = require 'text!app/templates/propertyNumber.tpl.html'
@@ -7,6 +8,7 @@ define (require) ->
   class PropertyIndicator
     constructor: (@property, @instance_property, @object, @timer) ->
       @$el = $(tpl_property)
+      @keyAdded = new Signals.Signal()
       console.log "..."
       console.log @property
       console.log @instance_property
@@ -21,6 +23,7 @@ define (require) ->
 
       key = {time: currentTime, val: currentValue}
       @instance_property.keys.push(key)
+      @keyAdded.dispatch()
 
     getCurrentVal: () =>
       val = @property.val

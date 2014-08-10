@@ -27666,9 +27666,10 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!timeline/components/PropertyNumber',['require','jquery','Mustache','text!app/templates/propertyNumber.tpl.html'],function(require) {
-    var $, Mustache, PropertyIndicator, tpl_property;
+  define('cs!timeline/components/PropertyNumber',['require','jquery','Signal','Mustache','text!app/templates/propertyNumber.tpl.html'],function(require) {
+    var $, Mustache, PropertyIndicator, Signals, tpl_property;
     $ = require('jquery');
+    Signals = require('Signal');
     Mustache = require('Mustache');
     tpl_property = require('text!app/templates/propertyNumber.tpl.html');
     return PropertyIndicator = (function() {
@@ -27681,6 +27682,7 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
         this.getCurrentVal = __bind(this.getCurrentVal, this);
         this.onKeyClick = __bind(this.onKeyClick, this);
         this.$el = $(tpl_property);
+        this.keyAdded = new Signals.Signal();
         console.log("...");
         console.log(this.property);
         console.log(this.instance_property);
@@ -27696,7 +27698,8 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
           time: currentTime,
           val: currentValue
         };
-        return this.instance_property.keys.push(key);
+        this.instance_property.keys.push(key);
+        return this.keyAdded.dispatch();
       };
 
       PropertyIndicator.prototype.getCurrentVal = function() {
@@ -27738,10 +27741,11 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!timeline/components/PropertiesEditor',['require','jquery','lodash','cs!timeline/components/PropertyNumber','text!app/templates/propertiesEditor.tpl.html'],function(require) {
-    var $, PropertiesEditor, PropertyNumber, tpl_propertiesEditor, _;
+  define('cs!timeline/components/PropertiesEditor',['require','jquery','lodash','Signal','cs!timeline/components/PropertyNumber','text!app/templates/propertiesEditor.tpl.html'],function(require) {
+    var $, PropertiesEditor, PropertyNumber, Signals, tpl_propertiesEditor, _;
     $ = require('jquery');
     _ = require('lodash');
+    Signals = require('Signal');
     PropertyNumber = require('cs!timeline/components/PropertyNumber');
     tpl_propertiesEditor = require('text!app/templates/propertiesEditor.tpl.html');
     return PropertiesEditor = (function() {
@@ -27749,11 +27753,17 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
         this.timeline = timeline;
         this.timer = timer;
         this.onSelect = __bind(this.onSelect, this);
+        this.onKeyAdded = __bind(this.onKeyAdded, this);
         this.$el = $(tpl_propertiesEditor);
         this.$container = this.$el.find('.properties-editor__main');
+        this.keyAdded = new Signals.Signal();
         $('body').append(this.$el);
         this.timeline.onSelect.add(this.onSelect);
       }
+
+      PropertiesEditor.prototype.onKeyAdded = function() {
+        return this.keyAdded.dispatch();
+      };
 
       PropertiesEditor.prototype.onSelect = function(selectedObject) {
         var instance_prop, key, prop, type_properties, _results;
@@ -27768,6 +27778,7 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
             return d.name === key;
           });
           prop = new PropertyNumber(prop, instance_prop, selectedObject, this.timer);
+          prop.keyAdded.add(this.onKeyAdded);
           _results.push(this.$container.append(prop.$el));
         }
         return _results;
@@ -27782,6 +27793,8 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
 
 
 (function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
   define('cs!app/Editor',['require','jquery','text!app/templates/timeline.tpl.html','cs!timeline/Timeline','cs!timeline/components/PropertiesEditor'],function(require) {
     var $, Editor, EditorTimeline, PropertiesEditor, tpl_timeline;
     $ = require('jquery');
@@ -27790,6 +27803,7 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
     PropertiesEditor = require('cs!timeline/components/PropertiesEditor');
     return Editor = (function() {
       function Editor() {
+        this.onKeyAdded = __bind(this.onKeyAdded, this);
         this.app = window.app;
         this.timer = this.app.timer;
         this.$timeline = $(tpl_timeline);
@@ -27820,8 +27834,13 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
         })(this));
       };
 
+      Editor.prototype.onKeyAdded = function() {
+        return this.timeline.isDirty = true;
+      };
+
       Editor.prototype.initPropertiesEditor = function() {
-        return this.propertiesEditor = new PropertiesEditor(this.timeline, this.timer);
+        this.propertiesEditor = new PropertiesEditor(this.timeline, this.timer);
+        return this.propertiesEditor.keyAdded.add(this.onKeyAdded);
       };
 
       Editor.prototype.initAdd = function() {
