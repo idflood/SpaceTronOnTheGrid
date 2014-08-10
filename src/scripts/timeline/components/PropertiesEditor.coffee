@@ -25,7 +25,7 @@ define (require) ->
       #console.log type_properties
       for key, prop of type_properties
         instance_prop = _.find(selectedObject.properties, (d) -> d.name == key)
-        prop = new PropertyNumber(prop, instance_prop)
+        prop = new PropertyNumber(prop, instance_prop, selectedObject)
         @$container.append(prop.$el)
 
 
