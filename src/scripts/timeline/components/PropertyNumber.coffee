@@ -9,10 +9,6 @@ define (require) ->
     constructor: (@property, @instance_property, @object, @timer) ->
       @$el = $(tpl_property)
       @keyAdded = new Signals.Signal()
-      console.log "..."
-      console.log @property
-      console.log @instance_property
-
       @render()
 
     onKeyClick: (e) =>

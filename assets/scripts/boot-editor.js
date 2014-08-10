@@ -27683,9 +27683,6 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
         this.onKeyClick = __bind(this.onKeyClick, this);
         this.$el = $(tpl_property);
         this.keyAdded = new Signals.Signal();
-        console.log("...");
-        console.log(this.property);
-        console.log(this.instance_property);
         this.render();
       }
 
