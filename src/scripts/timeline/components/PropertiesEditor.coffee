@@ -22,13 +22,10 @@ define (require) ->
     onSelect: (selectedObject) =>
       @$container.empty()
 
-      #for key, option of selectedObject.options
-      #  # body...
       console.log "selected:"
       console.log selectedObject
       type_properties = selectedObject.classObject.properties
 
-      #console.log type_properties
       for key, prop of type_properties
         instance_prop = _.find(selectedObject.properties, (d) -> d.name == key)
         prop = new PropertyNumber(prop, instance_prop, selectedObject, @timer)
