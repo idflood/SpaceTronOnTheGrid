@@ -2,11 +2,15 @@ define (require) ->
   $ = require 'jquery'
   Signals = require 'Signal'
   _ = require 'lodash'
+  d3 = require 'd3'
 
   Mustache = require 'Mustache'
   tpl_property = require 'text!app/templates/propertyNumber.tpl.html'
 
   class PropertyIndicator
+    # @property: Static property definition (ex: {name: 'x', label: 'x', val: 0})
+    # @instance_property: The current property on the data object.
+    # @object: The parent object.
     constructor: (@property, @instance_property, @object, @timer) ->
       @$el = $(tpl_property)
       @keyAdded = new Signals.Signal()
@@ -14,19 +18,8 @@ define (require) ->
 
     onKeyClick: (e) =>
       e.preventDefault()
-      properties = @object.properties
-      property = _.find(properties, (prop) => prop.name == @property.name)
-      if !property
-        property = {keys: [], name: @property.name, val: @getInputVal()}
-        properties.push(property)
       currentValue = @getCurrentVal()
-      # We want seconds for keys and not milliseconds.
-      currentTime = @timer.getCurrentTime() / 1000
-
-      key = {time: currentTime, val: @getInputVal()}
-      #@instance_property.keys.push(key)
-      property.keys.push(key)
-      @keyAdded.dispatch()
+      @addKey(currentValue)
 
     getInputVal: () =>
       parseFloat(@$el.find('input').val(), 10)
@@ -41,6 +34,26 @@ define (require) ->
         # Use the instance property if defined (value changed but no key)
         val = @instance_property.val
       return val
+
+    getProperty: () =>
+      properties = @object.properties
+      return _.find(properties, (prop) => prop.name == @property.name)
+
+    addKey: (val) =>
+      property = @getProperty()
+      if !property
+        property = {keys: [], name: @property.name, val: current_value}
+        properties.push(property)
+      # We want seconds for keys and not milliseconds.
+      currentTime = @timer.getCurrentTime() / 1000
+      key = {time: currentTime, val: val}
+
+      property.keys.push(key)
+      sortKeys = (keys) -> keys.sort((a, b) -> d3.ascending(a.time, b.time))
+      property.keys = sortKeys(property.keys)
+      @object.isDirty = true
+      console.log @object
+      @keyAdded.dispatch()
 
     render: () =>
       # current values are defined in @object.values
@@ -58,3 +71,26 @@ define (require) ->
       view = Mustache.render(tpl_property, data)
       @$el.html(view)
       @$el.find('.property__key').click(@onKeyClick)
+      @$el.find('input').change (e) =>
+        current_value = @getInputVal()
+        currentTime = @timer.getCurrentTime() / 1000
+        current_property = @getProperty()
+
+        if current_property.keys && current_property.keys.length
+          # Add a new key if there is no other key at same time
+          current_key = _.find(current_property.keys, (key) => key.time == currentTime)
+
+          if current_key
+            # if there is a key update it
+            current_key.val = current_value
+          else
+            # add a new key
+            @addKey(current_value)
+        else
+          # There is no keys, simply update the property value
+          current_property.val = current_value
+
+          #sdsadfh jsdafklj k
+          # todo:  here should certainly modify current property
+          @object.isDirty = true
+

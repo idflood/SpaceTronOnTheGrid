@@ -27674,11 +27674,12 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!timeline/components/PropertyNumber',['require','jquery','Signal','lodash','Mustache','text!app/templates/propertyNumber.tpl.html'],function(require) {
-    var $, Mustache, PropertyIndicator, Signals, tpl_property, _;
+  define('cs!timeline/components/PropertyNumber',['require','jquery','Signal','lodash','d3','Mustache','text!app/templates/propertyNumber.tpl.html'],function(require) {
+    var $, Mustache, PropertyIndicator, Signals, d3, tpl_property, _;
     $ = require('jquery');
     Signals = require('Signal');
     _ = require('lodash');
+    d3 = require('d3');
     Mustache = require('Mustache');
     tpl_property = require('text!app/templates/propertyNumber.tpl.html');
     return PropertyIndicator = (function() {
@@ -27688,6 +27689,8 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
         this.object = object;
         this.timer = timer;
         this.render = __bind(this.render, this);
+        this.addKey = __bind(this.addKey, this);
+        this.getProperty = __bind(this.getProperty, this);
         this.getCurrentVal = __bind(this.getCurrentVal, this);
         this.getInputVal = __bind(this.getInputVal, this);
         this.onKeyClick = __bind(this.onKeyClick, this);
@@ -27697,30 +27700,10 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
       }
 
       PropertyIndicator.prototype.onKeyClick = function(e) {
-        var currentTime, currentValue, key, properties, property;
+        var currentValue;
         e.preventDefault();
-        properties = this.object.properties;
-        property = _.find(properties, (function(_this) {
-          return function(prop) {
-            return prop.name === _this.property.name;
-          };
-        })(this));
-        if (!property) {
-          property = {
-            keys: [],
-            name: this.property.name,
-            val: this.getInputVal()
-          };
-          properties.push(property);
-        }
         currentValue = this.getCurrentVal();
-        currentTime = this.timer.getCurrentTime() / 1000;
-        key = {
-          time: currentTime,
-          val: this.getInputVal()
-        };
-        property.keys.push(key);
-        return this.keyAdded.dispatch();
+        return this.addKey(currentValue);
       };
 
       PropertyIndicator.prototype.getInputVal = function() {
@@ -27738,6 +27721,44 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
         return val;
       };
 
+      PropertyIndicator.prototype.getProperty = function() {
+        var properties;
+        properties = this.object.properties;
+        return _.find(properties, (function(_this) {
+          return function(prop) {
+            return prop.name === _this.property.name;
+          };
+        })(this));
+      };
+
+      PropertyIndicator.prototype.addKey = function(val) {
+        var currentTime, key, property, sortKeys;
+        property = this.getProperty();
+        if (!property) {
+          property = {
+            keys: [],
+            name: this.property.name,
+            val: current_value
+          };
+          properties.push(property);
+        }
+        currentTime = this.timer.getCurrentTime() / 1000;
+        key = {
+          time: currentTime,
+          val: val
+        };
+        property.keys.push(key);
+        sortKeys = function(keys) {
+          return keys.sort(function(a, b) {
+            return d3.ascending(a.time, b.time);
+          });
+        };
+        property.keys = sortKeys(property.keys);
+        this.object.isDirty = true;
+        console.log(this.object);
+        return this.keyAdded.dispatch();
+      };
+
       PropertyIndicator.prototype.render = function() {
         var data, val, view;
         this.values = this.object.values != null ? this.object.values : {};
@@ -27749,7 +27770,28 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
         };
         view = Mustache.render(tpl_property, data);
         this.$el.html(view);
-        return this.$el.find('.property__key').click(this.onKeyClick);
+        this.$el.find('.property__key').click(this.onKeyClick);
+        return this.$el.find('input').change((function(_this) {
+          return function(e) {
+            var currentTime, current_key, current_property, current_value;
+            current_value = _this.getInputVal();
+            currentTime = _this.timer.getCurrentTime() / 1000;
+            current_property = _this.getProperty();
+            if (current_property.keys && current_property.keys.length) {
+              current_key = _.find(current_property.keys, function(key) {
+                return key.time === currentTime;
+              });
+              if (current_key) {
+                return current_key.val = current_value;
+              } else {
+                return _this.addKey(current_value);
+              }
+            } else {
+              current_property.val = current_value;
+              return _this.object.isDirty = true;
+            }
+          };
+        })(this));
       };
 
       return PropertyIndicator;
@@ -27895,7 +27937,8 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
               type: element_name,
               start: current_time,
               end: current_time + 2,
-              options: {}
+              options: {},
+              properties: []
             };
             window.app.data.push(data);
             self.timeline.isDirty = true;

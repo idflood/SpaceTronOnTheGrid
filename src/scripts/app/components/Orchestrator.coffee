@@ -1,5 +1,6 @@
 define (require) ->
   ElementFactory = require 'cs!app/components/ElementFactory'
+  _ = require 'lodash'
 
   TweenMax = require 'TweenMax'
   TimelineMax = require 'TimelineMax'
@@ -31,20 +32,23 @@ define (require) ->
         if !item.classObject then item.classObject = @factory.getTypeClass(item.type)
 
         # create the values object to contain all properties
-        if !item.values && item.properties
+        if !item.values
           item.values = {}
           #item.isDirty = true
-          #if item.values && item.isDirty
-          for key, property of item.properties
-            #console.log property
-            if property.keys.length
+          for key, property of item.classObject.properties
+            item_property = _.find(item.properties, (prop) -> prop.name == key)
+            # Create the item property if it didn't exist.
+            if !item_property
+              item_property = {keys: [], name: property.name, val: property.val}
+              item.properties.push(item_property)
+
+            if item_property.keys.length
               # Take the value of the first key as initial value.
               # @todo: update this when the value of the first key change. (when rebuilding the timeline, simply delete item.values before item.timeline)
-              item.values[property.name] = property.keys[0].val
-            else if property.default
-              item.values[property.name] = property.val
-            else
-              item.values[property.name] = 0
+              item_property.val = item_property.keys[0].val
+
+            item.values[property.name] = item_property.val
+
           #console.log item
 
         # Handle adding keys to previously emptry properties
@@ -60,27 +64,30 @@ define (require) ->
           item.isDirty = true
 
         if item.timeline and item.isDirty and item.properties
-          #console.log "dirty timeline"
-          #console.log item
+          console.log "dirty timeline"
+          console.log item
           item.isDirty = false
           item.timeline.clear()
           #console.log item
           for property in item.properties
             propertyTimeline = new TimelineMax()
             propName = property.name
+            #console.log "rebuilding object.."
+            #console.log item
+            # Add a inital key, even if there is no animation to set the value from time 0.
+            first_key = if property.keys.length > 0 then property.keys[0] else false
+            tween_time = 0
+            if first_key
+              tween_time = Math.min(-1, first_key.time - 0.1)
+
+            tween_duration = 0
+            val = {}
+            val[propName] = if first_key then first_key.val else property.val
+            tween = TweenLite.to(item.values, tween_duration, val)
+            propertyTimeline.add(tween, tween_time)
 
 
             for key, key_index in property.keys
-              if key_index == 0
-                # Add a tween before start for initial value
-                tween_time = Math.min(-1, key.time - 0.1)
-                #tween_duration = key.time - tween_time
-                tween_duration = 0
-                val = {}
-                val[propName] = key.val
-                tween = TweenLite.to(item.values, tween_duration, val)
-                propertyTimeline.add(tween, tween_time)
-
               if key_index < property.keys.length - 1
                 next_key = property.keys[key_index + 1]
                 tween_duration = next_key.time - key.time

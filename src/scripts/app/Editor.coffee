@@ -83,6 +83,7 @@ define (require) ->
             start: current_time
             end: current_time + 2
             options: {}
+            properties: []
             #options: window.ElementFactory.elements[element_name].default_attributes()
             #properties: window.ElementFactory.elements[element_name].default_properties(current_time)
           window.app.data.push(data)

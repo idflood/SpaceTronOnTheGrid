@@ -53064,9 +53064,10 @@ define("TimelineMax", ["TweenMax"], (function (global) {
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/components/Orchestrator',['require','cs!app/components/ElementFactory','TweenMax','TimelineMax'],function(require) {
-    var ElementFactory, Orchestrator, TimelineMax, TweenMax;
+  define('cs!app/components/Orchestrator',['require','cs!app/components/ElementFactory','lodash','TweenMax','TimelineMax'],function(require) {
+    var ElementFactory, Orchestrator, TimelineMax, TweenMax, _;
     ElementFactory = require('cs!app/components/ElementFactory');
+    _ = require('lodash');
     TweenMax = require('TweenMax');
     TimelineMax = require('TimelineMax');
     return Orchestrator = (function() {
@@ -53085,7 +53086,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       }
 
       Orchestrator.prototype.update = function(timestamp) {
-        var el, item, key, key_index, next_key, propName, property, propertyTimeline, seconds, should_exist, tween, tween_duration, tween_time, type, val, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3;
+        var el, first_key, item, item_property, key, key_index, next_key, propName, property, propertyTimeline, seconds, should_exist, tween, tween_duration, tween_time, type, val, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3;
         seconds = timestamp / 1000;
         _ref = this.data;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -53094,18 +53095,26 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           if (!item.classObject) {
             item.classObject = this.factory.getTypeClass(item.type);
           }
-          if (!item.values && item.properties) {
+          if (!item.values) {
             item.values = {};
-            _ref1 = item.properties;
+            _ref1 = item.classObject.properties;
             for (key in _ref1) {
               property = _ref1[key];
-              if (property.keys.length) {
-                item.values[property.name] = property.keys[0].val;
-              } else if (property["default"]) {
-                item.values[property.name] = property.val;
-              } else {
-                item.values[property.name] = 0;
+              item_property = _.find(item.properties, function(prop) {
+                return prop.name === key;
+              });
+              if (!item_property) {
+                item_property = {
+                  keys: [],
+                  name: property.name,
+                  val: property.val
+                };
+                item.properties.push(item_property);
               }
+              if (item_property.keys.length) {
+                item_property.val = item_property.keys[0].val;
+              }
+              item.values[property.name] = item_property.val;
             }
           }
           if (!item.timeline) {
@@ -53114,6 +53123,8 @@ define("TimelineMax", ["TweenMax"], (function (global) {
             item.isDirty = true;
           }
           if (item.timeline && item.isDirty && item.properties) {
+            console.log("dirty timeline");
+            console.log(item);
             item.isDirty = false;
             item.timeline.clear();
             _ref2 = item.properties;
@@ -53121,17 +53132,19 @@ define("TimelineMax", ["TweenMax"], (function (global) {
               property = _ref2[_j];
               propertyTimeline = new TimelineMax();
               propName = property.name;
+              first_key = property.keys.length > 0 ? property.keys[0] : false;
+              tween_time = 0;
+              if (first_key) {
+                tween_time = Math.min(-1, first_key.time - 0.1);
+              }
+              tween_duration = 0;
+              val = {};
+              val[propName] = first_key ? first_key.val : property.val;
+              tween = TweenLite.to(item.values, tween_duration, val);
+              propertyTimeline.add(tween, tween_time);
               _ref3 = property.keys;
               for (key_index = _k = 0, _len2 = _ref3.length; _k < _len2; key_index = ++_k) {
                 key = _ref3[key_index];
-                if (key_index === 0) {
-                  tween_time = Math.min(-1, key.time - 0.1);
-                  tween_duration = 0;
-                  val = {};
-                  val[propName] = key.val;
-                  tween = TweenLite.to(item.values, tween_duration, val);
-                  propertyTimeline.add(tween, tween_time);
-                }
                 if (key_index < property.keys.length - 1) {
                   next_key = property.keys[key_index + 1];
                   tween_duration = next_key.time - key.time;
