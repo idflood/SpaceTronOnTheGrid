@@ -19,7 +19,7 @@ define (require) ->
       y: {name: 'y', label: 'y', val: 0}
       z: {name: 'z', label: 'z', val: 0}
 
-    constructor: (@values = {}) ->
+    constructor: (@values = {}, time = 0) ->
       # Set the default value of instance properties.
       # Should not happen when created with the orchestrator (so never really...)
       #for key, prop of Circles.properties
@@ -31,7 +31,7 @@ define (require) ->
       @totalDuration = 0
       @items = []
       @cache = @buildCache()
-      @build()
+      @build(time)
 
     buildCache: () ->
       cache = {}

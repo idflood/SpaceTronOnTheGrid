@@ -52911,14 +52911,17 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         }
       };
 
-      function Circles(values) {
+      function Circles(values, time) {
         this.values = values != null ? values : {};
+        if (time == null) {
+          time = 0;
+        }
         this.timeline = new TimelineMax();
         this.container = new THREE.Object3D();
         this.totalDuration = 0;
         this.items = [];
         this.cache = this.buildCache();
-        this.build();
+        this.build(time);
       }
 
       Circles.prototype.buildCache = function() {
@@ -53089,7 +53092,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       ElementFactory.elements = {
         Circles: {
           classObject: Circles,
-          create: function(values) {
+          create: function(values, time) {
             var item;
             item = new Circles(values);
             return item;
@@ -53101,7 +53104,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         return ElementFactory.elements[itemType].classObject;
       };
 
-      ElementFactory.prototype.create = function(itemName, values) {
+      ElementFactory.prototype.create = function(itemName, values, time) {
         var item;
         item = ElementFactory.elements[itemName];
         if (!item) {
@@ -53110,7 +53113,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         }
         console.log("will create a " + itemName);
         console.log(values);
-        return item.create(values);
+        return item.create(values, time);
       };
 
       return ElementFactory;
@@ -53229,7 +53232,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           }
           if (should_exist && !item.object) {
             type = item.type;
-            el = this.factory.create(type, item.values);
+            el = this.factory.create(type, item.values, seconds - item.start);
             this.scene.add(el.container);
             item.object = el;
           }

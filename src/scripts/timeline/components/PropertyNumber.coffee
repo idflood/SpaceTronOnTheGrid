@@ -97,4 +97,4 @@ define (require) ->
           if @object.object
             currentTime = @timer.getCurrentTime() / 1000
             # Set the property on the instance object.
-            @object.object.update(currentTime)
+            @object.object.update(currentTime - @object.start)

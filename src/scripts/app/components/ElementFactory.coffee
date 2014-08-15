@@ -12,7 +12,7 @@ define (require) ->
       Circles:
         classObject: Circles
 
-        create: (values) ->
+        create: (values, time) ->
           item = new Circles(values)
           return item
 
@@ -20,13 +20,13 @@ define (require) ->
       ElementFactory.elements[itemType].classObject
 
 
-    create: (itemName, values) ->
+    create: (itemName, values, time) ->
       item = ElementFactory.elements[itemName]
       if !item
         console.warn("Can't create item: " + itemName)
         return false
       console.log("will create a " + itemName)
       console.log values
-      return item.create(values)
+      return item.create(values, time)
 
   window.ElementFactory = ElementFactory

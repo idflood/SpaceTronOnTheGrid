@@ -27790,7 +27790,7 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
               _this.object.values[_this.property.name] = current_value;
               if (_this.object.object) {
                 currentTime = _this.timer.getCurrentTime() / 1000;
-                return _this.object.object.update(currentTime);
+                return _this.object.object.update(currentTime - _this.object.start);
               }
             }
           };
