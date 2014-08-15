@@ -7,11 +7,14 @@ define (require) ->
   require 'vendors/three.js-extras/postprocessing/ShaderPass'
   require 'vendors/three.js-extras/postprocessing/RenderPass'
   require 'vendors/three.js-extras/postprocessing/FilmPass'
+  require 'vendors/three.js-extras/postprocessing/GlitchPass'
 
   require 'vendors/three.js-extras/shaders/CopyShader'
   require 'vendors/three.js-extras/shaders/FXAAShader'
   require 'vendors/three.js-extras/shaders/FilmShader'
   require 'vendors/three.js-extras/shaders/ConvolutionShader'
+  require 'vendors/three.js-extras/shaders/VignetteShader'
+  require 'vendors/three.js-extras/shaders/DigitalGlitch'
 
   class PostFX
     constructor: (@scene, @camera, @renderer) ->
@@ -21,15 +24,22 @@ define (require) ->
       @effectFXAA = new THREE.ShaderPass( THREE.FXAAShader )
       @effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight )
 
-      @bloom = new THREE.BloomPass(1.5, 25, 4)
+      @bloom = new THREE.BloomPass(1.3, 25, 4)
 
-      @filmShader = new THREE.FilmPass( 0.12, 0.0, 648, false )
+      @glitchPass = new THREE.GlitchPass()
+
+      @vignettePass = new THREE.ShaderPass(THREE.VignetteShader)
+      @vignettePass.uniforms['darkness'].value = 2
+
+      @filmShader = new THREE.FilmPass( 0.21, 0.01, 648, false )
       @filmShader.renderToScreen = true
 
       @composer = new THREE.EffectComposer( @renderer )
       @composer.addPass( renderModel )
       @composer.addPass( @effectFXAA )
       @composer.addPass( @bloom )
+      #@composer.addPass( @glitchPass )
+      @composer.addPass( @vignettePass )
       @composer.addPass( @filmShader )
 
     resize: (SCREEN_WIDTH, SCREEN_HEIGHT) ->

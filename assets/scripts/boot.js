@@ -36828,6 +36828,124 @@ THREE.FilmPass.prototype = {
 define("vendors/three.js-extras/postprocessing/FilmPass", function(){});
 
 /**
+
+ */
+
+THREE.GlitchPass = function ( dt_size ) {
+
+  if ( THREE.DigitalGlitch === undefined ) console.error( "THREE.GlitchPass relies on THREE.DigitalGlitch" );
+
+  var shader = THREE.DigitalGlitch;
+  this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+
+  if(dt_size==undefined) dt_size=64;
+
+
+  this.uniforms[ "tDisp"].value=this.generateHeightmap(dt_size);
+
+
+  this.material = new THREE.ShaderMaterial({
+    uniforms: this.uniforms,
+    vertexShader: shader.vertexShader,
+    fragmentShader: shader.fragmentShader
+  });
+
+  console.log(this.material);
+
+  this.enabled = true;
+  this.renderToScreen = false;
+  this.needsSwap = true;
+
+
+  this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+  this.scene  = new THREE.Scene();
+
+  this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
+  this.scene.add( this.quad );
+
+  this.goWild=false;
+  this.curF=0;
+  this.generateTrigger();
+
+};
+
+THREE.GlitchPass.prototype = {
+
+  render: function ( renderer, writeBuffer, readBuffer, delta )
+  {
+    this.uniforms[ "tDiffuse" ].value = readBuffer;
+    this.uniforms[ 'seed' ].value=Math.random();//default seeding
+    this.uniforms[ 'byp' ].value=0;
+
+    if(this.curF % this.randX ==0 || this.goWild==true)
+    {
+      this.uniforms[ 'amount' ].value=Math.random()/30;
+      this.uniforms[ 'angle' ].value=THREE.Math.randFloat(-Math.PI,Math.PI);
+      this.uniforms[ 'seed_x' ].value=THREE.Math.randFloat(-1,1);
+      this.uniforms[ 'seed_y' ].value=THREE.Math.randFloat(-1,1);
+      this.uniforms[ 'distortion_x' ].value=THREE.Math.randFloat(0,1);
+      this.uniforms[ 'distortion_y' ].value=THREE.Math.randFloat(0,1);
+      this.curF=0;
+      this.generateTrigger();
+    }
+    else if(this.curF % this.randX <this.randX/5)
+    {
+      this.uniforms[ 'amount' ].value=Math.random()/90;
+      this.uniforms[ 'angle' ].value=THREE.Math.randFloat(-Math.PI,Math.PI);
+      this.uniforms[ 'distortion_x' ].value=THREE.Math.randFloat(0,1);
+      this.uniforms[ 'distortion_y' ].value=THREE.Math.randFloat(0,1);
+      this.uniforms[ 'seed_x' ].value=THREE.Math.randFloat(-0.3,0.3);
+      this.uniforms[ 'seed_y' ].value=THREE.Math.randFloat(-0.3,0.3);
+    }
+    else if(this.goWild==false)
+    {
+      this.uniforms[ 'byp' ].value=1;
+    }
+    this.curF++;
+
+    this.quad.material = this.material;
+    if ( this.renderToScreen )
+    {
+      renderer.render( this.scene, this.camera );
+    }
+    else
+    {
+      renderer.render( this.scene, this.camera, writeBuffer, false );
+    }
+  },
+  generateTrigger:function()
+  {
+    this.randX=THREE.Math.randInt(120,240);
+  },
+  generateHeightmap:function(dt_size)
+  {
+    var data_arr = new Float32Array( dt_size*dt_size * 3 );
+    console.log(dt_size);
+    var length=dt_size*dt_size;
+
+    for ( var i = 0; i < length; i++)
+    {
+      var val=THREE.Math.randFloat(0,1);
+      data_arr[ i*3 + 0 ] = val;
+      data_arr[ i*3 + 1 ] = val;
+      data_arr[ i*3 + 2 ] = val;
+    }
+
+    var texture = new THREE.DataTexture( data_arr, dt_size, dt_size, THREE.RGBFormat, THREE.FloatType );
+    console.log(texture);
+    console.log(dt_size);
+    texture.minFilter = THREE.NearestFilter;
+    texture.magFilter = THREE.NearestFilter;
+    texture.needsUpdate = true;
+    texture.flipY = false;
+    return texture;
+  }
+};
+
+
+define("vendors/three.js-extras/postprocessing/GlitchPass", function(){});
+
+/**
  * @author alteredq / http://alteredqualia.com/
  *
  * Full-screen textured quad shader
@@ -37190,9 +37308,183 @@ THREE.ConvolutionShader = {
 
 define("vendors/three.js-extras/shaders/ConvolutionShader", function(){});
 
+/**
+ * @author alteredq / http://alteredqualia.com/
+ *
+ * Vignette shader
+ * based on PaintEffect postprocess from ro.me
+ * http://code.google.com/p/3-dreams-of-black/source/browse/deploy/js/effects/PaintEffect.js
+ */
+
+THREE.VignetteShader = {
+
+  uniforms: {
+
+    "tDiffuse": { type: "t", value: null },
+    "offset":   { type: "f", value: 1.0 },
+    "darkness": { type: "f", value: 1.0 }
+
+  },
+
+  vertexShader: [
+
+    "varying vec2 vUv;",
+
+    "void main() {",
+
+      "vUv = uv;",
+      "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+    "}"
+
+  ].join("\n"),
+
+  fragmentShader: [
+
+    "uniform float offset;",
+    "uniform float darkness;",
+
+    "uniform sampler2D tDiffuse;",
+
+    "varying vec2 vUv;",
+
+    "void main() {",
+
+      // Eskil's vignette
+
+      "vec4 texel = texture2D( tDiffuse, vUv );",
+      "vec2 uv = ( vUv - vec2( 0.5 ) ) * vec2( offset );",
+      "gl_FragColor = vec4( mix( texel.rgb, vec3( 1.0 - darkness ), dot( uv, uv ) ), texel.a );",
+
+      /*
+      // alternative version from glfx.js
+      // this one makes more "dusty" look (as opposed to "burned")
+
+      "vec4 color = texture2D( tDiffuse, vUv );",
+      "float dist = distance( vUv, vec2( 0.5 ) );",
+      "color.rgb *= smoothstep( 0.8, offset * 0.799, dist *( darkness + offset ) );",
+      "gl_FragColor = color;",
+      */
+
+    "}"
+
+  ].join("\n")
+
+};
+
+
+define("vendors/three.js-extras/shaders/VignetteShader", function(){});
+
+/**
+ * @author felixturner / http://airtight.cc/
+ *
+ * RGB Shift Shader
+ * Shifts red and blue channels from center in opposite directions
+ * Ported from http://kriss.cx/tom/2009/05/rgb-shift/
+ * by Tom Butterworth / http://kriss.cx/tom/
+ *
+ * amount: shift distance (1 is width of input)
+ * angle: shift angle in radians
+ */
+
+THREE.DigitalGlitch = {
+
+  uniforms: {
+
+    "tDiffuse":   { type: "t", value: null },//diffuse texture
+    "tDisp":    { type: "t", value: null },//displacement texture for digital glitch squares
+    "byp":      { type: "i", value: 0 },//apply the glitch ?
+    "amount":   { type: "f", value: 0.08 },
+    "angle":    { type: "f", value: 0.02 },
+    "seed":     { type: "f", value: 0.02 },
+    "seed_x":   { type: "f", value: 0.02 },//-1,1
+    "seed_y":   { type: "f", value: 0.02 },//-1,1
+    "distortion_x": { type: "f", value: 0.5 },
+    "distortion_y": { type: "f", value: 0.6 },
+    "col_s":    { type: "f", value: 0.05 }
+  },
+
+  vertexShader: [
+
+    "varying vec2 vUv;",
+    "void main() {",
+      "vUv = uv;",
+      "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+    "}"
+  ].join("\n"),
+
+  fragmentShader: [
+    "uniform int byp;",//should we apply the glitch ?
+
+    "uniform sampler2D tDiffuse;",
+    "uniform sampler2D tDisp;",
+
+    "uniform float amount;",
+    "uniform float angle;",
+    "uniform float seed;",
+    "uniform float seed_x;",
+    "uniform float seed_y;",
+    "uniform float distortion_x;",
+    "uniform float distortion_y;",
+    "uniform float col_s;",
+
+    "varying vec2 vUv;",
+
+
+    "float rand(vec2 co){",
+      "return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);",
+    "}",
+
+    "void main() {",
+      "if(byp<1) {",
+        "vec2 p = vUv;",
+        "float xs = floor(gl_FragCoord.x / 0.5);",
+        "float ys = floor(gl_FragCoord.y / 0.5);",
+        //based on staffantans glitch shader for unity https://github.com/staffantan/unityglitch
+        "vec4 normal = texture2D (tDisp, p*seed*seed);",
+        "if(p.y<distortion_x+col_s && p.y>distortion_x-col_s*seed) {",
+          "if(seed_x>0.){",
+            "p.y = 1. - (p.y + distortion_y);",
+          "}",
+          "else {",
+            "p.y = distortion_y;",
+          "}",
+        "}",
+        "if(p.x<distortion_y+col_s && p.x>distortion_y-col_s*seed) {",
+          "if(seed_y>0.){",
+            "p.x=distortion_x;",
+          "}",
+          "else {",
+            "p.x = 1. - (p.x + distortion_x);",
+          "}",
+        "}",
+        "p.x+=normal.x*seed_x*(seed/5.);",
+        "p.y+=normal.y*seed_y*(seed/5.);",
+        //base from RGB shift shader
+        "vec2 offset = amount * vec2( cos(angle), sin(angle));",
+        "vec4 cr = texture2D(tDiffuse, p + offset);",
+        "vec4 cga = texture2D(tDiffuse, p);",
+        "vec4 cb = texture2D(tDiffuse, p - offset);",
+        "gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);",
+        //add noise
+        "vec4 snow = 200.*amount*vec4(rand(vec2(xs * seed,ys * seed*50.))*0.2);",
+        "gl_FragColor = gl_FragColor+ snow;",
+      "}",
+      "else {",
+        "gl_FragColor=texture2D (tDiffuse, vUv);",
+      "}",
+    "}"
+
+  ].join("\n")
+
+};
+
+
+define("vendors/three.js-extras/shaders/DigitalGlitch", function(){});
+
 
 (function() {
-  define('cs!app/components/PostFX',['require','threejs','vendors/three.js-extras/postprocessing/EffectComposer','vendors/three.js-extras/postprocessing/MaskPass','vendors/three.js-extras/postprocessing/BloomPass','vendors/three.js-extras/postprocessing/ShaderPass','vendors/three.js-extras/postprocessing/RenderPass','vendors/three.js-extras/postprocessing/FilmPass','vendors/three.js-extras/shaders/CopyShader','vendors/three.js-extras/shaders/FXAAShader','vendors/three.js-extras/shaders/FilmShader','vendors/three.js-extras/shaders/ConvolutionShader'],function(require) {
+  define('cs!app/components/PostFX',['require','threejs','vendors/three.js-extras/postprocessing/EffectComposer','vendors/three.js-extras/postprocessing/MaskPass','vendors/three.js-extras/postprocessing/BloomPass','vendors/three.js-extras/postprocessing/ShaderPass','vendors/three.js-extras/postprocessing/RenderPass','vendors/three.js-extras/postprocessing/FilmPass','vendors/three.js-extras/postprocessing/GlitchPass','vendors/three.js-extras/shaders/CopyShader','vendors/three.js-extras/shaders/FXAAShader','vendors/three.js-extras/shaders/FilmShader','vendors/three.js-extras/shaders/ConvolutionShader','vendors/three.js-extras/shaders/VignetteShader','vendors/three.js-extras/shaders/DigitalGlitch'],function(require) {
     var PostFX, THREE;
     THREE = require('threejs');
     require('vendors/three.js-extras/postprocessing/EffectComposer');
@@ -37201,10 +37493,13 @@ define("vendors/three.js-extras/shaders/ConvolutionShader", function(){});
     require('vendors/three.js-extras/postprocessing/ShaderPass');
     require('vendors/three.js-extras/postprocessing/RenderPass');
     require('vendors/three.js-extras/postprocessing/FilmPass');
+    require('vendors/three.js-extras/postprocessing/GlitchPass');
     require('vendors/three.js-extras/shaders/CopyShader');
     require('vendors/three.js-extras/shaders/FXAAShader');
     require('vendors/three.js-extras/shaders/FilmShader');
     require('vendors/three.js-extras/shaders/ConvolutionShader');
+    require('vendors/three.js-extras/shaders/VignetteShader');
+    require('vendors/three.js-extras/shaders/DigitalGlitch');
     return PostFX = (function() {
       function PostFX(scene, camera, renderer) {
         var renderModel;
@@ -37215,13 +37510,17 @@ define("vendors/three.js-extras/shaders/ConvolutionShader", function(){});
         renderModel = new THREE.RenderPass(this.scene, this.camera);
         this.effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
         this.effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
-        this.bloom = new THREE.BloomPass(1.5, 25, 4);
-        this.filmShader = new THREE.FilmPass(0.12, 0.0, 648, false);
+        this.bloom = new THREE.BloomPass(1.3, 25, 4);
+        this.glitchPass = new THREE.GlitchPass();
+        this.vignettePass = new THREE.ShaderPass(THREE.VignetteShader);
+        this.vignettePass.uniforms['darkness'].value = 2;
+        this.filmShader = new THREE.FilmPass(0.21, 0.01, 648, false);
         this.filmShader.renderToScreen = true;
         this.composer = new THREE.EffectComposer(this.renderer);
         this.composer.addPass(renderModel);
         this.composer.addPass(this.effectFXAA);
         this.composer.addPass(this.bloom);
+        this.composer.addPass(this.vignettePass);
         this.composer.addPass(this.filmShader);
       }
 
@@ -52666,7 +52965,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
   define('cs!app/components/Colors',['require','threejs'],function(require) {
     var Colors, THREE, items, length;
     THREE = require('threejs');
-    items = [new THREE.Color(0xc0ddde), new THREE.Color(0xf1c47e)];
+    items = [new THREE.Color(0xffffff), new THREE.Color(0xffffff), new THREE.Color(0xffffff), new THREE.Color(0xffffff), new THREE.Color(0xfF777F)];
     length = items.length;
     return Colors = (function() {
       function Colors() {}
@@ -52968,7 +53267,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         this.rngOutline = new RNG(this.values.seed);
         for (i = _i = 0, _ref = this.values.numItems - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
           color = Colors.get(this.rng.random(0, 1000));
-          fillColor = color.clone().multiplyScalar(this.rng.random(0.3, 0.5));
+          fillColor = color.clone().multiplyScalar(this.rng.random(0.1, 0.5));
           rndtype = this.rng.random(0, 1000) / 1000;
           size = this.rng.random(this.values.circleRadius, this.values.circleRadiusMax);
           x = this.getRandomPosition();
@@ -52979,6 +53278,9 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           border_radius = this.rngOutline.exponential();
           draw_outline = rndtype < 0.8 ? true : false;
           draw_circle = rndtype > 0.5 ? true : false;
+          if (draw_outline === false) {
+            fillColor.multiplyScalar(3);
+          }
           item = new AnimatedCircle({
             size: size,
             outlineWidth: border_radius,
