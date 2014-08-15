@@ -95,13 +95,16 @@ define (require) ->
       if values == false then return
       needs_rebuild = false
 
-      if values.seed? && values.seed != @cache.seed
-        needs_rebuild = true
-        # Update the value on properties.
-        # If this object has keys this will have the side effect to
-        # simply set the default value to the current one.
-        @properties.seed = values.seed
-        @cache.seed = values.seed
+      # Check if any of the invaldating property changed.
+      for key, prop of Circles.properties
+        if prop.triggerRebuild && values[key]?
+          if @cache[key] != values[key]
+            @cache[key] = values[key]
+            # Update the value on properties.
+            # If this object has keys this will have the side effect to
+            # simply set the default value to the current one.
+            @properties[key] = values[key]
+            needs_rebuild = true
 
       if values.x?
         @container.position.set(values.x, values.y, values.z)

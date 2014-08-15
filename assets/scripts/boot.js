@@ -52999,7 +52999,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       };
 
       Circles.prototype.update = function(seconds, values) {
-        var item, needs_rebuild, progression, _i, _len, _ref;
+        var item, key, needs_rebuild, progression, prop, _i, _len, _ref, _ref1;
         if (values == null) {
           values = false;
         }
@@ -53007,10 +53007,16 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           return;
         }
         needs_rebuild = false;
-        if ((values.seed != null) && values.seed !== this.cache.seed) {
-          needs_rebuild = true;
-          this.properties.seed = values.seed;
-          this.cache.seed = values.seed;
+        _ref = Circles.properties;
+        for (key in _ref) {
+          prop = _ref[key];
+          if (prop.triggerRebuild && (values[key] != null)) {
+            if (this.cache[key] !== values[key]) {
+              this.cache[key] = values[key];
+              this.properties[key] = values[key];
+              needs_rebuild = true;
+            }
+          }
         }
         if (values.x != null) {
           this.container.position.set(values.x, values.y, values.z);
@@ -53018,9 +53024,9 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         if (values.progression != null) {
           progression = values.progression / 2;
           this.timeline.seek(this.totalDuration * progression);
-          _ref = this.items;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            item = _ref[_i];
+          _ref1 = this.items;
+          for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+            item = _ref1[_i];
             item.update(seconds, values.progression);
           }
         }
