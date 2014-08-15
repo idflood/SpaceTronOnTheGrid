@@ -52998,6 +52998,20 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         return this.update(0, this.properties);
       };
 
+      Circles.prototype.valueChanged = function(key, values) {
+        var has_changed, new_val;
+        if (values[key] == null) {
+          return false;
+        }
+        new_val = values[key];
+        has_changed = true;
+        if ((this.cache[key] != null) && this.cache[key] === new_val) {
+          has_changed = false;
+        }
+        this.cache[key] = new_val;
+        return has_changed;
+      };
+
       Circles.prototype.update = function(seconds, values) {
         var item, key, needs_rebuild, progression, prop, _i, _len, _ref, _ref1;
         if (values == null) {
@@ -53010,12 +53024,10 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         _ref = Circles.properties;
         for (key in _ref) {
           prop = _ref[key];
-          if (prop.triggerRebuild && (values[key] != null)) {
-            if (this.cache[key] !== values[key]) {
-              this.cache[key] = values[key];
-              this.properties[key] = values[key];
-              needs_rebuild = true;
-            }
+          if (prop.triggerRebuild && this.valueChanged(key, values)) {
+            this.cache[key] = values[key];
+            this.properties[key] = values[key];
+            needs_rebuild = true;
           }
         }
         if (values.x != null) {

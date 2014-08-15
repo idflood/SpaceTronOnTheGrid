@@ -90,6 +90,16 @@ define (require) ->
       # Set initial properties
       @update(0, @properties)
 
+    valueChanged: (key, values) ->
+      # Value can't change if it is not even set.
+      if !values[key]? then return false
+      new_val = values[key]
+      has_changed = true
+      if @cache[key]? && @cache[key] == new_val then has_changed = false
+
+      # Directly set the new cache value to avoid setting it multiple time to true.
+      @cache[key] = new_val
+      return has_changed
 
     update: (seconds, values = false) ->
       if values == false then return
@@ -97,14 +107,13 @@ define (require) ->
 
       # Check if any of the invaldating property changed.
       for key, prop of Circles.properties
-        if prop.triggerRebuild && values[key]?
-          if @cache[key] != values[key]
-            @cache[key] = values[key]
-            # Update the value on properties.
-            # If this object has keys this will have the side effect to
-            # simply set the default value to the current one.
-            @properties[key] = values[key]
-            needs_rebuild = true
+        if prop.triggerRebuild && @valueChanged(key, values)
+          @cache[key] = values[key]
+          # Update the value on properties.
+          # If this object has keys this will have the side effect to
+          # simply set the default value to the current one.
+          @properties[key] = values[key]
+          needs_rebuild = true
 
       if values.x?
         @container.position.set(values.x, values.y, values.z)
