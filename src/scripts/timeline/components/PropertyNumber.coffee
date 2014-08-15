@@ -94,3 +94,11 @@ define (require) ->
           # todo:  here should certainly modify current property
           @object.isDirty = true
 
+          # Simply update the custom object with new values.
+          # @todo: remove @object.isDirty = true above.
+          if @object.object
+            currentTime = @timer.getCurrentTime() / 1000
+            valueUpdate = {}
+            valueUpdate[current_property.name] = current_property.val
+            # Set the property on the instance object.
+            @object.object.update(currentTime, valueUpdate)

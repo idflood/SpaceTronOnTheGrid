@@ -55,6 +55,15 @@ define (require) ->
 
       #@update(0, values)
 
+    destroy: () ->
+      @timeline.clear()
+
+      for child in @container.children
+        @container.remove(child)
+      #@container.destroy()
+
+      @container = null
+
     update: (seconds, progression) ->
       #console.log "ok"
       # Progression goes from 0 to 2, we want to be a percent of total

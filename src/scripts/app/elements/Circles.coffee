@@ -10,7 +10,7 @@ define (require) ->
   class Circles
     @properties:
       numItems: {name: 'numItems', label: 'num items', val: 20}
-      seed: {name: 'seed', label: 'seed', val: 12002}
+      seed: {name: 'seed', label: 'seed', val: 12002, triggerRebuild: true}
       radius: {name: 'radius', label: 'radius', val: 80}
       circleRadius: {name: 'circleRadius', label: 'circle radius', val: 20}
       circleRadiusMax: {name: 'circleRadiusMax', label: 'circle radius max', val: 20}
@@ -26,15 +26,39 @@ define (require) ->
           @properties[key] = prop.val
 
       @timeline = new TimelineMax()
-      @rng = new RNG(@properties.seed)
-      @rngAnimation = new RNG(@properties.seed + "lorem")
-      @rngOutline = new RNG(@properties.seed)
+
       @container = new THREE.Object3D()
       @totalDuration = 0
       @items = []
+      @cache = {
+        seed: @properties.seed
+      }
 
       #@blackMaterial = new THREE.MeshBasicMaterial({color: 0x7ed2f1, transparent: true, depthWrite: false, depthTest: false})
       #@blackMaterial.blending = THREE.AdditiveBlending
+
+      @build()
+
+    rebuild: () ->
+      console.log "rebuild...."
+      @empty()
+      @build()
+
+    empty: () ->
+      if !@items || !@items.length then return
+      @timeline.clear()
+
+      for item in @items
+        @container.remove(item.container)
+        item.destroy()
+      @items = []
+
+    build: () ->
+      console.log "build Circles"
+      console.log this
+      @rng = new RNG(@properties.seed)
+      @rngAnimation = new RNG(@properties.seed + "lorem")
+      @rngOutline = new RNG(@properties.seed)
 
       for i in [0..@properties.numItems - 1]
         color = Colors.get(@rng.random(0, 1000))
@@ -70,8 +94,19 @@ define (require) ->
       # Set initial properties
       @update(0, @properties)
 
+
     update: (seconds, values = false) ->
       if values == false then return
+      needs_rebuild = false
+
+      if values.seed? && values.seed != @cache.seed
+        needs_rebuild = true
+        # Update the value on properties.
+        # If this object has keys this will have the side effect to
+        # simply set the default value to the current one.
+        @properties.seed = values.seed
+        @cache.seed = values.seed
+
       if values.x?
         @container.position.set(values.x, values.y, values.z)
 
@@ -81,6 +116,8 @@ define (require) ->
         for item in @items
           item.update(seconds, values.progression)
 
+      if needs_rebuild == true
+        @rebuild()
 
     getRandomPosition: () ->
       return @rng.random(-@properties.radius, @properties.radius)
@@ -92,7 +129,6 @@ define (require) ->
 
 
     drawOutline: (x, y, size, color) =>
-
 
     destroy: () ->
       # clean up...

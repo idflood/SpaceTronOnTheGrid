@@ -27773,7 +27773,7 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
         this.$el.find('.property__key').click(this.onKeyClick);
         return this.$el.find('input').change((function(_this) {
           return function(e) {
-            var currentTime, current_key, current_property, current_value;
+            var currentTime, current_key, current_property, current_value, valueUpdate;
             current_value = _this.getInputVal();
             currentTime = _this.timer.getCurrentTime() / 1000;
             current_property = _this.getProperty();
@@ -27788,7 +27788,13 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
               }
             } else {
               current_property.val = current_value;
-              return _this.object.isDirty = true;
+              _this.object.isDirty = true;
+              if (_this.object.object) {
+                currentTime = _this.timer.getCurrentTime() / 1000;
+                valueUpdate = {};
+                valueUpdate[current_property.name] = current_property.val;
+                return _this.object.object.update(currentTime, valueUpdate);
+              }
             }
           };
         })(this));

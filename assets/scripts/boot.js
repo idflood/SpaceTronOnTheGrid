@@ -52802,6 +52802,17 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         }
       }
 
+      AnimatedCircle.prototype.destroy = function() {
+        var child, _i, _len, _ref;
+        this.timeline.clear();
+        _ref = this.container.children;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          child = _ref[_i];
+          this.container.remove(child);
+        }
+        return this.container = null;
+      };
+
       AnimatedCircle.prototype.update = function(seconds, progression) {
         return this.container.scale.set(this.animatedProperties.scale, this.animatedProperties.scale, this.animatedProperties.scale);
       };
@@ -52862,7 +52873,8 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         seed: {
           name: 'seed',
           label: 'seed',
-          val: 12002
+          val: 12002,
+          triggerRebuild: true
         },
         radius: {
           name: 'radius',
@@ -52902,7 +52914,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       };
 
       function Circles(properties) {
-        var border_radius, color, delay, draw_circle, draw_outline, duration, fillColor, i, item, key, prop, rndtype, size, x, y, _i, _ref, _ref1;
+        var key, prop, _ref;
         this.properties = properties != null ? properties : {};
         this.drawOutline = __bind(this.drawOutline, this);
         this.createCircle = __bind(this.createCircle, this);
@@ -52914,13 +52926,44 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           }
         }
         this.timeline = new TimelineMax();
-        this.rng = new RNG(this.properties.seed);
-        this.rngAnimation = new RNG(this.properties.seed + "lorem");
-        this.rngOutline = new RNG(this.properties.seed);
         this.container = new THREE.Object3D();
         this.totalDuration = 0;
         this.items = [];
-        for (i = _i = 0, _ref1 = this.properties.numItems - 1; 0 <= _ref1 ? _i <= _ref1 : _i >= _ref1; i = 0 <= _ref1 ? ++_i : --_i) {
+        this.cache = {
+          seed: this.properties.seed
+        };
+        this.build();
+      }
+
+      Circles.prototype.rebuild = function() {
+        console.log("rebuild....");
+        this.empty();
+        return this.build();
+      };
+
+      Circles.prototype.empty = function() {
+        var item, _i, _len, _ref;
+        if (!this.items || !this.items.length) {
+          return;
+        }
+        this.timeline.clear();
+        _ref = this.items;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          item = _ref[_i];
+          this.container.remove(item.container);
+          item.destroy();
+        }
+        return this.items = [];
+      };
+
+      Circles.prototype.build = function() {
+        var border_radius, color, delay, draw_circle, draw_outline, duration, fillColor, i, item, rndtype, size, x, y, _i, _ref;
+        console.log("build Circles");
+        console.log(this);
+        this.rng = new RNG(this.properties.seed);
+        this.rngAnimation = new RNG(this.properties.seed + "lorem");
+        this.rngOutline = new RNG(this.properties.seed);
+        for (i = _i = 0, _ref = this.properties.numItems - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
           color = Colors.get(this.rng.random(0, 1000));
           fillColor = color.clone().multiplyScalar(this.rng.random(0.3, 0.5));
           rndtype = this.rng.random(0, 1000) / 1000;
@@ -52950,16 +52993,22 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           this.items.push(item);
         }
         this.totalDuration = this.timeline.duration();
-        this.update(0, this.properties);
-      }
+        return this.update(0, this.properties);
+      };
 
       Circles.prototype.update = function(seconds, values) {
-        var item, progression, _i, _len, _ref, _results;
+        var item, needs_rebuild, progression, _i, _len, _ref;
         if (values == null) {
           values = false;
         }
         if (values === false) {
           return;
+        }
+        needs_rebuild = false;
+        if ((values.seed != null) && values.seed !== this.cache.seed) {
+          needs_rebuild = true;
+          this.properties.seed = values.seed;
+          this.cache.seed = values.seed;
         }
         if (values.x != null) {
           this.container.position.set(values.x, values.y, values.z);
@@ -52968,12 +53017,13 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           progression = values.progression / 2;
           this.timeline.seek(this.totalDuration * progression);
           _ref = this.items;
-          _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             item = _ref[_i];
-            _results.push(item.update(seconds, values.progression));
+            item.update(seconds, values.progression);
           }
-          return _results;
+        }
+        if (needs_rebuild === true) {
+          return this.rebuild();
         }
       };
 
