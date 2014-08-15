@@ -88,7 +88,7 @@ define (require) ->
       @totalDuration = @timeline.duration()
 
       # Set initial properties
-      @update(0, @properties)
+      @update(0, @properties, true)
 
     valueChanged: (key, values) ->
       # Value can't change if it is not even set.
@@ -101,7 +101,7 @@ define (require) ->
       @cache[key] = new_val
       return has_changed
 
-    update: (seconds, values = false) ->
+    update: (seconds, values = false, force = false) ->
       if values == false then return
       needs_rebuild = false
 
@@ -115,10 +115,10 @@ define (require) ->
           @properties[key] = values[key]
           needs_rebuild = true
 
-      if values.x?
+      if force || @valueChanged("x", values) || @valueChanged("y", values) || @valueChanged("z", values)
         @container.position.set(values.x, values.y, values.z)
 
-      if values.progression?
+      if force || @valueChanged("progression", values)
         progression = values.progression / 2
         @timeline.seek(@totalDuration * progression)
         for item in @items

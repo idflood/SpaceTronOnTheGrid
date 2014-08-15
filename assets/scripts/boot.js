@@ -52995,7 +52995,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           this.items.push(item);
         }
         this.totalDuration = this.timeline.duration();
-        return this.update(0, this.properties);
+        return this.update(0, this.properties, true);
       };
 
       Circles.prototype.valueChanged = function(key, values) {
@@ -53012,10 +53012,13 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         return has_changed;
       };
 
-      Circles.prototype.update = function(seconds, values) {
+      Circles.prototype.update = function(seconds, values, force) {
         var item, key, needs_rebuild, progression, prop, _i, _len, _ref, _ref1;
         if (values == null) {
           values = false;
+        }
+        if (force == null) {
+          force = false;
         }
         if (values === false) {
           return;
@@ -53030,10 +53033,10 @@ define("TimelineMax", ["TweenMax"], (function (global) {
             needs_rebuild = true;
           }
         }
-        if (values.x != null) {
+        if (force || this.valueChanged("x", values) || this.valueChanged("y", values) || this.valueChanged("z", values)) {
           this.container.position.set(values.x, values.y, values.z);
         }
-        if (values.progression != null) {
+        if (force || this.valueChanged("progression", values)) {
           progression = values.progression / 2;
           this.timeline.seek(this.totalDuration * progression);
           _ref1 = this.items;
