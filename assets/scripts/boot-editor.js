@@ -27000,7 +27000,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
     return Timeline = (function() {
       function Timeline() {
         this.render = __bind(this.render, this);
-        var height, margin, width, xAxis, xAxisElement, xAxisGrid, xGrid;
+        var height, margin, width;
         this.app = window.app;
         this.isDirty = true;
         this.onSelect = new Signals.Signal();
@@ -27020,7 +27020,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.label_position_x = -170;
         this.x = d3.time.scale().range([0, width]);
         this.x.domain(this.initialDomain);
-        xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(Utils.formatMinutes);
+        this.xAxis = d3.svg.axis().scale(this.x).orient("top").tickSize(-height, 0).tickFormat(Utils.formatMinutes);
         this.svg = d3.select('.editor__time-main').append("svg").attr("width", width + margin.left + margin.right).attr("height", 600);
         this.svgContainer = this.svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         this.linesContainer = this.svg.append("g").attr("transform", "translate(" + margin.left + "," + (margin.top + 10) + ")");
@@ -27049,14 +27049,14 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
             return _this.isDirty = true;
           };
         })(this));
-        xAxisGrid = d3.svg.axis().scale(this.x).ticks(100).tickSize(-height, 0).tickFormat("").orient("top");
-        xGrid = this.svgContainer.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(xAxisGrid);
-        xAxisElement = this.svgContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(xAxis);
+        this.xAxisGrid = d3.svg.axis().scale(this.x).ticks(100).tickSize(-this.items.dy, 0).tickFormat("").orient("top");
+        this.xGrid = this.svgContainer.append('g').attr('class', 'x axis grid').attr("transform", "translate(0," + margin.top + ")").call(this.xAxisGrid);
+        this.xAxisElement = this.svgContainer.append("g").attr("class", "x axis").attr("transform", "translate(0," + margin.top + ")").call(this.xAxis);
         this.header.onBrush.add((function(_this) {
           return function(extent) {
             _this.x.domain(extent);
-            xGrid.call(xAxisGrid);
-            xAxisElement.call(xAxis);
+            _this.xGrid.call(_this.xAxisGrid);
+            _this.xAxisElement.call(_this.xAxis);
             return _this.isDirty = true;
           };
         })(this));
@@ -27077,7 +27077,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
       }
 
       Timeline.prototype.render = function() {
-        var bar, properties;
+        var bar, height, properties;
         this.header.render();
         this.timeIndicator.render();
         if (this.isDirty) {
@@ -27085,6 +27085,10 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           properties = this.properties.render(bar);
           this.keys.render(properties);
           this.isDirty = false;
+          height = Math.max(this.items.dy + 30, 230);
+          this.xAxis.tickSize(-height, 0);
+          this.xAxisGrid.tickSize(-height, 0);
+          this.svg.attr("height", height);
         }
         return window.requestAnimationFrame(this.render);
       };

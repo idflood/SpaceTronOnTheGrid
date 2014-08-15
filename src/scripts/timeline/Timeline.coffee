@@ -35,7 +35,7 @@ define (require) ->
       @x = d3.time.scale().range([0, width])
       @x.domain(@initialDomain)
 
-      xAxis = d3.svg.axis()
+      @xAxis = d3.svg.axis()
         .scale(@x)
         .orient("top")
         .tickSize(-height, 0)
@@ -63,27 +63,27 @@ define (require) ->
       @keys = new Keys(this)
       @keys.onKeyUpdated.add () => @isDirty = true
 
-      xAxisGrid = d3.svg.axis()
+      @xAxisGrid = d3.svg.axis()
         .scale(@x)
         .ticks(100)
-        .tickSize(-height, 0)
+        .tickSize(-@items.dy, 0)
         .tickFormat("")
         .orient("top")
 
-      xGrid = @svgContainer.append('g')
+      @xGrid = @svgContainer.append('g')
         .attr('class', 'x axis grid')
         .attr("transform", "translate(0," + margin.top + ")")
-        .call(xAxisGrid)
+        .call(@xAxisGrid)
 
-      xAxisElement = @svgContainer.append("g")
+      @xAxisElement = @svgContainer.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + margin.top + ")")
-        .call(xAxis)
+        .call(@xAxis)
 
       @header.onBrush.add (extent) =>
         @x.domain(extent)
-        xGrid.call(xAxisGrid)
-        xAxisElement.call(xAxis)
+        @xGrid.call(@xAxisGrid)
+        @xAxisElement.call(@xAxis)
         @isDirty = true
 
       # First render
@@ -111,5 +111,13 @@ define (require) ->
         properties = @properties.render(bar)
         @keys.render(properties)
         @isDirty = false
+
+        # Adapt the timeline height.
+        height = Math.max(@items.dy + 30, 230)
+        @xAxis.tickSize(-height, 0)
+        @xAxisGrid.tickSize(-height, 0)
+        @xGrid.call(@xAxisGrid)
+        @xAxisElement.call(@xAxis)
+        @svg.attr("height", height)
 
       window.requestAnimationFrame(@render)
