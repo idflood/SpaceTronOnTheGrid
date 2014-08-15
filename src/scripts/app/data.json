@@ -6,11 +6,6 @@
     "start": 0,
     "end": 2,
     "collapsed": true,
-    "options": {
-      "numItems": 12,
-      "seed": 12002,
-      "radius": 84
-    },
     "properties": [
       {
         "name": "progression",
@@ -29,6 +24,46 @@
             "val": 2
           }
         ]
+      },
+      {
+        "keys": [],
+        "name": "numItems",
+        "val": 12
+      },
+      {
+        "keys": [],
+        "name": "seed",
+        "val": 12002
+      },
+      {
+        "keys": [],
+        "name": "radius",
+        "val": 84
+      },
+      {
+        "keys": [],
+        "name": "circleRadius",
+        "val": 20
+      },
+      {
+        "keys": [],
+        "name": "circleRadiusMax",
+        "val": 20
+      },
+      {
+        "keys": [],
+        "name": "x",
+        "val": 0
+      },
+      {
+        "keys": [],
+        "name": "y",
+        "val": 0
+      },
+      {
+        "keys": [],
+        "name": "z",
+        "val": 0
       }
     ]
   },
@@ -38,17 +73,10 @@
     "label": "Circles 2",
     "start": 1.473,
     "end": 5.034,
-    "options": {
-      "numItems": 83,
-      "seed": -27998,
-      "radius": 265,
-      "circleRadius": 3,
-      "circleRadiusMax": 50
-    },
     "properties": [
       {
         "name": "progression",
-        "val": 1,
+        "val": 0,
         "keys": [
           {
             "time": 1.701,
@@ -67,6 +95,46 @@
             "val": 0
           }
         ]
+      },
+      {
+        "keys": [],
+        "name": "numItems",
+        "val": 83
+      },
+      {
+        "keys": [],
+        "name": "seed",
+        "val": -27998
+      },
+      {
+        "keys": [],
+        "name": "radius",
+        "val": 265
+      },
+      {
+        "keys": [],
+        "name": "circleRadius",
+        "val": 3
+      },
+      {
+        "keys": [],
+        "name": "circleRadiusMax",
+        "val": 50
+      },
+      {
+        "keys": [],
+        "name": "x",
+        "val": 0
+      },
+      {
+        "keys": [],
+        "name": "y",
+        "val": 0
+      },
+      {
+        "keys": [],
+        "name": "z",
+        "val": 0
       }
     ]
   },
@@ -76,13 +144,6 @@
     "label": "Circles 3",
     "start": 4.719,
     "end": 6.718999999999999,
-    "options": {
-      "numItems": 20,
-      "seed": 12002,
-      "radius": 80,
-      "circleRadius": 20,
-      "circleRadiusMax": 20
-    },
     "properties": [
       {
         "name": "progression",
@@ -91,7 +152,7 @@
       },
       {
         "name": "x",
-        "val": 0,
+        "val": 100,
         "keys": [
           {
             "time": 5,
@@ -113,6 +174,31 @@
         "name": "z",
         "val": 0,
         "keys": []
+      },
+      {
+        "keys": [],
+        "name": "numItems",
+        "val": 20
+      },
+      {
+        "keys": [],
+        "name": "seed",
+        "val": 12002
+      },
+      {
+        "keys": [],
+        "name": "radius",
+        "val": 80
+      },
+      {
+        "keys": [],
+        "name": "circleRadius",
+        "val": 20
+      },
+      {
+        "keys": [],
+        "name": "circleRadiusMax",
+        "val": 20
       }
     ]
   }
