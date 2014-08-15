@@ -21,16 +21,14 @@ define (require) ->
       y: {name: 'y', label: 'y', val: 0}
       z: {name: 'z', label: 'z', val: 0}
 
-    constructor: (@properties = {}) ->
+    constructor: (@values = {}, time = 0) ->
       for key, prop of AnimatedCircle.properties
-        if !@properties[key]?
-          @properties[key] = prop.val
-      #@properties = _.cloneDeep(AnimatedCircle.properties)
-      #@properties = _.merge(@properties, properties)
+        if !@values[key]?
+          @values[key] = prop.val
 
       @container = new THREE.Object3D()
       @container.scale.set(0.001,0.001,0.001)
-      @container.position.set(@properties.x, @properties.y, @properties.z)
+      @container.position.set(@values.x, @values.y, @values.z)
       @animatedProperties =
         scale: 0.001
       @timeline = new TimelineMax()
@@ -38,20 +36,19 @@ define (require) ->
       tween = TweenLite.to(@animatedProperties, 0, {scale: 0.00001, ease: Linear.easeNone})
       @timeline.add(tween, 0)
       # Middle
-      tween = TweenLite.to(@animatedProperties, @properties.duration, {scale: 1, delay: @properties.delay, ease: Cubic.easeOut})
+      tween = TweenLite.to(@animatedProperties, @values.duration, {scale: 1, delay: @values.delay, ease: Cubic.easeOut})
       @timeline.add(tween)
 
       # Stay for a while
-      tween = TweenLite.to(@animatedProperties, @properties.duration * 0.5, {scale: 1, ease: Cubic.easeOut})
+      tween = TweenLite.to(@animatedProperties, @values.duration * 0.5, {scale: 1, ease: Cubic.easeOut})
       @timeline.add(tween)
 
       # End
-      tween = TweenLite.to(@animatedProperties, @properties.duration, {scale: 0.00001, ease: Cubic.easeIn})
+      tween = TweenLite.to(@animatedProperties, @values.duration, {scale: 0.00001, ease: Cubic.easeIn})
       @timeline.add(tween)
 
-      if @properties.drawOutline then @renderOutline(@properties.size, @properties.color, @properties.outlineWidth)
-      if @properties.drawCircle then @renderCircle(@properties.size, @properties.fillColor)
-
+      if @values.drawOutline then @renderOutline(@values.size, @values.color, @values.outlineWidth)
+      if @values.drawCircle then @renderCircle(@values.size, @values.fillColor)
 
       #@update(0, values)
 

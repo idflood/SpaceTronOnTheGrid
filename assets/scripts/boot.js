@@ -52754,21 +52754,24 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         }
       };
 
-      function AnimatedCircle(properties) {
+      function AnimatedCircle(values, time) {
         var key, prop, tween, _ref;
-        this.properties = properties != null ? properties : {};
+        this.values = values != null ? values : {};
+        if (time == null) {
+          time = 0;
+        }
         this.renderOutline = __bind(this.renderOutline, this);
         this.renderCircle = __bind(this.renderCircle, this);
         _ref = AnimatedCircle.properties;
         for (key in _ref) {
           prop = _ref[key];
-          if (this.properties[key] == null) {
-            this.properties[key] = prop.val;
+          if (this.values[key] == null) {
+            this.values[key] = prop.val;
           }
         }
         this.container = new THREE.Object3D();
         this.container.scale.set(0.001, 0.001, 0.001);
-        this.container.position.set(this.properties.x, this.properties.y, this.properties.z);
+        this.container.position.set(this.values.x, this.values.y, this.values.z);
         this.animatedProperties = {
           scale: 0.001
         };
@@ -52778,27 +52781,27 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           ease: Linear.easeNone
         });
         this.timeline.add(tween, 0);
-        tween = TweenLite.to(this.animatedProperties, this.properties.duration, {
+        tween = TweenLite.to(this.animatedProperties, this.values.duration, {
           scale: 1,
-          delay: this.properties.delay,
+          delay: this.values.delay,
           ease: Cubic.easeOut
         });
         this.timeline.add(tween);
-        tween = TweenLite.to(this.animatedProperties, this.properties.duration * 0.5, {
+        tween = TweenLite.to(this.animatedProperties, this.values.duration * 0.5, {
           scale: 1,
           ease: Cubic.easeOut
         });
         this.timeline.add(tween);
-        tween = TweenLite.to(this.animatedProperties, this.properties.duration, {
+        tween = TweenLite.to(this.animatedProperties, this.values.duration, {
           scale: 0.00001,
           ease: Cubic.easeIn
         });
         this.timeline.add(tween);
-        if (this.properties.drawOutline) {
-          this.renderOutline(this.properties.size, this.properties.color, this.properties.outlineWidth);
+        if (this.values.drawOutline) {
+          this.renderOutline(this.values.size, this.values.color, this.values.outlineWidth);
         }
-        if (this.properties.drawCircle) {
-          this.renderCircle(this.properties.size, this.properties.fillColor);
+        if (this.values.drawCircle) {
+          this.renderCircle(this.values.size, this.values.fillColor);
         }
       }
 
@@ -52986,7 +52989,8 @@ define("TimelineMax", ["TweenMax"], (function (global) {
             delay: delay,
             duration: duration,
             x: x,
-            y: y
+            y: y,
+            z: 0
           });
           this.container.add(item.container);
           this.timeline.add(item.timeline, 0);

@@ -80,7 +80,8 @@ define (require) ->
           delay: delay,
           duration: duration,
           x: x,
-          y: y
+          y: y,
+          z: 0
         })
         @container.add(item.container)
         @timeline.add(item.timeline, 0)

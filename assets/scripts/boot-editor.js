@@ -27088,6 +27088,8 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           height = Math.max(this.items.dy + 30, 230);
           this.xAxis.tickSize(-height, 0);
           this.xAxisGrid.tickSize(-height, 0);
+          this.xGrid.call(this.xAxisGrid);
+          this.xAxisElement.call(this.xAxis);
           this.svg.attr("height", height);
         }
         return window.requestAnimationFrame(this.render);
