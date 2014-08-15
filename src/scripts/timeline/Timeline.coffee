@@ -22,7 +22,8 @@ define (require) ->
       @isDirty = true
       @onSelect = new Signals.Signal()
       @timer = @app.timer
-      @currentTime = @timer.time
+      @currentTime = @timer.time #used in timeindicator.
+      @lastTime = @currentTime[0]
       @initialDomain = [0, @timer.totalDuration - 220 * 1000]
       margin = {top: 6, right: 20, bottom: 0, left: 190}
       this.margin = margin
@@ -97,13 +98,14 @@ define (require) ->
           .attr('width', INNER_WIDTH)
         @x.range([0, width])
 
-        xGrid.call(xAxisGrid)
-        xAxisElement.call(xAxis)
+        @xGrid.call(@xAxisGrid)
+        @xAxisElement.call(@xAxis)
         @header.resize(INNER_WIDTH)
 
     render: () =>
-      @header.render()
-      @timeIndicator.render()
+      if @isDirty || @timer.time[0] != @lastTime
+        @header.render()
+        @timeIndicator.render()
 
       if @isDirty
         # No need to call this on each frames, but only on brush, key drag, ...
@@ -120,4 +122,5 @@ define (require) ->
         @xAxisElement.call(@xAxis)
         @svg.attr("height", height)
 
+      @lastTime = @timer.time[0]
       window.requestAnimationFrame(@render)

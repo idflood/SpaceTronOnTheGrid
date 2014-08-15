@@ -6,10 +6,10 @@ define (require) ->
 
   class TimeIndicator
     constructor: (@timeline, @container) ->
+      @timeSelection = @container.selectAll('.time-indicator').data(@timeline.currentTime)
 
     render: () =>
-      timeSelection = @container.selectAll('.time-indicator').data(@timeline.currentTime)
-      timeGrp = timeSelection.enter().append("svg")
+      timeGrp = @timeSelection.enter().append("svg")
         .attr('class', "time-indicator timeline__right-mask")
         .attr('width', window.innerWidth - @timeline.label_position_x)
         .attr('height', 442)

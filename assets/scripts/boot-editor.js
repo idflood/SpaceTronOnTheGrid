@@ -19838,12 +19838,12 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.timeline = timeline;
         this.container = container;
         this.render = __bind(this.render, this);
+        this.timeSelection = this.container.selectAll('.time-indicator').data(this.timeline.currentTime);
       }
 
       TimeIndicator.prototype.render = function() {
         var timeGrp, timeSelection;
-        timeSelection = this.container.selectAll('.time-indicator').data(this.timeline.currentTime);
-        timeGrp = timeSelection.enter().append("svg").attr('class', "time-indicator timeline__right-mask").attr('width', window.innerWidth - this.timeline.label_position_x).attr('height', 442);
+        timeGrp = this.timeSelection.enter().append("svg").attr('class', "time-indicator timeline__right-mask").attr('width', window.innerWidth - this.timeline.label_position_x).attr('height', 442);
         timeSelection = timeGrp.append('rect').attr('class', 'time-indicator__line').attr('x', -1).attr('y', -this.timeline.margin.top).attr('width', 1).attr('height', 1000);
         timeSelection = this.container.selectAll('.time-indicator rect');
         return timeSelection.attr('x', this.timeline.x(this.timeline.currentTime[0]) - 0.5);
@@ -27006,6 +27006,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         this.onSelect = new Signals.Signal();
         this.timer = this.app.timer;
         this.currentTime = this.timer.time;
+        this.lastTime = this.currentTime[0];
         this.initialDomain = [0, this.timer.totalDuration - 220 * 1000];
         margin = {
           top: 6,
@@ -27069,8 +27070,8 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
             _this.svg.attr("width", width + margin.left + margin.right);
             _this.svg.selectAll('.timeline__right-mask').attr('width', INNER_WIDTH);
             _this.x.range([0, width]);
-            xGrid.call(xAxisGrid);
-            xAxisElement.call(xAxis);
+            _this.xGrid.call(_this.xAxisGrid);
+            _this.xAxisElement.call(_this.xAxis);
             return _this.header.resize(INNER_WIDTH);
           };
         })(this);
@@ -27078,8 +27079,10 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
 
       Timeline.prototype.render = function() {
         var bar, height, properties;
-        this.header.render();
-        this.timeIndicator.render();
+        if (this.isDirty || this.timer.time[0] !== this.lastTime) {
+          this.header.render();
+          this.timeIndicator.render();
+        }
         if (this.isDirty) {
           bar = this.items.render();
           properties = this.properties.render(bar);
@@ -27092,6 +27095,7 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
           this.xAxisElement.call(this.xAxis);
           this.svg.attr("height", height);
         }
+        this.lastTime = this.timer.time[0];
         return window.requestAnimationFrame(this.render);
       };
 
