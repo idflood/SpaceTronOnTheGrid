@@ -12,24 +12,21 @@ define (require) ->
       Circles:
         classObject: Circles
 
-        create: (options) ->
-          # Assign default parameters if not defined
-          defaults = Circles.defaults
-          options = extend (extend {}, defaults), options
-          item = new Circles(options)
+        create: (values) ->
+          item = new Circles(values)
           return item
 
     getTypeClass: (itemType) =>
       ElementFactory.elements[itemType].classObject
 
 
-    create: (itemName, data) ->
+    create: (itemName, values) ->
       item = ElementFactory.elements[itemName]
       if !item
         console.warn("Can't create item: " + itemName)
         return false
       console.log("will create a " + itemName)
-      console.log data
-      return item.create(data)
+      console.log values
+      return item.create(values)
 
   window.ElementFactory = ElementFactory

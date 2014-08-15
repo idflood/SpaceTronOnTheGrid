@@ -27962,10 +27962,11 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
             obj = source[_i];
             new_data = {
               id: obj.id,
+              type: obj.type,
               label: obj.label,
               start: obj.start,
               end: obj.end,
-              options: obj.options,
+              collapsed: obj.collapsed,
               properties: obj.properties
             };
             target.push(new_data);

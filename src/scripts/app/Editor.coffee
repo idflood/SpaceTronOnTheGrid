@@ -97,10 +97,11 @@ define (require) ->
 
           new_data =
             id: obj.id,
+            type: obj.type,
             label: obj.label,
             start: obj.start,
             end: obj.end,
-            options: obj.options
+            collapsed: obj.collapsed,
             properties: obj.properties
 
           target.push(new_data)

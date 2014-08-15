@@ -19,11 +19,12 @@ define (require) ->
       y: {name: 'y', label: 'y', val: 0}
       z: {name: 'z', label: 'z', val: 0}
 
-    constructor: (@properties = {}) ->
+    constructor: (@values = {}) ->
       # Set the default value of instance properties.
-      for key, prop of Circles.properties
-        if !@properties[key]?
-          @properties[key] = prop.val
+      # Should not happen when created with the orchestrator (so never really...)
+      #for key, prop of Circles.properties
+      #  if !@values[key]?
+      #    @values[key] = prop.val
 
       @timeline = new TimelineMax()
       @container = new THREE.Object3D()
@@ -34,8 +35,8 @@ define (require) ->
 
     buildCache: () ->
       cache = {}
-      for key, prop of @properties
-        cache[key] = prop
+      for key, prop of @values
+        cache[key] = prop.val
       return cache
 
     rebuild: () ->
@@ -52,15 +53,15 @@ define (require) ->
       @items = []
 
     build: () ->
-      @rng = new RNG(@properties.seed)
-      @rngAnimation = new RNG(@properties.seed + "lorem")
-      @rngOutline = new RNG(@properties.seed)
+      @rng = new RNG(@values.seed)
+      @rngAnimation = new RNG(@values.seed + "lorem")
+      @rngOutline = new RNG(@values.seed)
 
-      for i in [0..@properties.numItems - 1]
+      for i in [0..@values.numItems - 1]
         color = Colors.get(@rng.random(0, 1000))
         fillColor = color.clone().multiplyScalar(@rng.random(0.3, 0.5))
         rndtype = @rng.random(0, 1000) / 1000
-        size = @rng.random(@properties.circleRadius, @properties.circleRadiusMax)
+        size = @rng.random(@values.circleRadius, @values.circleRadiusMax)
         x = @getRandomPosition()
         y = @getRandomPosition()
         delay = @rngAnimation.random(0, 2400) / 1000
@@ -88,7 +89,7 @@ define (require) ->
       @totalDuration = @timeline.duration()
 
       # Set initial properties
-      @update(0, @properties, true)
+      @update(0, @values, true)
 
     valueChanged: (key, values) ->
       # Value can't change if it is not even set.
@@ -112,7 +113,7 @@ define (require) ->
           # Update the value on properties.
           # If this object has keys this will have the side effect to
           # simply set the default value to the current one.
-          @properties[key] = values[key]
+          #@values[key] = values[key]
           needs_rebuild = true
 
       if force || @valueChanged("x", values) || @valueChanged("y", values) || @valueChanged("z", values)
@@ -128,7 +129,7 @@ define (require) ->
         @rebuild()
 
     getRandomPosition: () ->
-      return @rng.random(-@properties.radius, @properties.radius)
+      return @rng.random(-@values.radius, @values.radius)
 
     destroy: () ->
       # clean up...

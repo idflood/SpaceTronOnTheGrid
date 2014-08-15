@@ -114,7 +114,7 @@ define (require) ->
         # Create the item
         if should_exist && !item.object
           type = item.type
-          el = @factory.create(type, item.options)
+          el = @factory.create(type, item.values)
           @scene.add(el.container)
           item.object = el
 

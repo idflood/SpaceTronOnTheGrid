@@ -52911,16 +52911,8 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         }
       };
 
-      function Circles(properties) {
-        var key, prop, _ref;
-        this.properties = properties != null ? properties : {};
-        _ref = Circles.properties;
-        for (key in _ref) {
-          prop = _ref[key];
-          if (this.properties[key] == null) {
-            this.properties[key] = prop.val;
-          }
-        }
+      function Circles(values) {
+        this.values = values != null ? values : {};
         this.timeline = new TimelineMax();
         this.container = new THREE.Object3D();
         this.totalDuration = 0;
@@ -52932,10 +52924,10 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       Circles.prototype.buildCache = function() {
         var cache, key, prop, _ref;
         cache = {};
-        _ref = this.properties;
+        _ref = this.values;
         for (key in _ref) {
           prop = _ref[key];
-          cache[key] = prop;
+          cache[key] = prop.val;
         }
         return cache;
       };
@@ -52962,14 +52954,14 @@ define("TimelineMax", ["TweenMax"], (function (global) {
 
       Circles.prototype.build = function() {
         var border_radius, color, delay, draw_circle, draw_outline, duration, fillColor, i, item, rndtype, size, x, y, _i, _ref;
-        this.rng = new RNG(this.properties.seed);
-        this.rngAnimation = new RNG(this.properties.seed + "lorem");
-        this.rngOutline = new RNG(this.properties.seed);
-        for (i = _i = 0, _ref = this.properties.numItems - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        this.rng = new RNG(this.values.seed);
+        this.rngAnimation = new RNG(this.values.seed + "lorem");
+        this.rngOutline = new RNG(this.values.seed);
+        for (i = _i = 0, _ref = this.values.numItems - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
           color = Colors.get(this.rng.random(0, 1000));
           fillColor = color.clone().multiplyScalar(this.rng.random(0.3, 0.5));
           rndtype = this.rng.random(0, 1000) / 1000;
-          size = this.rng.random(this.properties.circleRadius, this.properties.circleRadiusMax);
+          size = this.rng.random(this.values.circleRadius, this.values.circleRadiusMax);
           x = this.getRandomPosition();
           y = this.getRandomPosition();
           delay = this.rngAnimation.random(0, 2400) / 1000;
@@ -52995,7 +52987,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           this.items.push(item);
         }
         this.totalDuration = this.timeline.duration();
-        return this.update(0, this.properties, true);
+        return this.update(0, this.values, true);
       };
 
       Circles.prototype.valueChanged = function(key, values) {
@@ -53029,7 +53021,6 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           prop = _ref[key];
           if (prop.triggerRebuild && this.valueChanged(key, values)) {
             this.cache[key] = values[key];
-            this.properties[key] = values[key];
             needs_rebuild = true;
           }
         }
@@ -53051,7 +53042,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       };
 
       Circles.prototype.getRandomPosition = function() {
-        return this.rng.random(-this.properties.radius, this.properties.radius);
+        return this.rng.random(-this.values.radius, this.values.radius);
       };
 
       Circles.prototype.destroy = function() {
@@ -53096,11 +53087,9 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       ElementFactory.elements = {
         Circles: {
           classObject: Circles,
-          create: function(options) {
-            var defaults, item;
-            defaults = Circles.defaults;
-            options = extend(extend({}, defaults), options);
-            item = new Circles(options);
+          create: function(values) {
+            var item;
+            item = new Circles(values);
             return item;
           }
         }
@@ -53110,7 +53099,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         return ElementFactory.elements[itemType].classObject;
       };
 
-      ElementFactory.prototype.create = function(itemName, data) {
+      ElementFactory.prototype.create = function(itemName, values) {
         var item;
         item = ElementFactory.elements[itemName];
         if (!item) {
@@ -53118,8 +53107,8 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           return false;
         }
         console.log("will create a " + itemName);
-        console.log(data);
-        return item.create(data);
+        console.log(values);
+        return item.create(values);
       };
 
       return ElementFactory;
@@ -53238,7 +53227,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           }
           if (should_exist && !item.object) {
             type = item.type;
-            el = this.factory.create(type, item.options);
+            el = this.factory.create(type, item.values);
             this.scene.add(el.container);
             item.object = el;
           }
@@ -53648,7 +53637,7 @@ define('text',['module'], function (module) {
 });
 
 
-define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\n    "type": "Circles",\n    "label": "Test circles",\n    "start": 0,\n    "end": 2,\n    "collapsed": true,\n    "options": {\n      "numItems": 12,\n      "seed": 12002,\n      "radius": 84\n    },\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0,\n        "keys": [\n          {\n            "time": 0,\n            "val": 0\n          },\n          {\n            "time": 1,\n            "val": 1\n          },\n          {\n            "time": 2,\n            "val": 2\n          }\n        ]\n      }\n    ]\n  },\n  {\n    "id": "item2",\n    "type": "Circles",\n    "label": "Circles 2",\n    "start": 1.473,\n    "end": 5.034,\n    "options": {\n      "numItems": 83,\n      "seed": -27998,\n      "radius": 265,\n      "circleRadius": 3,\n      "circleRadiusMax": 50\n    },\n    "properties": [\n      {\n        "name": "progression",\n        "val": 1,\n        "keys": [\n          {\n            "time": 1.701,\n            "val": 0\n          },\n          {\n            "time": 2.4379999999999997,\n            "val": 1\n          },\n          {\n            "time": 2.701,\n            "val": 1\n          },\n          {\n            "time": 3.403,\n            "val": 0\n          }\n        ]\n      }\n    ]\n  },\n  {\n    "id": "item3",\n    "type": "Circles",\n    "label": "Circles 3",\n    "start": 4.719,\n    "end": 6.718999999999999,\n    "options": {\n      "numItems": 20,\n      "seed": 12002,\n      "radius": 80,\n      "circleRadius": 20,\n      "circleRadiusMax": 20\n    },\n    "properties": [\n      {\n        "name": "progression",\n        "val": 1,\n        "keys": []\n      },\n      {\n        "name": "x",\n        "val": 0,\n        "keys": [\n          {\n            "time": 5,\n            "val": 100\n          }\n        ]\n      },\n      {\n        "name": "y",\n        "val": 0,\n        "keys": [\n          {\n            "time": 5.315,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "name": "z",\n        "val": 0,\n        "keys": []\n      }\n    ]\n  }\n]\n';});
+define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\n    "type": "Circles",\n    "label": "Test circles",\n    "start": 0,\n    "end": 2,\n    "collapsed": true,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0,\n        "keys": [\n          {\n            "time": 0,\n            "val": 0\n          },\n          {\n            "time": 1,\n            "val": 1\n          },\n          {\n            "time": 2,\n            "val": 2\n          }\n        ]\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 12\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 12002\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 84\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 0\n      }\n    ]\n  },\n  {\n    "id": "item2",\n    "type": "Circles",\n    "label": "Circles 2",\n    "start": 1.473,\n    "end": 5.034,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0,\n        "keys": [\n          {\n            "time": 1.701,\n            "val": 0\n          },\n          {\n            "time": 2.4379999999999997,\n            "val": 1\n          },\n          {\n            "time": 2.701,\n            "val": 1\n          },\n          {\n            "time": 3.403,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 83\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": -27998\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 265\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 3\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 50\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 0\n      }\n    ]\n  },\n  {\n    "id": "item3",\n    "type": "Circles",\n    "label": "Circles 3",\n    "start": 4.719,\n    "end": 6.718999999999999,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 1,\n        "keys": []\n      },\n      {\n        "name": "x",\n        "val": 100,\n        "keys": [\n          {\n            "time": 5,\n            "val": 100\n          }\n        ]\n      },\n      {\n        "name": "y",\n        "val": 0,\n        "keys": [\n          {\n            "time": 5.315,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "name": "z",\n        "val": 0,\n        "keys": []\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 12002\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 80\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      }\n    ]\n  }\n]\n';});
 
 
 (function() {
