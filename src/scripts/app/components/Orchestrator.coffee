@@ -28,6 +28,17 @@ define (require) ->
       for item in @data
         should_exist = if seconds >= item.start && seconds <= item.end then true else false
 
+        # Remove the item
+        if (item.object && should_exist == false) || item.isDirtyObject
+          item.isDirtyObject = false
+          if item.object
+            @scene.remove(item.object.container)
+            item.object.destroy()
+            delete item.object
+
+        # If object doesn't exist skip the update.
+        if should_exist == false then continue
+
         # Assign the object class to be able to access all object properties in propertiesEditor
         if !item.classObject then item.classObject = @factory.getTypeClass(item.type)
 
@@ -102,14 +113,6 @@ define (require) ->
           # force main timeline to refresh
           seconds = seconds - 0.0000001
         #if item.values then console.log item.values.percent
-
-        # Remove the item
-        if (item.object && should_exist == false) || item.isDirtyObject
-          item.isDirtyObject = false
-          if item.object
-            @scene.remove(item.object.container)
-            item.object.destroy()
-            delete item.object
 
         # Create the item
         if should_exist && !item.object

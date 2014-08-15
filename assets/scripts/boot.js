@@ -53160,6 +53160,17 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           item = _ref[_i];
           should_exist = seconds >= item.start && seconds <= item.end ? true : false;
+          if ((item.object && should_exist === false) || item.isDirtyObject) {
+            item.isDirtyObject = false;
+            if (item.object) {
+              this.scene.remove(item.object.container);
+              item.object.destroy();
+              delete item.object;
+            }
+          }
+          if (should_exist === false) {
+            continue;
+          }
           if (!item.classObject) {
             item.classObject = this.factory.getTypeClass(item.type);
           }
@@ -53225,14 +53236,6 @@ define("TimelineMax", ["TweenMax"], (function (global) {
               item.timeline.add(propertyTimeline, 0);
             }
             seconds = seconds - 0.0000001;
-          }
-          if ((item.object && should_exist === false) || item.isDirtyObject) {
-            item.isDirtyObject = false;
-            if (item.object) {
-              this.scene.remove(item.object.container);
-              item.object.destroy();
-              delete item.object;
-            }
           }
           if (should_exist && !item.object) {
             type = item.type;
