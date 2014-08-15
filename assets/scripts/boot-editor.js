@@ -27787,6 +27787,7 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
               }
             } else {
               current_property.val = current_value;
+              _this.object.values[_this.property.name] = current_value;
               if (_this.object.object) {
                 currentTime = _this.timer.getCurrentTime() / 1000;
                 return _this.object.object.update(currentTime);

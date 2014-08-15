@@ -72,7 +72,7 @@
     "type": "Circles",
     "label": "Circles 2",
     "start": 1.473,
-    "end": 5.034,
+    "end": 3.503,
     "properties": [
       {
         "name": "progression",
@@ -142,20 +142,29 @@
     "id": "item3",
     "type": "Circles",
     "label": "Circles 3",
-    "start": 4.719,
-    "end": 6.718999999999999,
+    "start": 3.096,
+    "end": 5.482,
     "properties": [
       {
         "name": "progression",
-        "val": 1,
-        "keys": []
+        "val": 0.5,
+        "keys": [
+          {
+            "time": 3.307,
+            "val": 0
+          },
+          {
+            "time": 3.832000000000001,
+            "val": 0.5
+          }
+        ]
       },
       {
         "name": "x",
         "val": 100,
         "keys": [
           {
-            "time": 5,
+            "time": 3.3770000000000007,
             "val": 100
           }
         ]
@@ -165,7 +174,7 @@
         "val": 0,
         "keys": [
           {
-            "time": 5.315,
+            "time": 3.692000000000001,
             "val": 0
           }
         ]
@@ -199,6 +208,70 @@
         "keys": [],
         "name": "circleRadiusMax",
         "val": 20
+      }
+    ]
+  },
+  {
+    "id": "item4",
+    "type": "Circles",
+    "label": "Circles 4",
+    "start": 3.477,
+    "end": 5.477,
+    "collapsed": false,
+    "properties": [
+      {
+        "keys": [],
+        "name": "numItems",
+        "val": 50
+      },
+      {
+        "keys": [],
+        "name": "seed",
+        "val": 1325
+      },
+      {
+        "keys": [],
+        "name": "radius",
+        "val": 150
+      },
+      {
+        "keys": [],
+        "name": "circleRadius",
+        "val": 10
+      },
+      {
+        "keys": [],
+        "name": "circleRadiusMax",
+        "val": 20
+      },
+      {
+        "keys": [
+          {
+            "time": 3.477,
+            "val": 0
+          },
+          {
+            "time": 4.327,
+            "val": 1
+          }
+        ],
+        "name": "progression",
+        "val": 0
+      },
+      {
+        "keys": [],
+        "name": "x",
+        "val": -100
+      },
+      {
+        "keys": [],
+        "name": "y",
+        "val": 0
+      },
+      {
+        "keys": [],
+        "name": "z",
+        "val": 0
       }
     ]
   }

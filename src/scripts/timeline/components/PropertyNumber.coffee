@@ -87,9 +87,12 @@ define (require) ->
             # add a new key
             @addKey(current_value)
         else
-          # There is no keys, simply update the property value
+          # There is no keys, simply update the property value (for data saving)
           current_property.val = current_value
+          # Also directly set the object value.
+          @object.values[@property.name] = current_value
 
+          #@object.isDirty = true
           # Simply update the custom object with new values.
           if @object.object
             currentTime = @timer.getCurrentTime() / 1000

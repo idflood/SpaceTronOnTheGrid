@@ -39,9 +39,9 @@ define (require) ->
         cache[key] = prop.val
       return cache
 
-    rebuild: () ->
+    rebuild: (time) ->
       @empty()
-      @build()
+      @build(time)
 
     empty: () ->
       if !@items || !@items.length then return
@@ -52,7 +52,7 @@ define (require) ->
         item.destroy()
       @items = []
 
-    build: () ->
+    build: (time = 0) ->
       @rng = new RNG(@values.seed)
       @rngAnimation = new RNG(@values.seed + "lorem")
       @rngOutline = new RNG(@values.seed)
@@ -89,7 +89,7 @@ define (require) ->
       @totalDuration = @timeline.duration()
 
       # Set initial properties
-      @update(0, @values, true)
+      @update(time, @values, true)
 
     valueChanged: (key, values) ->
       # Value can't change if it is not even set.
@@ -121,7 +121,7 @@ define (require) ->
           item.update(seconds, values.progression)
 
       if needs_rebuild == true
-        @rebuild()
+        @rebuild(seconds)
 
     getRandomPosition: () ->
       return @rng.random(-@values.radius, @values.radius)

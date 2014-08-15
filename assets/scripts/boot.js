@@ -52932,9 +52932,9 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         return cache;
       };
 
-      Circles.prototype.rebuild = function() {
+      Circles.prototype.rebuild = function(time) {
         this.empty();
-        return this.build();
+        return this.build(time);
       };
 
       Circles.prototype.empty = function() {
@@ -52952,8 +52952,11 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         return this.items = [];
       };
 
-      Circles.prototype.build = function() {
+      Circles.prototype.build = function(time) {
         var border_radius, color, delay, draw_circle, draw_outline, duration, fillColor, i, item, rndtype, size, x, y, _i, _ref;
+        if (time == null) {
+          time = 0;
+        }
         this.rng = new RNG(this.values.seed);
         this.rngAnimation = new RNG(this.values.seed + "lorem");
         this.rngOutline = new RNG(this.values.seed);
@@ -52987,7 +52990,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           this.items.push(item);
         }
         this.totalDuration = this.timeline.duration();
-        return this.update(0, this.values, true);
+        return this.update(time, this.values, true);
       };
 
       Circles.prototype.valueChanged = function(key, values) {
@@ -53036,7 +53039,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           }
         }
         if (needs_rebuild === true) {
-          return this.rebuild();
+          return this.rebuild(seconds);
         }
       };
 
@@ -53636,7 +53639,7 @@ define('text',['module'], function (module) {
 });
 
 
-define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\n    "type": "Circles",\n    "label": "Test circles",\n    "start": 0,\n    "end": 2,\n    "collapsed": true,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0,\n        "keys": [\n          {\n            "time": 0,\n            "val": 0\n          },\n          {\n            "time": 1,\n            "val": 1\n          },\n          {\n            "time": 2,\n            "val": 2\n          }\n        ]\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 12\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 12002\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 84\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 0\n      }\n    ]\n  },\n  {\n    "id": "item2",\n    "type": "Circles",\n    "label": "Circles 2",\n    "start": 1.473,\n    "end": 5.034,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0,\n        "keys": [\n          {\n            "time": 1.701,\n            "val": 0\n          },\n          {\n            "time": 2.4379999999999997,\n            "val": 1\n          },\n          {\n            "time": 2.701,\n            "val": 1\n          },\n          {\n            "time": 3.403,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 83\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": -27998\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 265\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 3\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 50\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 0\n      }\n    ]\n  },\n  {\n    "id": "item3",\n    "type": "Circles",\n    "label": "Circles 3",\n    "start": 4.719,\n    "end": 6.718999999999999,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 1,\n        "keys": []\n      },\n      {\n        "name": "x",\n        "val": 100,\n        "keys": [\n          {\n            "time": 5,\n            "val": 100\n          }\n        ]\n      },\n      {\n        "name": "y",\n        "val": 0,\n        "keys": [\n          {\n            "time": 5.315,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "name": "z",\n        "val": 0,\n        "keys": []\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 12002\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 80\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      }\n    ]\n  }\n]\n';});
+define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\n    "type": "Circles",\n    "label": "Test circles",\n    "start": 0,\n    "end": 2,\n    "collapsed": true,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0,\n        "keys": [\n          {\n            "time": 0,\n            "val": 0\n          },\n          {\n            "time": 1,\n            "val": 1\n          },\n          {\n            "time": 2,\n            "val": 2\n          }\n        ]\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 12\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 12002\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 84\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 0\n      }\n    ]\n  },\n  {\n    "id": "item2",\n    "type": "Circles",\n    "label": "Circles 2",\n    "start": 1.473,\n    "end": 3.503,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0,\n        "keys": [\n          {\n            "time": 1.701,\n            "val": 0\n          },\n          {\n            "time": 2.4379999999999997,\n            "val": 1\n          },\n          {\n            "time": 2.701,\n            "val": 1\n          },\n          {\n            "time": 3.403,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 83\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": -27998\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 265\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 3\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 50\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 0\n      }\n    ]\n  },\n  {\n    "id": "item3",\n    "type": "Circles",\n    "label": "Circles 3",\n    "start": 3.096,\n    "end": 5.482,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0.5,\n        "keys": [\n          {\n            "time": 3.307,\n            "val": 0\n          },\n          {\n            "time": 3.832000000000001,\n            "val": 0.5\n          }\n        ]\n      },\n      {\n        "name": "x",\n        "val": 100,\n        "keys": [\n          {\n            "time": 3.3770000000000007,\n            "val": 100\n          }\n        ]\n      },\n      {\n        "name": "y",\n        "val": 0,\n        "keys": [\n          {\n            "time": 3.692000000000001,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "name": "z",\n        "val": 0,\n        "keys": []\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 12002\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 80\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      }\n    ]\n  },\n  {\n    "id": "item4",\n    "type": "Circles",\n    "label": "Circles 4",\n    "start": 3.477,\n    "end": 5.477,\n    "collapsed": false,\n    "properties": [\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 50\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 1325\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 150\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 10\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      },\n      {\n        "keys": [\n          {\n            "time": 3.477,\n            "val": 0\n          },\n          {\n            "time": 4.327,\n            "val": 1\n          }\n        ],\n        "name": "progression",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": -100\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 0\n      }\n    ]\n  }\n]\n';});
 
 
 (function() {
