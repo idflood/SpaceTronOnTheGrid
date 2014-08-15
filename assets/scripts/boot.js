@@ -52925,11 +52925,20 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         this.container = new THREE.Object3D();
         this.totalDuration = 0;
         this.items = [];
-        this.cache = {
-          seed: this.properties.seed
-        };
+        this.cache = this.buildCache();
         this.build();
       }
+
+      Circles.prototype.buildCache = function() {
+        var cache, key, prop, _ref;
+        cache = {};
+        _ref = this.properties;
+        for (key in _ref) {
+          prop = _ref[key];
+          cache[key] = prop;
+        }
+        return cache;
+      };
 
       Circles.prototype.rebuild = function() {
         this.empty();

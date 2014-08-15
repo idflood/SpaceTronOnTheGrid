@@ -26,15 +26,17 @@ define (require) ->
           @properties[key] = prop.val
 
       @timeline = new TimelineMax()
-
       @container = new THREE.Object3D()
       @totalDuration = 0
       @items = []
-      @cache = {
-        seed: @properties.seed
-      }
-
+      @cache = @buildCache()
       @build()
+
+    buildCache: () ->
+      cache = {}
+      for key, prop of @properties
+        cache[key] = prop
+      return cache
 
     rebuild: () ->
       @empty()
