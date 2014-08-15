@@ -82,7 +82,7 @@ define (require) ->
             type: element_name
             start: current_time
             end: current_time + 2
-            options: {}
+            collapsed: false
             properties: []
             #options: window.ElementFactory.elements[element_name].default_attributes()
             #properties: window.ElementFactory.elements[element_name].default_properties(current_time)

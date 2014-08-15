@@ -27939,7 +27939,7 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
               type: element_name,
               start: current_time,
               end: current_time + 2,
-              options: {},
+              collapsed: false,
               properties: []
             };
             window.app.data.push(data);
