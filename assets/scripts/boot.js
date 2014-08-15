@@ -52853,8 +52853,6 @@ define("TimelineMax", ["TweenMax"], (function (global) {
 
 
 (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
   define('cs!app/elements/Circles',['require','lodash','threejs','rng','TimelineMax','cs!app/components/Colors','cs!app/elements/AnimatedCircle'],function(require) {
     var AnimatedCircle, Circles, Colors, RNG, THREE, TimelineMax, _;
     _ = require('lodash');
@@ -52916,8 +52914,6 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       function Circles(properties) {
         var key, prop, _ref;
         this.properties = properties != null ? properties : {};
-        this.drawOutline = __bind(this.drawOutline, this);
-        this.createCircle = __bind(this.createCircle, this);
         _ref = Circles.properties;
         for (key in _ref) {
           prop = _ref[key];
@@ -52936,7 +52932,6 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       }
 
       Circles.prototype.rebuild = function() {
-        console.log("rebuild....");
         this.empty();
         return this.build();
       };
@@ -52958,8 +52953,6 @@ define("TimelineMax", ["TweenMax"], (function (global) {
 
       Circles.prototype.build = function() {
         var border_radius, color, delay, draw_circle, draw_outline, duration, fillColor, i, item, rndtype, size, x, y, _i, _ref;
-        console.log("build Circles");
-        console.log(this);
         this.rng = new RNG(this.properties.seed);
         this.rngAnimation = new RNG(this.properties.seed + "lorem");
         this.rngOutline = new RNG(this.properties.seed);
@@ -53030,10 +53023,6 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       Circles.prototype.getRandomPosition = function() {
         return this.rng.random(-this.properties.radius, this.properties.radius);
       };
-
-      Circles.prototype.createCircle = function(x, y, size, color) {};
-
-      Circles.prototype.drawOutline = function(x, y, size, color) {};
 
       Circles.prototype.destroy = function() {
         if (this.container) {

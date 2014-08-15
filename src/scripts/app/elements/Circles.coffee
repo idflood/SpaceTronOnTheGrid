@@ -34,13 +34,9 @@ define (require) ->
         seed: @properties.seed
       }
 
-      #@blackMaterial = new THREE.MeshBasicMaterial({color: 0x7ed2f1, transparent: true, depthWrite: false, depthTest: false})
-      #@blackMaterial.blending = THREE.AdditiveBlending
-
       @build()
 
     rebuild: () ->
-      console.log "rebuild...."
       @empty()
       @build()
 
@@ -54,8 +50,6 @@ define (require) ->
       @items = []
 
     build: () ->
-      console.log "build Circles"
-      console.log this
       @rng = new RNG(@properties.seed)
       @rngAnimation = new RNG(@properties.seed + "lorem")
       @rngOutline = new RNG(@properties.seed)
@@ -121,14 +115,6 @@ define (require) ->
 
     getRandomPosition: () ->
       return @rng.random(-@properties.radius, @properties.radius)
-      #x = @rng.exponential() * @radius
-      #if @rng.random(-1, 1) < 0 then x *= -1
-      #return x
-
-    createCircle: (x, y, size, color) =>
-
-
-    drawOutline: (x, y, size, color) =>
 
     destroy: () ->
       # clean up...
@@ -137,4 +123,3 @@ define (require) ->
         delete @container
       delete @rng
       delete @rngOutline
-      #delete @blackMaterial
