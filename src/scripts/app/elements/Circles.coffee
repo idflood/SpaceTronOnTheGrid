@@ -109,11 +109,6 @@ define (require) ->
       # Check if any of the invaldating property changed.
       for key, prop of Circles.properties
         if prop.triggerRebuild && @valueChanged(key, values)
-          @cache[key] = values[key]
-          # Update the value on properties.
-          # If this object has keys this will have the side effect to
-          # simply set the default value to the current one.
-          #@values[key] = values[key]
           needs_rebuild = true
 
       if force || @valueChanged("x", values) || @valueChanged("y", values) || @valueChanged("z", values)

@@ -53020,7 +53020,6 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         for (key in _ref) {
           prop = _ref[key];
           if (prop.triggerRebuild && this.valueChanged(key, values)) {
-            this.cache[key] = values[key];
             needs_rebuild = true;
           }
         }
