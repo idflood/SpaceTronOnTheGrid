@@ -137,3 +137,4 @@ define (require) ->
         delete @container
       delete @rng
       delete @rngOutline
+      delete @cache

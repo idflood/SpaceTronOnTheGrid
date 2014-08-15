@@ -53059,7 +53059,8 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           delete this.container;
         }
         delete this.rng;
-        return delete this.rngOutline;
+        delete this.rngOutline;
+        return delete this.cache;
       };
 
       return Circles;
