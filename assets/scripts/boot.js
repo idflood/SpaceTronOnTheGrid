@@ -53013,7 +53013,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           force = false;
         }
         if (values === false) {
-          return;
+          values = this.values;
         }
         needs_rebuild = false;
         _ref = Circles.properties;

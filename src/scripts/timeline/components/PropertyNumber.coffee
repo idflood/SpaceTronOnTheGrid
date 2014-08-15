@@ -51,8 +51,8 @@ define (require) ->
       property.keys.push(key)
       sortKeys = (keys) -> keys.sort((a, b) -> d3.ascending(a.time, b.time))
       property.keys = sortKeys(property.keys)
+      # Todo: remove object.isDirty, make it nicer.
       @object.isDirty = true
-      console.log @object
       @keyAdded.dispatch()
 
     render: () =>
@@ -90,15 +90,8 @@ define (require) ->
           # There is no keys, simply update the property value
           current_property.val = current_value
 
-          #sdsadfh jsdafklj k
-          # todo:  here should certainly modify current property
-          @object.isDirty = true
-
           # Simply update the custom object with new values.
-          # @todo: remove @object.isDirty = true above.
           if @object.object
             currentTime = @timer.getCurrentTime() / 1000
-            valueUpdate = {}
-            valueUpdate[current_property.name] = current_property.val
             # Set the property on the instance object.
-            @object.object.update(currentTime, valueUpdate)
+            @object.object.update(currentTime)

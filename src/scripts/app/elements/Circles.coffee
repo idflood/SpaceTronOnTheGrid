@@ -103,7 +103,7 @@ define (require) ->
       return has_changed
 
     update: (seconds, values = false, force = false) ->
-      if values == false then return
+      if values == false then values = @values
       needs_rebuild = false
 
       # Check if any of the invaldating property changed.
