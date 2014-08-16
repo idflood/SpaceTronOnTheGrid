@@ -29,13 +29,14 @@ define (require) ->
 
       @$timeline = $(tpl_timeline)
       $('body').append(@$timeline)
+      $('body').addClass('has-editor')
 
       @timeline = new EditorTimeline()
       @initControls()
       @initExport()
       @initAdd()
-      @initToggle()
       @initPropertiesEditor()
+      @initToggle()
 
     initToggle: () ->
       timelineClosed = false
@@ -44,10 +45,16 @@ define (require) ->
         e.preventDefault()
         timelineClosed = !timelineClosed
         $toggleLink.toggleClass('menu-item--toggle-up', timelineClosed)
-        if timelineClosed
-          @$timeline.css('bottom', -200)
-        else
-          @$timeline.css('bottom', 0)
+        $('body').toggleClass('timeline-is-closed', timelineClosed)
+
+      propertiesClosed = false
+      $toggleLinkSide = $('.properties-editor').find('[data-action="toggle"]')
+      $toggleLinkSide.click (e) =>
+        e.preventDefault()
+        propertiesClosed = !propertiesClosed
+        $toggleLinkSide.toggleClass('menu-item--toggle-left', propertiesClosed)
+        $('body').toggleClass('properties-is-closed', propertiesClosed)
+
 
     onKeyAdded: () =>
       @timeline.isDirty = true

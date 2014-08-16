@@ -27815,7 +27815,7 @@ define('text!app/templates/propertyNumber.tpl.html',[],function () { return '<di
 }).call(this);
 
 
-define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<div class="properties-editor">\n  <div class="properties-editor__main"></div>\n</div>\n';});
+define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<div class="properties-editor">\n  <a href="#" class="menu-item menu-item--toggle-side" data-action="toggle"><i class="icon-toggle"></i></a>\n  <div class="properties-editor__main"></div>\n</div>\n';});
 
 
 (function() {
@@ -27888,28 +27888,35 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
         this.timer = this.app.timer;
         this.$timeline = $(tpl_timeline);
         $('body').append(this.$timeline);
+        $('body').addClass('has-editor');
         this.timeline = new EditorTimeline();
         this.initControls();
         this.initExport();
         this.initAdd();
-        this.initToggle();
         this.initPropertiesEditor();
+        this.initToggle();
       }
 
       Editor.prototype.initToggle = function() {
-        var $toggleLink, timelineClosed;
+        var $toggleLink, $toggleLinkSide, propertiesClosed, timelineClosed;
         timelineClosed = false;
         $toggleLink = this.$timeline.find('[data-action="toggle"]');
-        return $toggleLink.click((function(_this) {
+        $toggleLink.click((function(_this) {
           return function(e) {
             e.preventDefault();
             timelineClosed = !timelineClosed;
             $toggleLink.toggleClass('menu-item--toggle-up', timelineClosed);
-            if (timelineClosed) {
-              return _this.$timeline.css('bottom', -200);
-            } else {
-              return _this.$timeline.css('bottom', 0);
-            }
+            return $('body').toggleClass('timeline-is-closed', timelineClosed);
+          };
+        })(this));
+        propertiesClosed = false;
+        $toggleLinkSide = $('.properties-editor').find('[data-action="toggle"]');
+        return $toggleLinkSide.click((function(_this) {
+          return function(e) {
+            e.preventDefault();
+            propertiesClosed = !propertiesClosed;
+            $toggleLinkSide.toggleClass('menu-item--toggle-left', propertiesClosed);
+            return $('body').toggleClass('properties-is-closed', propertiesClosed);
           };
         })(this));
       };

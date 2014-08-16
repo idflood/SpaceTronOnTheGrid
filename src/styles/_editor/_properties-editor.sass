@@ -9,6 +9,12 @@
   font-size: 11px
   color: #fafafa
 
+  .properties-is-closed &
+    right: -281px
+
+  .timeline-is-closed &
+    bottom: 97px
+
   &__main
     padding: 20px 10px
 
@@ -39,3 +45,20 @@
   border: 1px solid #333
   color: #fff
   padding: 2px 5px
+
+a.menu-item--toggle-side
+  position: absolute
+  top: 4px
+  left: 10px
+
+  .properties-is-closed &
+    left: -20px
+
+  i
+    &:before
+      content: "\f054"
+
+  &.menu-item--toggle-left
+    i
+      &:before
+        content: "\f053"
