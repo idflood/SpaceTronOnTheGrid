@@ -36827,11 +36827,7 @@ THREE.FilmPass.prototype = {
 
 define("vendors/three.js-extras/postprocessing/FilmPass", function(){});
 
-/**
-
- */
-
-THREE.GlitchPass = function ( dt_size ) {
+THREE.GlitchPass2 = function ( dt_size ) {
 
   if ( THREE.DigitalGlitch === undefined ) console.error( "THREE.GlitchPass relies on THREE.DigitalGlitch" );
 
@@ -36839,7 +36835,6 @@ THREE.GlitchPass = function ( dt_size ) {
   this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
   if(dt_size==undefined) dt_size=64;
-
 
   this.uniforms[ "tDisp"].value=this.generateHeightmap(dt_size);
 
@@ -36850,12 +36845,9 @@ THREE.GlitchPass = function ( dt_size ) {
     fragmentShader: shader.fragmentShader
   });
 
-  console.log(this.material);
-
   this.enabled = true;
   this.renderToScreen = false;
   this.needsSwap = true;
-
 
   this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
   this.scene  = new THREE.Scene();
@@ -36869,38 +36861,26 @@ THREE.GlitchPass = function ( dt_size ) {
 
 };
 
-THREE.GlitchPass.prototype = {
+THREE.GlitchPass2.prototype = {
 
   render: function ( renderer, writeBuffer, readBuffer, delta )
   {
     this.uniforms[ "tDiffuse" ].value = readBuffer;
     this.uniforms[ 'seed' ].value=Math.random();//default seeding
-    this.uniforms[ 'byp' ].value=0;
+    //this.uniforms[ 'byp' ].value=0;
 
-    if(this.curF % this.randX ==0 || this.goWild==true)
-    {
-      this.uniforms[ 'amount' ].value=Math.random()/30;
-      this.uniforms[ 'angle' ].value=THREE.Math.randFloat(-Math.PI,Math.PI);
-      this.uniforms[ 'seed_x' ].value=THREE.Math.randFloat(-1,1);
-      this.uniforms[ 'seed_y' ].value=THREE.Math.randFloat(-1,1);
-      this.uniforms[ 'distortion_x' ].value=THREE.Math.randFloat(0,1);
-      this.uniforms[ 'distortion_y' ].value=THREE.Math.randFloat(0,1);
-      this.curF=0;
-      this.generateTrigger();
-    }
-    else if(this.curF % this.randX <this.randX/5)
-    {
-      this.uniforms[ 'amount' ].value=Math.random()/90;
-      this.uniforms[ 'angle' ].value=THREE.Math.randFloat(-Math.PI,Math.PI);
-      this.uniforms[ 'distortion_x' ].value=THREE.Math.randFloat(0,1);
-      this.uniforms[ 'distortion_y' ].value=THREE.Math.randFloat(0,1);
-      this.uniforms[ 'seed_x' ].value=THREE.Math.randFloat(-0.3,0.3);
-      this.uniforms[ 'seed_y' ].value=THREE.Math.randFloat(-0.3,0.3);
-    }
-    else if(this.goWild==false)
-    {
-      this.uniforms[ 'byp' ].value=1;
-    }
+    this.uniforms[ 'amount' ].value=Math.random()/420;
+    this.uniforms[ 'angle' ].value=THREE.Math.randFloat(-Math.PI,Math.PI);
+    this.uniforms[ 'seed_x' ].value=THREE.Math.randFloat(-1,1);
+    this.uniforms[ 'seed_y' ].value=THREE.Math.randFloat(-1,1);
+    this.uniforms[ 'seed_x' ].value *= 0.001;
+    this.uniforms[ 'seed_y' ].value *= 0.001;
+    this.uniforms[ 'distortion_x' ].value=THREE.Math.randFloat(0,0.001);
+    this.uniforms[ 'distortion_y' ].value=THREE.Math.randFloat(0,0.001);
+    //this.curF=0;
+    this.generateTrigger();
+
+    this.uniforms[ 'byp' ].value=0;
     this.curF++;
 
     this.quad.material = this.material;
@@ -36920,7 +36900,6 @@ THREE.GlitchPass.prototype = {
   generateHeightmap:function(dt_size)
   {
     var data_arr = new Float32Array( dt_size*dt_size * 3 );
-    console.log(dt_size);
     var length=dt_size*dt_size;
 
     for ( var i = 0; i < length; i++)
@@ -36932,8 +36911,6 @@ THREE.GlitchPass.prototype = {
     }
 
     var texture = new THREE.DataTexture( data_arr, dt_size, dt_size, THREE.RGBFormat, THREE.FloatType );
-    console.log(texture);
-    console.log(dt_size);
     texture.minFilter = THREE.NearestFilter;
     texture.magFilter = THREE.NearestFilter;
     texture.needsUpdate = true;
@@ -36943,7 +36920,7 @@ THREE.GlitchPass.prototype = {
 };
 
 
-define("vendors/three.js-extras/postprocessing/GlitchPass", function(){});
+define("app/postprocessing/GlitchPass2", function(){});
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -37484,7 +37461,7 @@ define("vendors/three.js-extras/shaders/DigitalGlitch", function(){});
 
 
 (function() {
-  define('cs!app/components/PostFX',['require','threejs','vendors/three.js-extras/postprocessing/EffectComposer','vendors/three.js-extras/postprocessing/MaskPass','vendors/three.js-extras/postprocessing/BloomPass','vendors/three.js-extras/postprocessing/ShaderPass','vendors/three.js-extras/postprocessing/RenderPass','vendors/three.js-extras/postprocessing/FilmPass','vendors/three.js-extras/postprocessing/GlitchPass','vendors/three.js-extras/shaders/CopyShader','vendors/three.js-extras/shaders/FXAAShader','vendors/three.js-extras/shaders/FilmShader','vendors/three.js-extras/shaders/ConvolutionShader','vendors/three.js-extras/shaders/VignetteShader','vendors/three.js-extras/shaders/DigitalGlitch'],function(require) {
+  define('cs!app/components/PostFX',['require','threejs','vendors/three.js-extras/postprocessing/EffectComposer','vendors/three.js-extras/postprocessing/MaskPass','vendors/three.js-extras/postprocessing/BloomPass','vendors/three.js-extras/postprocessing/ShaderPass','vendors/three.js-extras/postprocessing/RenderPass','vendors/three.js-extras/postprocessing/FilmPass','app/postprocessing/GlitchPass2','vendors/three.js-extras/shaders/CopyShader','vendors/three.js-extras/shaders/FXAAShader','vendors/three.js-extras/shaders/FilmShader','vendors/three.js-extras/shaders/ConvolutionShader','vendors/three.js-extras/shaders/VignetteShader','vendors/three.js-extras/shaders/DigitalGlitch'],function(require) {
     var PostFX, THREE;
     THREE = require('threejs');
     require('vendors/three.js-extras/postprocessing/EffectComposer');
@@ -37493,7 +37470,7 @@ define("vendors/three.js-extras/shaders/DigitalGlitch", function(){});
     require('vendors/three.js-extras/postprocessing/ShaderPass');
     require('vendors/three.js-extras/postprocessing/RenderPass');
     require('vendors/three.js-extras/postprocessing/FilmPass');
-    require('vendors/three.js-extras/postprocessing/GlitchPass');
+    require('app/postprocessing/GlitchPass2');
     require('vendors/three.js-extras/shaders/CopyShader');
     require('vendors/three.js-extras/shaders/FXAAShader');
     require('vendors/three.js-extras/shaders/FilmShader');
@@ -37511,7 +37488,7 @@ define("vendors/three.js-extras/shaders/DigitalGlitch", function(){});
         this.effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
         this.effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
         this.bloom = new THREE.BloomPass(1.3, 25, 4);
-        this.glitchPass = new THREE.GlitchPass();
+        this.glitchPass = new THREE.GlitchPass2();
         this.vignettePass = new THREE.ShaderPass(THREE.VignetteShader);
         this.vignettePass.uniforms['darkness'].value = 2;
         this.filmShader = new THREE.FilmPass(0.21, 0.01, 648, false);
@@ -37520,6 +37497,7 @@ define("vendors/three.js-extras/shaders/DigitalGlitch", function(){});
         this.composer.addPass(renderModel);
         this.composer.addPass(this.effectFXAA);
         this.composer.addPass(this.bloom);
+        this.composer.addPass(this.glitchPass);
         this.composer.addPass(this.vignettePass);
         this.composer.addPass(this.filmShader);
       }

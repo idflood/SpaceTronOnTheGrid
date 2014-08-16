@@ -7,7 +7,7 @@ define (require) ->
   require 'vendors/three.js-extras/postprocessing/ShaderPass'
   require 'vendors/three.js-extras/postprocessing/RenderPass'
   require 'vendors/three.js-extras/postprocessing/FilmPass'
-  require 'vendors/three.js-extras/postprocessing/GlitchPass'
+  require 'app/postprocessing/GlitchPass2'
 
   require 'vendors/three.js-extras/shaders/CopyShader'
   require 'vendors/three.js-extras/shaders/FXAAShader'
@@ -26,7 +26,7 @@ define (require) ->
 
       @bloom = new THREE.BloomPass(1.3, 25, 4)
 
-      @glitchPass = new THREE.GlitchPass()
+      @glitchPass = new THREE.GlitchPass2()
 
       @vignettePass = new THREE.ShaderPass(THREE.VignetteShader)
       @vignettePass.uniforms['darkness'].value = 2
@@ -38,7 +38,7 @@ define (require) ->
       @composer.addPass( renderModel )
       @composer.addPass( @effectFXAA )
       @composer.addPass( @bloom )
-      #@composer.addPass( @glitchPass )
+      @composer.addPass( @glitchPass )
       @composer.addPass( @vignettePass )
       @composer.addPass( @filmShader )
 
