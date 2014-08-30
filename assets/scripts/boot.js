@@ -53259,7 +53259,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         this.rngOutline = new RNG(this.values.seed);
         for (i = _i = 0, _ref = this.values.numItems - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
           color = Colors.get(this.rng.random(0, 1000));
-          if (this.rng.random(0, 1) > this.values.percent_color) {
+          if (this.rng.random(0, 1000) > this.values.percent_color * 1000) {
             color = Colors.get(0);
           }
           fillColor = color.clone().multiplyScalar(this.rng.random(0.1, 0.5));

@@ -62,7 +62,7 @@ define (require) ->
 
       for i in [0..@values.numItems - 1]
         color = Colors.get(@rng.random(0, 1000))
-        if @rng.random(0, 1) > @values.percent_color
+        if @rng.random(0, 1000) > @values.percent_color * 1000
           color = Colors.get(0)
 
         fillColor = color.clone().multiplyScalar(@rng.random(0.1, 0.5))
