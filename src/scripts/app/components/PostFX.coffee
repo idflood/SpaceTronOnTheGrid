@@ -27,11 +27,12 @@ define (require) ->
       @bloom = new THREE.BloomPass(1.3, 25, 4)
 
       @glitchPass = new THREE.GlitchPass2()
+      @glitchPass.intensity = 0.5;
 
       @vignettePass = new THREE.ShaderPass(THREE.VignetteShader)
       @vignettePass.uniforms['darkness'].value = 2
 
-      @filmShader = new THREE.FilmPass( 0.21, 0.01, 648, false )
+      @filmShader = new THREE.FilmPass( 0.24, 0.01, 648, false )
       @filmShader.renderToScreen = true
 
       @composer = new THREE.EffectComposer( @renderer )

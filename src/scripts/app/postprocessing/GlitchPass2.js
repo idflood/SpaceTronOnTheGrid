@@ -7,6 +7,7 @@ THREE.GlitchPass2 = function ( dt_size ) {
 
   if(dt_size==undefined) dt_size=64;
 
+  this.intensity = 1;
   this.uniforms[ "tDisp"].value=this.generateHeightmap(dt_size);
 
 
@@ -40,7 +41,7 @@ THREE.GlitchPass2.prototype = {
     this.uniforms[ 'seed' ].value=Math.random();//default seeding
     //this.uniforms[ 'byp' ].value=0;
 
-    this.uniforms[ 'amount' ].value=Math.random()/420;
+    this.uniforms[ 'amount' ].value = (Math.random()/420) * this.intensity;
     this.uniforms[ 'angle' ].value=THREE.Math.randFloat(-Math.PI,Math.PI);
     this.uniforms[ 'seed_x' ].value=THREE.Math.randFloat(-1,1);
     this.uniforms[ 'seed_y' ].value=THREE.Math.randFloat(-1,1);

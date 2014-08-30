@@ -15,6 +15,8 @@ define (require) ->
       circleRadius: {name: 'circleRadius', label: 'circle radius', val: 20}
       circleRadiusMax: {name: 'circleRadiusMax', label: 'circle radius max', val: 20}
       progression: {name: 'progression', label: 'progression', val: 1}
+      depth: {name: 'depth', label: 'depth', val: 0}
+      percent_color: {name: 'percent_color', label: 'percent color', val: 0.4, triggerRebuild: true}
       x: {name: 'x', label: 'x', val: 0}
       y: {name: 'y', label: 'y', val: 0}
       z: {name: 'z', label: 'z', val: 0}
@@ -30,6 +32,7 @@ define (require) ->
       @container = new THREE.Object3D()
       @totalDuration = 0
       @items = []
+      @items_position = []
       @cache = @buildCache()
       @build(time)
 
@@ -59,11 +62,17 @@ define (require) ->
 
       for i in [0..@values.numItems - 1]
         color = Colors.get(@rng.random(0, 1000))
+        if @rng.random(0, 1) > @values.percent_color
+          color = Colors.get(0)
+
         fillColor = color.clone().multiplyScalar(@rng.random(0.1, 0.5))
         rndtype = @rng.random(0, 1000) / 1000
         size = @rng.random(@values.circleRadius, @values.circleRadiusMax)
         x = @getRandomPosition()
         y = @getRandomPosition()
+        z = @getRandomPosition()
+        pos = {x: x, y: y, z: z}
+
         delay = @rngAnimation.random(0, 2400) / 1000
         duration = @rngAnimation.random(600, 800) / 1000
         duration *= 4
@@ -82,13 +91,15 @@ define (require) ->
           fillColor: fillColor,
           delay: delay,
           duration: duration,
-          x: x,
-          y: y,
-          z: 0
+          depth: @values.depth,
+          x: pos.x,
+          y: pos.y,
+          z: pos.z
         })
         @container.add(item.container)
         @timeline.add(item.timeline, 0)
         @items.push(item)
+        @items_position.push(pos)
 
       @totalDuration = @timeline.duration()
 
@@ -122,7 +133,12 @@ define (require) ->
         progression = values.progression / 2
         @timeline.seek(@totalDuration * progression)
         for item in @items
-          item.update(seconds, values.progression)
+          item.update(seconds, {progression: values.progression})
+
+      if force || @valueChanged("depth", values)
+        for item, key in @items
+          pos = @items_position[key]
+          item.container.position.set(pos.x, pos.y, pos.z * values.depth)
 
       if needs_rebuild == true
         @rebuild(seconds)

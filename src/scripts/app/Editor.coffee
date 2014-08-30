@@ -26,6 +26,7 @@ define (require) ->
     constructor: () ->
       @app = window.app
       @timer = @app.timer
+      @app.audio.playing = false
 
       @$timeline = $(tpl_timeline)
       $('body').append(@$timeline)
@@ -37,6 +38,12 @@ define (require) ->
       @initAdd()
       @initPropertiesEditor()
       @initToggle()
+
+      $(document).keypress (e) =>
+        console.log e
+        if e.charCode == 32
+          # Space
+          @playPause()
 
     initToggle: () ->
       timelineClosed = false
@@ -123,9 +130,16 @@ define (require) ->
 
         console.log data
 
+    playPause: () =>
+      @timer.toggle()
+      if @timer.is_playing
+        @app.audio.play()
+      else
+        @app.audio.pause()
+      console.log "toggle " + @timer.is_playing
+
     initControls: () ->
       $play_pause = @$timeline.find('.control.icon-play')
       $play_pause.click (e) =>
         e.preventDefault()
-        @timer.toggle()
-        console.log "toggle " + @timer.is_playing
+        @playPause()

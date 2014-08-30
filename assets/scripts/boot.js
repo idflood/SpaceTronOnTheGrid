@@ -36836,6 +36836,7 @@ THREE.GlitchPass2 = function ( dt_size ) {
 
   if(dt_size==undefined) dt_size=64;
 
+  this.intensity = 1;
   this.uniforms[ "tDisp"].value=this.generateHeightmap(dt_size);
 
 
@@ -36869,7 +36870,7 @@ THREE.GlitchPass2.prototype = {
     this.uniforms[ 'seed' ].value=Math.random();//default seeding
     //this.uniforms[ 'byp' ].value=0;
 
-    this.uniforms[ 'amount' ].value=Math.random()/420;
+    this.uniforms[ 'amount' ].value = (Math.random()/420) * this.intensity;
     this.uniforms[ 'angle' ].value=THREE.Math.randFloat(-Math.PI,Math.PI);
     this.uniforms[ 'seed_x' ].value=THREE.Math.randFloat(-1,1);
     this.uniforms[ 'seed_y' ].value=THREE.Math.randFloat(-1,1);
@@ -37489,9 +37490,10 @@ define("vendors/three.js-extras/shaders/DigitalGlitch", function(){});
         this.effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
         this.bloom = new THREE.BloomPass(1.3, 25, 4);
         this.glitchPass = new THREE.GlitchPass2();
+        this.glitchPass.intensity = 0.5;
         this.vignettePass = new THREE.ShaderPass(THREE.VignetteShader);
         this.vignettePass.uniforms['darkness'].value = 2;
-        this.filmShader = new THREE.FilmPass(0.21, 0.01, 648, false);
+        this.filmShader = new THREE.FilmPass(0.24, 0.01, 648, false);
         this.filmShader.renderToScreen = true;
         this.composer = new THREE.EffectComposer(this.renderer);
         this.composer.addPass(renderModel);
@@ -52943,7 +52945,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
   define('cs!app/components/Colors',['require','threejs'],function(require) {
     var Colors, THREE, items, length;
     THREE = require('threejs');
-    items = [new THREE.Color(0xffffff), new THREE.Color(0xffffff), new THREE.Color(0xffffff), new THREE.Color(0xffffff), new THREE.Color(0xfF777F)];
+    items = [new THREE.Color(0xffffff), new THREE.Color(0x023750), new THREE.Color(0x028A9E), new THREE.Color(0x0EBFA9), new THREE.Color(0xF2C01D), new THREE.Color(0xD93024)];
     length = items.length;
     return Colors = (function() {
       function Colors() {}
@@ -53174,6 +53176,17 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           label: 'progression',
           val: 1
         },
+        depth: {
+          name: 'depth',
+          label: 'depth',
+          val: 0
+        },
+        percent_color: {
+          name: 'percent_color',
+          label: 'percent color',
+          val: 0.4,
+          triggerRebuild: true
+        },
         x: {
           name: 'x',
           label: 'x',
@@ -53200,6 +53213,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         this.container = new THREE.Object3D();
         this.totalDuration = 0;
         this.items = [];
+        this.items_position = [];
         this.cache = this.buildCache();
         this.build(time);
       }
@@ -53236,7 +53250,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       };
 
       Circles.prototype.build = function(time) {
-        var border_radius, color, delay, draw_circle, draw_outline, duration, fillColor, i, item, rndtype, size, x, y, _i, _ref;
+        var border_radius, color, delay, draw_circle, draw_outline, duration, fillColor, i, item, pos, rndtype, size, x, y, z, _i, _ref;
         if (time == null) {
           time = 0;
         }
@@ -53245,11 +53259,20 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         this.rngOutline = new RNG(this.values.seed);
         for (i = _i = 0, _ref = this.values.numItems - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
           color = Colors.get(this.rng.random(0, 1000));
+          if (this.rng.random(0, 1) > this.values.percent_color) {
+            color = Colors.get(0);
+          }
           fillColor = color.clone().multiplyScalar(this.rng.random(0.1, 0.5));
           rndtype = this.rng.random(0, 1000) / 1000;
           size = this.rng.random(this.values.circleRadius, this.values.circleRadiusMax);
           x = this.getRandomPosition();
           y = this.getRandomPosition();
+          z = this.getRandomPosition();
+          pos = {
+            x: x,
+            y: y,
+            z: z
+          };
           delay = this.rngAnimation.random(0, 2400) / 1000;
           duration = this.rngAnimation.random(600, 800) / 1000;
           duration *= 4;
@@ -53268,13 +53291,15 @@ define("TimelineMax", ["TweenMax"], (function (global) {
             fillColor: fillColor,
             delay: delay,
             duration: duration,
-            x: x,
-            y: y,
-            z: 0
+            depth: this.values.depth,
+            x: pos.x,
+            y: pos.y,
+            z: pos.z
           });
           this.container.add(item.container);
           this.timeline.add(item.timeline, 0);
           this.items.push(item);
+          this.items_position.push(pos);
         }
         this.totalDuration = this.timeline.duration();
         return this.update(time, this.values, true);
@@ -53295,7 +53320,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       };
 
       Circles.prototype.update = function(seconds, values, force) {
-        var item, key, needs_rebuild, progression, prop, _i, _len, _ref, _ref1;
+        var item, key, needs_rebuild, pos, progression, prop, _i, _j, _len, _len1, _ref, _ref1, _ref2;
         if (values == null) {
           values = false;
         }
@@ -53322,7 +53347,17 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           _ref1 = this.items;
           for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
             item = _ref1[_i];
-            item.update(seconds, values.progression);
+            item.update(seconds, {
+              progression: values.progression
+            });
+          }
+        }
+        if (force || this.valueChanged("depth", values)) {
+          _ref2 = this.items;
+          for (key = _j = 0, _len1 = _ref2.length; _j < _len1; key = ++_j) {
+            item = _ref2[key];
+            pos = this.items_position[key];
+            item.container.position.set(pos.x, pos.y, pos.z * values.depth);
           }
         }
         if (needs_rebuild === true) {
@@ -53531,6 +53566,228 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       };
 
       return Orchestrator;
+
+    })();
+  });
+
+}).call(this);
+
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  define('cs!app/components/Audio',['require','lodash'],function(require) {
+    var Audio, _;
+    _ = require('lodash');
+    return Audio = (function() {
+      function Audio(mp3Url, onLoadedCallback) {
+        var gain2, parameters, volume;
+        this.onLoadedCallback = onLoadedCallback;
+        this.rms = __bind(this.rms, this);
+        this.play = __bind(this.play, this);
+        this.pause = __bind(this.pause, this);
+        this.createSound = __bind(this.createSound, this);
+        this.load = __bind(this.load, this);
+        this.seek = __bind(this.seek, this);
+        this.update = __bind(this.update, this);
+        this.fftSize = 512;
+        this.filters = {};
+        this.playing = false;
+        this.now = 0.0;
+        this.timeDelay = 0.0;
+        this.context = false;
+        if (typeof AudioContext !== "undefined") {
+          this.context = new AudioContext();
+        } else if (typeof webkitAudioContext !== "undefined") {
+          this.context = new webkitAudioContext();
+        }
+        this.analyser = this.context.createAnalyser();
+        this.analyser.fftSize = this.fftSize;
+        this.source = this.context.createBufferSource();
+        parameters = {
+          bass: {
+            type: 0,
+            frequency: 120,
+            Q: 1.2,
+            gain: 2.0
+          },
+          mid: {
+            type: 2,
+            frequency: 400,
+            Q: 1.2,
+            gain: 4.0
+          },
+          treble: {
+            type: 1,
+            frequency: 2000,
+            Q: 1.2,
+            gain: 3.0
+          }
+        };
+        _.each(parameters, (function(_this) {
+          return function(spec, key) {
+            var filter;
+            filter = _this.context.createBiquadFilter();
+            filter.key = key;
+            filter.type = spec.type;
+            filter.frequency = spec.frequency;
+            filter.Q.value = spec.Q;
+            filter.analyser = _this.context.createAnalyser();
+            filter.analyser.fftSize = _this.fftSize;
+            if (_this.context.createDelay != null) {
+              filter.delayNode = _this.context.createDelay();
+            } else {
+              filter.delayNode = _this.context.createDelayNode();
+            }
+            filter.delayNode.delayTime.value = 0;
+            if (_this.context.createGain != null) {
+              filter.gainNode = _this.context.createGain();
+            } else {
+              filter.gainNode = _this.context.createGainNode();
+            }
+            filter.gainNode.gain.value = spec.gain;
+            return _this.filters[key] = filter;
+          };
+        })(this));
+        if (this.context.createDelay != null) {
+          this.delay = this.context.createDelay();
+        } else {
+          this.delay = this.context.createDelayNode();
+        }
+        this.delay.delayTime.value = this.fftSize * 2 / this.context.sampleRate;
+        this.source.connect(this.analyser);
+        this.analyser.connect(this.delay);
+        volume = false;
+        if (volume) {
+          gain2 = this.context.createGainNode();
+          this.delay.connect(gain2);
+          gain2.gain.value = 0.00;
+          gain2.connect(this.context.destination);
+        } else {
+          this.delay.connect(this.context.destination);
+        }
+        _.each(this.filters, (function(_this) {
+          return function(filter) {
+            _this.source.connect(filter.delayNode);
+            filter.delayNode.connect(filter);
+            filter.connect(filter.gainNode);
+            return filter.gainNode.connect(filter.analyser);
+          };
+        })(this));
+        this.samples = this.analyser.frequencyBinCount;
+        this.data = {
+          freq: new Uint8Array(this.samples),
+          time: new Uint8Array(this.samples),
+          filter: {
+            bass: new Uint8Array(256),
+            mid: new Uint8Array(256),
+            treble: new Uint8Array(256)
+          }
+        };
+        this.load(mp3Url);
+      }
+
+      Audio.prototype.update = function() {
+        var bins, num, waveforms, _i;
+        if (this.playing === false) {
+          return;
+        }
+        this.analyser.smoothingTimeConstant = 0;
+        this.analyser.getByteFrequencyData(this.data.freq);
+        this.analyser.getByteTimeDomainData(this.data.time);
+        _.each(this.filters, (function(_this) {
+          return function(filter) {
+            return filter.analyser.getByteTimeDomainData(_this.data.filter[filter.key]);
+          };
+        })(this));
+        bins = [0, 0, 0, 0];
+        waveforms = [this.data.time, this.data.filter.bass, this.data.filter.mid, this.data.filter.treble];
+        for (num = _i = 0; _i <= 3; num = ++_i) {
+          bins[num] = this.rms(waveforms[num]);
+        }
+        this.bass = bins[1];
+        this.mid = bins[2];
+        this.high = bins[3];
+        return this.now = this.context.currentTime - this.timeDelay;
+      };
+
+      Audio.prototype.seek = function(seconds) {
+        this.now = seconds;
+        if (this.source.buffer) {
+          if (this.playing) {
+            this.pause();
+            return this.play();
+          }
+        }
+      };
+
+      Audio.prototype.load = function(url) {
+        var request;
+        request = new XMLHttpRequest();
+        request.open("GET", url, true);
+        request.responseType = "arraybuffer";
+        request.onload = (function(_this) {
+          return function() {
+            return _this.context.decodeAudioData(request.response, function(buff) {
+              _this.buffer = buff;
+              _this.source.buffer = _this.buffer;
+              _this.source.loop = false;
+              if (_this.onLoadedCallback) {
+                return _this.onLoadedCallback();
+              }
+            });
+          };
+        })(this);
+        return request.send();
+      };
+
+      Audio.prototype.createSound = function() {
+        var src;
+        src = this.context.createBufferSource();
+        if (this.buffer) {
+          src.buffer = this.buffer;
+        }
+        src.connect(this.analyser);
+        _.each(this.filters, (function(_this) {
+          return function(filter) {
+            return src.connect(filter.delayNode);
+          };
+        })(this));
+        return src;
+      };
+
+      Audio.prototype.pause = function() {
+        if (this.source) {
+          this.source.stop(0);
+          this.source.disconnect(0);
+          this.source = false;
+        }
+        return this.playing = false;
+      };
+
+      Audio.prototype.play = function() {
+        this.playing = true;
+        this.timeDelay = this.context.currentTime - this.now;
+        if (!this.source) {
+          this.source = this.createSound();
+        }
+        if (this.source.buffer) {
+          return this.source.start(0, this.now, this.buffer.duration - this.now);
+        }
+      };
+
+      Audio.prototype.rms = function(data) {
+        var accum, num, s, size, _i, _ref;
+        size = data.length;
+        accum = 0;
+        for (num = _i = 0, _ref = size - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; num = 0 <= _ref ? ++_i : --_i) {
+          s = (data[num] - 128) / 128;
+          accum += s * s;
+        }
+        return Math.sqrt(accum / size);
+      };
+
+      return Audio;
 
     })();
   });
@@ -53935,21 +54192,25 @@ define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/Main',['require','threejs','cs!app/components/Background','cs!app/components/PostFX','cs!app/components/Timer','cs!app/components/Orchestrator','text!app/data.json'],function(require) {
-    var App, Background, Orchestrator, PostFX, THREE, Timer, dataJson;
+  define('cs!app/Main',['require','threejs','cs!app/components/Background','cs!app/components/PostFX','cs!app/components/Timer','cs!app/components/Orchestrator','cs!app/components/Audio','text!app/data.json'],function(require) {
+    var App, Audio, Background, Orchestrator, PostFX, THREE, Timer, dataJson;
     THREE = require('threejs');
     Background = require('cs!app/components/Background');
     PostFX = require('cs!app/components/PostFX');
     Timer = require('cs!app/components/Timer');
     Orchestrator = require('cs!app/components/Orchestrator');
+    Audio = require('cs!app/components/Audio');
     dataJson = require('text!app/data.json');
     return App = (function() {
       function App() {
         this.animate = __bind(this.animate, this);
         this.onWindowResize = __bind(this.onWindowResize, this);
-        var container;
+        this.onAudioLoaded = __bind(this.onAudioLoaded, this);
+        var audio_url, container;
         window.app = this;
         this.timer = new Timer();
+        audio_url = 'http://localhost/SpaceTronOnTheGrid CB2.mp3';
+        this.audio = new Audio(audio_url, this.onAudioLoaded);
         this.dataSample = [
           {
             id: 'item1',
@@ -54000,6 +54261,11 @@ define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\
         this.postfx = new PostFX(this.scene, this.camera, this.renderer);
         this.animate();
       }
+
+      App.prototype.onAudioLoaded = function() {
+        console.log("audio loaded");
+        return $('body').addClass('is-audio-loaded');
+      };
 
       App.prototype.createElements = function() {
         var material, material2, object;
@@ -54069,6 +54335,7 @@ define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\
 
       App.prototype.animate = function() {
         requestAnimationFrame(this.animate);
+        this.audio.update();
         return this.render();
       };
 

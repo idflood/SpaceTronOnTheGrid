@@ -13,6 +13,7 @@ define (require) ->
   PostFX = require 'cs!app/components/PostFX'
   Timer = require 'cs!app/components/Timer'
   Orchestrator = require 'cs!app/components/Orchestrator'
+  Audio = require 'cs!app/components/Audio'
 
   dataJson = require 'text!app/data.json'
 
@@ -24,6 +25,8 @@ define (require) ->
       # Make the app accessible for the editor.
       window.app = this
       @timer = new Timer()
+      audio_url = 'http://localhost/SpaceTronOnTheGrid CB2.mp3'
+      @audio = new Audio(audio_url, @onAudioLoaded)
 
       @dataSample = [
         {
@@ -51,8 +54,6 @@ define (require) ->
       container = document.createElement( 'div' )
       document.body.appendChild( container )
 
-
-
       @camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 )
       @camera.position.z = 600
 
@@ -75,6 +76,10 @@ define (require) ->
       #new Background(@scene)
 
       @animate()
+
+    onAudioLoaded: () =>
+      console.log "audio loaded"
+      $('body').addClass('is-audio-loaded')
 
     createElements: () ->
       material = new THREE.MeshBasicMaterial({color: 0xebddc8, transparent: true, depthWrite: false, depthTest: false})
@@ -137,6 +142,7 @@ define (require) ->
 
     animate: () =>
       requestAnimationFrame(@animate)
+      @audio.update()
       @render()
 
     render: () ->

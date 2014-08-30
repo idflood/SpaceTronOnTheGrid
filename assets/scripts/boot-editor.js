@@ -19784,24 +19784,32 @@ define('text!app/templates/timeline.tpl.html',[],function () { return '<div clas
         var dragTime, dragTimeMove, self, timeClicker, timeGrp, timeSelection;
         self = this;
         dragTimeMove = function(d) {
-          var dx;
+          var dx, seconds;
           d3.event.sourceEvent.stopPropagation();
           dx = self.xDisplayed.invert(d3.event.sourceEvent.x - self.margin.left);
           dx = dx.getTime();
           dx = Math.max(0, dx);
-          return self.currentTime[0] = dx;
+          self.currentTime[0] = dx;
+          seconds = dx / 1000;
+          if (window.app.audio) {
+            return window.app.audio.seek(seconds);
+          }
         };
         dragTime = d3.behavior.drag().origin(function(d) {
           return d;
         }).on("drag", dragTimeMove);
         timeSelection = this.svgContainer.selectAll('.time-indicator').data(this.currentTime);
         timeClicker = timeSelection.enter().append('rect').attr('x', 0).attr('y', 20).attr('width', self.xDisplayed(self.timer.totalDuration)).attr('height', 50).attr('fill-opacity', 0).on('click', function(d) {
-          var dx, mouse;
+          var dx, mouse, seconds;
           mouse = d3.mouse(this);
           dx = self.xDisplayed.invert(mouse[0]);
           dx = dx.getTime();
           dx = Math.max(0, dx);
-          return self.currentTime[0] = dx;
+          self.currentTime[0] = dx;
+          seconds = dx / 1000;
+          if (window.app.audio) {
+            return window.app.audio.seek(seconds);
+          }
         });
         timeGrp = timeSelection.enter().append("g").attr('class', "time-indicator").attr("transform", "translate(0," + 30 + ")").call(dragTime);
         timeGrp.append('rect').attr('class', 'time-indicator__line').attr('x', -1).attr('y', 0).attr('width', 1).attr('height', 1000);
@@ -27883,9 +27891,11 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
     PropertiesEditor = require('cs!timeline/components/PropertiesEditor');
     return Editor = (function() {
       function Editor() {
+        this.playPause = __bind(this.playPause, this);
         this.onKeyAdded = __bind(this.onKeyAdded, this);
         this.app = window.app;
         this.timer = this.app.timer;
+        this.app.audio.playing = false;
         this.$timeline = $(tpl_timeline);
         $('body').append(this.$timeline);
         $('body').addClass('has-editor');
@@ -27895,6 +27905,14 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
         this.initAdd();
         this.initPropertiesEditor();
         this.initToggle();
+        $(document).keypress((function(_this) {
+          return function(e) {
+            console.log(e);
+            if (e.charCode === 32) {
+              return _this.playPause();
+            }
+          };
+        })(this));
       }
 
       Editor.prototype.initToggle = function() {
@@ -27996,14 +28014,23 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
         });
       };
 
+      Editor.prototype.playPause = function() {
+        this.timer.toggle();
+        if (this.timer.is_playing) {
+          this.app.audio.play();
+        } else {
+          this.app.audio.pause();
+        }
+        return console.log("toggle " + this.timer.is_playing);
+      };
+
       Editor.prototype.initControls = function() {
         var $play_pause;
         $play_pause = this.$timeline.find('.control.icon-play');
         return $play_pause.click((function(_this) {
           return function(e) {
             e.preventDefault();
-            _this.timer.toggle();
-            return console.log("toggle " + _this.timer.is_playing);
+            return _this.playPause();
           };
         })(this));
       };

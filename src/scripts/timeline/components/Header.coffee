@@ -70,6 +70,10 @@ define (require) ->
         dx = dx.getTime()
         dx = Math.max(0, dx)
         self.currentTime[0] = dx
+
+        seconds = dx / 1000
+        if window.app.audio
+          window.app.audio.seek(seconds)
         #self.render()
 
       dragTime = d3.behavior.drag()
@@ -90,6 +94,9 @@ define (require) ->
           dx = dx.getTime()
           dx = Math.max(0, dx)
           self.currentTime[0] = dx
+          seconds = dx / 1000
+          if window.app.audio
+            window.app.audio.seek(seconds)
           )
 
       timeGrp = timeSelection.enter().append("g")
