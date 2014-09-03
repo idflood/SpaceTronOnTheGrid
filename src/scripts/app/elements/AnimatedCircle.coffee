@@ -8,6 +8,10 @@ define (require) ->
   Colors = require 'cs!app/components/Colors'
 
   class AnimatedCircle
+    @circleGeom = new THREE.CircleGeometry( 10, 30, 0, Math.PI * 2 )
+    @ringGeom = new THREE.RingGeometry( 10 - 1, 10 + 1, 30, 1, 0, Math.PI * 2 )
+    @ringGeom2 = new THREE.RingGeometry( 10 - 1, 10, 30, 1, 0, Math.PI * 2 )
+
     @properties:
       size: {name: 'size', label: 'size', val: 80}
       outlineWidth: {name: 'outlineWidth', label: 'outline width', val: 2}
@@ -66,23 +70,29 @@ define (require) ->
       # Progression goes from 0 to 2, we want to be a percent of total
 
       #@timeline.seek(@timeline.duration() * progression)
-      @container.scale.set(@animatedProperties.scale, @animatedProperties.scale, @animatedProperties.scale)
+      scale = @animatedProperties.scale * @values.size * 0.1
+      @container.scale.set(scale, scale, scale)
 
     renderCircle: (size, color) =>
       #color = color.clone().multiplyScalar(@rng.random(0.3, 0.5))
-      material = new THREE.MeshBasicMaterial({color: color, transparent: true, depthWrite: false, depthTest: false})
+      material = new THREE.MeshBasicMaterial({color: color, wireframe: false, transparent: true, depthWrite: false, depthTest: false})
       material.blending = THREE.AdditiveBlending
 
       numSegments = parseInt(size / 1.5, 10) + 4
-      object = new THREE.Mesh( new THREE.CircleGeometry( size, numSegments, 0, Math.PI * 2 ), material )
+      #new THREE.CircleGeometry( size, numSegments, 0, Math.PI * 2 )
+      object = new THREE.Mesh( AnimatedCircle.circleGeom, material )
       #object = new THREE.Mesh( new THREE.BoxGeometry(30, 30, 30 , 2, 2, 2), material )
       #object.position.set( x, y, 0 )
       #object.rotation.set(Math.PI / -2, 0, 0)
       @container.add( object )
 
     renderOutline: (size, color, outlineWidth) =>
+      geom = AnimatedCircle.ringGeom
+      if outlineWidth > 1
+        geom = AnimatedCircle.ringGeom2
       material = new THREE.MeshBasicMaterial({color: color, transparent: true, depthWrite: false, depthTest: false})
       material.blending = THREE.AdditiveBlending
-      object = new THREE.Mesh( new THREE.RingGeometry( size - 1, size + outlineWidth, 50, 1, 0, Math.PI * 2 ), material )
+      #new THREE.RingGeometry( size - 1, size + outlineWidth, 50, 1, 0, Math.PI * 2 )
+      object = new THREE.Mesh( geom, material )
       #object.position.set(x, y, 0 )
       @container.add( object )

@@ -76,7 +76,8 @@ define (require) ->
         delay = @rngAnimation.random(0, 2400) / 1000
         duration = @rngAnimation.random(600, 800) / 1000
         duration *= 4
-        border_radius = @rngOutline.exponential()
+        border_radius = @rngOutline.random(1, 400) / 100
+
         draw_outline = if rndtype < 0.8 then true else false
         draw_circle = if rndtype > 0.5 then true else false
         if draw_outline == false
