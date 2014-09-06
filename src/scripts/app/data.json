@@ -16,7 +16,7 @@
             "val": 0
           },
           {
-            "time": 1,
+            "time": 1.3379999999999999,
             "val": 1
           },
           {
@@ -28,12 +28,12 @@
       {
         "keys": [],
         "name": "numItems",
-        "val": 12
+        "val": 2
       },
       {
         "keys": [],
         "name": "seed",
-        "val": 12002
+        "val": 8464
       },
       {
         "keys": [],
@@ -64,6 +64,16 @@
         "keys": [],
         "name": "z",
         "val": 0
+      },
+      {
+        "keys": [],
+        "name": "depth",
+        "val": 0
+      },
+      {
+        "keys": [],
+        "name": "percent_color",
+        "val": 0
       }
     ]
   },
@@ -71,27 +81,28 @@
     "id": "item2",
     "type": "Circles",
     "label": "Circles 2",
-    "start": 1.473,
-    "end": 3.503,
+    "start": 0.793,
+    "end": 4.800000000000006,
+    "collapsed": true,
     "properties": [
       {
         "name": "progression",
         "val": 0,
         "keys": [
           {
-            "time": 1.701,
+            "time": 1.021,
             "val": 0
           },
           {
-            "time": 2.4379999999999997,
+            "time": 1.9579999999999993,
             "val": 1
           },
           {
-            "time": 2.701,
+            "time": 2.2789999999999995,
             "val": 1
           },
           {
-            "time": 3.403,
+            "time": 4.435000000000008,
             "val": 0
           }
         ]
@@ -99,12 +110,12 @@
       {
         "keys": [],
         "name": "numItems",
-        "val": 83
+        "val": 5
       },
       {
         "keys": [],
         "name": "seed",
-        "val": -27998
+        "val": -456453
       },
       {
         "keys": [],
@@ -134,6 +145,16 @@
       {
         "keys": [],
         "name": "z",
+        "val": 70
+      },
+      {
+        "keys": [],
+        "name": "depth",
+        "val": 0
+      },
+      {
+        "keys": [],
+        "name": "percent_color",
         "val": 0
       }
     ]
@@ -142,20 +163,24 @@
     "id": "item3",
     "type": "Circles",
     "label": "Circles 3",
-    "start": 3.096,
-    "end": 5.482,
+    "start": 4.514,
+    "end": 12.172,
     "properties": [
       {
         "name": "progression",
-        "val": 0.5,
+        "val": 0,
         "keys": [
           {
-            "time": 3.307,
+            "time": 4.7250000000000005,
             "val": 0
           },
           {
-            "time": 3.832000000000001,
+            "time": 5.614999999999998,
             "val": 0.5
+          },
+          {
+            "time": 11.668999999999995,
+            "val": 0
           }
         ]
       },
@@ -164,7 +189,7 @@
         "val": 100,
         "keys": [
           {
-            "time": 3.3770000000000007,
+            "time": 4.795000000000001,
             "val": 100
           }
         ]
@@ -174,20 +199,20 @@
         "val": 0,
         "keys": [
           {
-            "time": 3.692000000000001,
+            "time": 5.110000000000001,
             "val": 0
           }
         ]
       },
       {
         "name": "z",
-        "val": 0,
+        "val": 120,
         "keys": []
       },
       {
         "keys": [],
         "name": "numItems",
-        "val": 20
+        "val": 5
       },
       {
         "keys": [],
@@ -208,6 +233,16 @@
         "keys": [],
         "name": "circleRadiusMax",
         "val": 20
+      },
+      {
+        "keys": [],
+        "name": "depth",
+        "val": 0
+      },
+      {
+        "keys": [],
+        "name": "percent_color",
+        "val": 0
       }
     ]
   },
@@ -215,14 +250,14 @@
     "id": "item4",
     "type": "Circles",
     "label": "Circles 4",
-    "start": 3.477,
-    "end": 5.477,
+    "start": 5.235,
+    "end": 11.328,
     "collapsed": false,
     "properties": [
       {
         "keys": [],
         "name": "numItems",
-        "val": 50
+        "val": 5
       },
       {
         "keys": [],
@@ -247,12 +282,16 @@
       {
         "keys": [
           {
-            "time": 3.477,
+            "time": 5.235,
             "val": 0
           },
           {
-            "time": 4.327,
+            "time": 6.085000000000001,
             "val": 1
+          },
+          {
+            "time": 11.049000000000001,
+            "val": 0
           }
         ],
         "name": "progression",
@@ -272,6 +311,16 @@
         "keys": [],
         "name": "z",
         "val": 0
+      },
+      {
+        "keys": [],
+        "name": "depth",
+        "val": 0
+      },
+      {
+        "keys": [],
+        "name": "percent_color",
+        "val": 0.4
       }
     ]
   }
