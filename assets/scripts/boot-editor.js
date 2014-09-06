@@ -27913,6 +27913,8 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
             }
           };
         })(this));
+        window.editorEnabled = true;
+        window.dispatchEvent(new Event('resize'));
       }
 
       Editor.prototype.initToggle = function() {
@@ -27924,7 +27926,8 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
             e.preventDefault();
             timelineClosed = !timelineClosed;
             $toggleLink.toggleClass('menu-item--toggle-up', timelineClosed);
-            return $('body').toggleClass('timeline-is-closed', timelineClosed);
+            $('body').toggleClass('timeline-is-closed', timelineClosed);
+            return window.dispatchEvent(new Event('resize'));
           };
         })(this));
         propertiesClosed = false;
@@ -27934,7 +27937,8 @@ define('text!app/templates/propertiesEditor.tpl.html',[],function () { return '<
             e.preventDefault();
             propertiesClosed = !propertiesClosed;
             $toggleLinkSide.toggleClass('menu-item--toggle-left', propertiesClosed);
-            return $('body').toggleClass('properties-is-closed', propertiesClosed);
+            $('body').toggleClass('properties-is-closed', propertiesClosed);
+            return window.dispatchEvent(new Event('resize'));
           };
         })(this));
       };

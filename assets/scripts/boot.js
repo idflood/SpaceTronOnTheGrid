@@ -37499,7 +37499,6 @@ define("vendors/three.js-extras/shaders/DigitalGlitch", function(){});
         this.composer.addPass(renderModel);
         this.composer.addPass(this.effectFXAA);
         this.composer.addPass(this.bloom);
-        this.composer.addPass(this.glitchPass);
         this.composer.addPass(this.vignettePass);
         this.composer.addPass(this.filmShader);
       }
@@ -54352,9 +54351,22 @@ define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\
       };
 
       App.prototype.onWindowResize = function() {
-        var SCREEN_HEIGHT, SCREEN_WIDTH;
+        var SCREEN_HEIGHT, SCREEN_WIDTH, propertieswidth, timelineheight;
+        console.log("on resize...");
         SCREEN_WIDTH = window.innerWidth;
         SCREEN_HEIGHT = window.innerHeight;
+        if (window.editorEnabled) {
+          timelineheight = 295;
+          if ($('body').hasClass('timeline-is-closed')) {
+            timelineheight = 95;
+          }
+          propertieswidth = 279;
+          if ($('body').hasClass('properties-is-closed')) {
+            propertieswidth = 0;
+          }
+          SCREEN_HEIGHT -= timelineheight;
+          SCREEN_WIDTH -= propertieswidth;
+        }
         this.camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);

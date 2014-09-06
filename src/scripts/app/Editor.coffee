@@ -45,6 +45,10 @@ define (require) ->
           # Space
           @playPause()
 
+      # Will help resize the canvas to correct size (minus sidebar and timeline)
+      window.editorEnabled = true
+      window.dispatchEvent(new Event('resize'))
+
     initToggle: () ->
       timelineClosed = false
       $toggleLink = @$timeline.find('[data-action="toggle"]')
@@ -53,6 +57,7 @@ define (require) ->
         timelineClosed = !timelineClosed
         $toggleLink.toggleClass('menu-item--toggle-up', timelineClosed)
         $('body').toggleClass('timeline-is-closed', timelineClosed)
+        window.dispatchEvent(new Event('resize'))
 
       propertiesClosed = false
       $toggleLinkSide = $('.properties-editor').find('[data-action="toggle"]')
@@ -61,6 +66,8 @@ define (require) ->
         propertiesClosed = !propertiesClosed
         $toggleLinkSide.toggleClass('menu-item--toggle-left', propertiesClosed)
         $('body').toggleClass('properties-is-closed', propertiesClosed)
+
+        window.dispatchEvent(new Event('resize'))
 
 
     onKeyAdded: () =>

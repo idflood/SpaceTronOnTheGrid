@@ -141,8 +141,17 @@ define (require) ->
       @scene.add( object )
 
     onWindowResize: () =>
+      console.log "on resize..."
       SCREEN_WIDTH = window.innerWidth
       SCREEN_HEIGHT = window.innerHeight
+      if window.editorEnabled
+        timelineheight = 295
+        if $('body').hasClass('timeline-is-closed') then timelineheight = 95
+        propertieswidth = 279
+        if $('body').hasClass('properties-is-closed') then propertieswidth = 0
+        SCREEN_HEIGHT -= timelineheight
+        SCREEN_WIDTH -= propertieswidth
+
       @camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT
       @camera.updateProjectionMatrix()
 
