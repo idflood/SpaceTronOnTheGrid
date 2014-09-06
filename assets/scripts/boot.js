@@ -37486,6 +37486,7 @@ define("vendors/three.js-extras/shaders/DigitalGlitch", function(){});
         this.renderer = renderer;
         this.renderer.autoClear = false;
         renderModel = new THREE.RenderPass(this.scene, this.camera);
+        window.renderModel = renderModel;
         this.effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
         this.effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
         this.bloom = new THREE.BloomPass(0.9, 25, 4);
@@ -38020,6 +38021,62 @@ define("vendors/three.js-extras/shaders/DigitalGlitch", function(){});
       };
 
       return Timer;
+
+    })();
+  });
+
+}).call(this);
+
+
+(function() {
+  define('cs!app/elements/Camera',['require','threejs'],function(require) {
+    var Camera, THREE;
+    THREE = require('threejs');
+    return Camera = (function() {
+      Camera.properties = {
+        x: {
+          name: 'x',
+          label: 'x',
+          val: 0
+        },
+        y: {
+          name: 'y',
+          label: 'y',
+          val: 0
+        },
+        z: {
+          name: 'z',
+          label: 'z',
+          val: 0
+        }
+      };
+
+      function Camera(values, time) {
+        this.values = values != null ? values : {};
+        if (time == null) {
+          time = 0;
+        }
+        this.isCamera = true;
+        this.container = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+        this.container.position.set(this.values.x, this.values.y, this.values.z);
+      }
+
+      Camera.prototype.update = function(seconds, values, force) {
+        if (values == null) {
+          values = false;
+        }
+        if (force == null) {
+          force = false;
+        }
+        return this.container.position.set(values.x, values.y, values.z);
+      };
+
+      Camera.prototype.destroy = function() {
+        delete this.container;
+        return delete this.isCamera;
+      };
+
+      return Camera;
 
     })();
   });
@@ -53641,8 +53698,9 @@ define("TimelineMax", ["TweenMax"], (function (global) {
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/components/ElementFactory',['require','cs!app/elements/Circles'],function(require) {
-    var Circles, ElementFactory, extend;
+  define('cs!app/components/ElementFactory',['require','cs!app/elements/Camera','cs!app/elements/Circles'],function(require) {
+    var Camera, Circles, ElementFactory, extend;
+    Camera = require('cs!app/elements/Camera');
     Circles = require('cs!app/elements/Circles');
     extend = function(object, properties) {
       var key, val;
@@ -53663,6 +53721,14 @@ define("TimelineMax", ["TweenMax"], (function (global) {
           create: function(values, time) {
             var item;
             item = new Circles(values);
+            return item;
+          }
+        },
+        Camera: {
+          classObject: Camera,
+          create: function(values, time) {
+            var item;
+            item = new Camera(values);
             return item;
           }
         }
@@ -53703,10 +53769,11 @@ define("TimelineMax", ["TweenMax"], (function (global) {
     TweenMax = require('TweenMax');
     TimelineMax = require('TimelineMax');
     return Orchestrator = (function() {
-      function Orchestrator(timer, data, scene) {
+      function Orchestrator(timer, data, scene, defaultCamera) {
         this.timer = timer;
         this.data = data;
         this.scene = scene;
+        this.defaultCamera = defaultCamera;
         this.update = __bind(this.update, this);
         this.factory = new ElementFactory();
         this.mainTimeline = new TimelineMax({
@@ -53718,7 +53785,8 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       }
 
       Orchestrator.prototype.update = function(timestamp) {
-        var el, first_key, item, item_property, key, key_index, next_key, propName, property, propertyTimeline, seconds, should_exist, tween, tween_duration, tween_time, type, val, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3;
+        var activeCamera, el, first_key, item, item_property, key, key_index, next_key, propName, property, propertyTimeline, seconds, should_exist, tween, tween_duration, tween_time, type, val, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3;
+        activeCamera = this.defaultCamera;
         seconds = timestamp / 1000;
         _ref = this.data;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -53807,9 +53875,17 @@ define("TimelineMax", ["TweenMax"], (function (global) {
             this.scene.add(el.container);
             item.object = el;
           }
+          if (item.object && item.object.isCamera) {
+            activeCamera = item.object.container;
+            window.updateCameraAspect(activeCamera);
+          }
           if (item.object) {
             item.object.update(seconds - item.start, item.values);
           }
+        }
+        window.activeCamera = activeCamera;
+        if (window.renderModel) {
+          window.renderModel.camera = activeCamera;
         }
         return this.mainTimeline.seek(seconds);
       };
@@ -54213,7 +54289,7 @@ define('text',['module'], function (module) {
 });
 
 
-define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\n    "type": "Circles",\n    "label": "Test circles",\n    "start": 0,\n    "end": 2,\n    "collapsed": true,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0,\n        "keys": [\n          {\n            "time": 0,\n            "val": 0\n          },\n          {\n            "time": 1,\n            "val": 1\n          },\n          {\n            "time": 2,\n            "val": 2\n          }\n        ]\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 12\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 12002\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 84\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 0\n      }\n    ]\n  },\n  {\n    "id": "item2",\n    "type": "Circles",\n    "label": "Circles 2",\n    "start": 1.473,\n    "end": 3.503,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0,\n        "keys": [\n          {\n            "time": 1.701,\n            "val": 0\n          },\n          {\n            "time": 2.4379999999999997,\n            "val": 1\n          },\n          {\n            "time": 2.701,\n            "val": 1\n          },\n          {\n            "time": 3.403,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 83\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": -27998\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 265\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 3\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 50\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 0\n      }\n    ]\n  },\n  {\n    "id": "item3",\n    "type": "Circles",\n    "label": "Circles 3",\n    "start": 3.096,\n    "end": 5.482,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0.5,\n        "keys": [\n          {\n            "time": 3.307,\n            "val": 0\n          },\n          {\n            "time": 3.832000000000001,\n            "val": 0.5\n          }\n        ]\n      },\n      {\n        "name": "x",\n        "val": 100,\n        "keys": [\n          {\n            "time": 3.3770000000000007,\n            "val": 100\n          }\n        ]\n      },\n      {\n        "name": "y",\n        "val": 0,\n        "keys": [\n          {\n            "time": 3.692000000000001,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "name": "z",\n        "val": 0,\n        "keys": []\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 12002\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 80\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      }\n    ]\n  },\n  {\n    "id": "item4",\n    "type": "Circles",\n    "label": "Circles 4",\n    "start": 3.477,\n    "end": 5.477,\n    "collapsed": false,\n    "properties": [\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 50\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 1325\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 150\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 10\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      },\n      {\n        "keys": [\n          {\n            "time": 3.477,\n            "val": 0\n          },\n          {\n            "time": 4.327,\n            "val": 1\n          }\n        ],\n        "name": "progression",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": -100\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 0\n      }\n    ]\n  }\n]\n';});
+define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\n    "type": "Circles",\n    "label": "Test circles",\n    "start": 0,\n    "end": 2,\n    "collapsed": true,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0,\n        "keys": [\n          {\n            "time": 0,\n            "val": 0\n          },\n          {\n            "time": 1.3379999999999999,\n            "val": 1\n          },\n          {\n            "time": 2,\n            "val": 2\n          }\n        ]\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 2\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 8464\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 84\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "depth",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "percent_color",\n        "val": 0\n      }\n    ]\n  },\n  {\n    "id": "item2",\n    "type": "Circles",\n    "label": "Circles 2",\n    "start": 0.793,\n    "end": 4.800000000000006,\n    "collapsed": true,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0,\n        "keys": [\n          {\n            "time": 1.021,\n            "val": 0\n          },\n          {\n            "time": 1.9579999999999993,\n            "val": 1\n          },\n          {\n            "time": 2.2789999999999995,\n            "val": 1\n          },\n          {\n            "time": 4.435000000000008,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 5\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": -456453\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 265\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 3\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 50\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 70\n      },\n      {\n        "keys": [],\n        "name": "depth",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "percent_color",\n        "val": 0\n      }\n    ]\n  },\n  {\n    "id": "item3",\n    "type": "Circles",\n    "label": "Circles 3",\n    "start": 4.514,\n    "end": 12.172,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0,\n        "keys": [\n          {\n            "time": 4.7250000000000005,\n            "val": 0\n          },\n          {\n            "time": 5.614999999999998,\n            "val": 0.5\n          },\n          {\n            "time": 11.668999999999995,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "name": "x",\n        "val": 100,\n        "keys": [\n          {\n            "time": 4.795000000000001,\n            "val": 100\n          }\n        ]\n      },\n      {\n        "name": "y",\n        "val": 0,\n        "keys": [\n          {\n            "time": 5.110000000000001,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "name": "z",\n        "val": 120,\n        "keys": []\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 5\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 12002\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 80\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "depth",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "percent_color",\n        "val": 0\n      }\n    ]\n  },\n  {\n    "id": "item4",\n    "type": "Circles",\n    "label": "Circles 4",\n    "start": 5.235,\n    "end": 11.328,\n    "collapsed": false,\n    "properties": [\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 5\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 1325\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 150\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 10\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      },\n      {\n        "keys": [\n          {\n            "time": 5.235,\n            "val": 0\n          },\n          {\n            "time": 6.085000000000001,\n            "val": 1\n          },\n          {\n            "time": 11.049000000000001,\n            "val": 0\n          }\n        ],\n        "name": "progression",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": -100\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "depth",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "percent_color",\n        "val": 0.4\n      }\n    ]\n  }\n]\n';});
 
 
 (function() {
@@ -54232,9 +54308,11 @@ define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\
       function App() {
         this.animate = __bind(this.animate, this);
         this.onWindowResize = __bind(this.onWindowResize, this);
+        this.updateCameraAspect = __bind(this.updateCameraAspect, this);
         this.onAudioLoaded = __bind(this.onAudioLoaded, this);
         var audio_url, container;
         window.app = this;
+        window.updateCameraAspect = this.updateCameraAspect;
         this.timer = new Timer();
         audio_url = 'http://localhost/SpaceTronOnTheGrid CB2.mp3';
         this.audio = new Audio(audio_url, this.onAudioLoaded);
@@ -54270,13 +54348,14 @@ define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\
           }
         ];
         this.data = JSON.parse(dataJson);
+        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+        this.camera.position.z = 600;
+        window.activeCamera = this.camera;
         this.scene = new THREE.Scene();
-        this.orchestrator = new Orchestrator(this.timer, this.data, this.scene);
+        this.orchestrator = new Orchestrator(this.timer, this.data, this.scene, this.camera);
         this.time = Date.now() * 0.0001;
         container = document.createElement('div');
         document.body.appendChild(container);
-        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
-        this.camera.position.z = 600;
         this.renderer = new THREE.WebGLRenderer({
           antialias: false,
           alpha: false
@@ -54350,9 +54429,8 @@ define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\
         return this.scene.add(object);
       };
 
-      App.prototype.onWindowResize = function() {
+      App.prototype.getScreenSize = function() {
         var SCREEN_HEIGHT, SCREEN_WIDTH, propertieswidth, timelineheight;
-        console.log("on resize...");
         SCREEN_WIDTH = window.innerWidth;
         SCREEN_HEIGHT = window.innerHeight;
         if (window.editorEnabled) {
@@ -54367,10 +54445,30 @@ define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\
           SCREEN_HEIGHT -= timelineheight;
           SCREEN_WIDTH -= propertieswidth;
         }
-        this.camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-        return this.postfx.resize(SCREEN_WIDTH, SCREEN_HEIGHT);
+        return {
+          width: SCREEN_WIDTH,
+          height: SCREEN_HEIGHT
+        };
+      };
+
+      App.prototype.updateCameraAspect = function(camera, size) {
+        if (size == null) {
+          size = false;
+        }
+        if (size === false) {
+          size = this.getScreenSize();
+        }
+        camera.aspect = size.width / size.height;
+        return camera.updateProjectionMatrix();
+      };
+
+      App.prototype.onWindowResize = function() {
+        var size;
+        size = this.getScreenSize();
+        this.updateCameraAspect(this.camera, size);
+        this.updateCameraAspect(window.activeCamera, size);
+        this.renderer.setSize(size.width, size.height);
+        return this.postfx.resize(size.width, size.height);
       };
 
       App.prototype.animate = function() {

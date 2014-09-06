@@ -24,6 +24,7 @@ define (require) ->
     constructor: () ->
       # Make the app accessible for the editor.
       window.app = this
+      window.updateCameraAspect = @updateCameraAspect
       @timer = new Timer()
       audio_url = 'http://localhost/SpaceTronOnTheGrid CB2.mp3'
       @audio = new Audio(audio_url, @onAudioLoaded)
@@ -46,16 +47,17 @@ define (require) ->
       @data = JSON.parse(dataJson)
       #@data = []
 
+      @camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 )
+      @camera.position.z = 600
+      window.activeCamera = @camera
+
       @scene = new THREE.Scene()
-      @orchestrator = new Orchestrator(@timer, @data, @scene)
+      @orchestrator = new Orchestrator(@timer, @data, @scene, @camera)
 
 
       @time = Date.now() * 0.0001
       container = document.createElement( 'div' )
       document.body.appendChild( container )
-
-      @camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 )
-      @camera.position.z = 600
 
       @renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } )
       @renderer.setSize( window.innerWidth, window.innerHeight )
@@ -94,8 +96,6 @@ define (require) ->
       object2.position.set( 320, 0, -450 )
       object2.rotation.set(0.17, 0.85, 0.78)
       @scene.add( object2 )
-
-
 
       object3 = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 650, 1, 1 ), material )
       object3.position.set( -120, -600, -950 )
@@ -140,8 +140,7 @@ define (require) ->
       object.rotation.set(0, 0, Math.PI / 4)
       @scene.add( object )
 
-    onWindowResize: () =>
-      console.log "on resize..."
+    getScreenSize: () ->
       SCREEN_WIDTH = window.innerWidth
       SCREEN_HEIGHT = window.innerHeight
       if window.editorEnabled
@@ -152,11 +151,21 @@ define (require) ->
         SCREEN_HEIGHT -= timelineheight
         SCREEN_WIDTH -= propertieswidth
 
-      @camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT
-      @camera.updateProjectionMatrix()
+      return {width: SCREEN_WIDTH, height: SCREEN_HEIGHT}
 
-      @renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT )
-      @postfx.resize(SCREEN_WIDTH, SCREEN_HEIGHT)
+    updateCameraAspect: (camera, size = false) =>
+      if size == false
+        size = @getScreenSize()
+      camera.aspect = size.width / size.height
+      camera.updateProjectionMatrix()
+
+    onWindowResize: () =>
+      size = @getScreenSize()
+      @updateCameraAspect(@camera, size)
+      @updateCameraAspect(window.activeCamera, size)
+
+      @renderer.setSize(size.width, size.height)
+      @postfx.resize(size.width, size.height)
 
     animate: () =>
       requestAnimationFrame(@animate)

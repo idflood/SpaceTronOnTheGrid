@@ -6,7 +6,7 @@ define (require) ->
   TimelineMax = require 'TimelineMax'
 
   class Orchestrator
-    constructor: (@timer, @data, @scene) ->
+    constructor: (@timer, @data, @scene, @defaultCamera) ->
       @factory = new ElementFactory()
       @mainTimeline = new TimelineMax({paused: true})
       #@dummy = {percent: 0}
@@ -22,6 +22,7 @@ define (require) ->
       @update(0)
 
     update: (timestamp) =>
+      activeCamera = @defaultCamera
       seconds = timestamp / 1000
 
       #return false
@@ -121,8 +122,18 @@ define (require) ->
           @scene.add(el.container)
           item.object = el
 
+        # If this is a camera set it as the active camera.
+        if item.object && item.object.isCamera
+          activeCamera = item.object.container
+          window.updateCameraAspect(activeCamera)
+
         # Update the item
         if item.object then item.object.update(seconds - item.start, item.values)
+
+      # Set correct camera
+      window.activeCamera = activeCamera
+      if window.renderModel
+        window.renderModel.camera = activeCamera
 
       # Finally update the main timeline.
       @mainTimeline.seek(seconds)

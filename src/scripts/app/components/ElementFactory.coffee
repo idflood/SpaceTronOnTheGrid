@@ -1,5 +1,5 @@
 define (require) ->
-
+  Camera = require 'cs!app/elements/Camera'
   Circles = require 'cs!app/elements/Circles'
 
   extend = (object, properties) ->
@@ -14,6 +14,13 @@ define (require) ->
 
         create: (values, time) ->
           item = new Circles(values)
+          return item
+
+      Camera:
+        classObject: Camera
+
+        create: (values, time) ->
+          item = new Camera(values)
           return item
 
     getTypeClass: (itemType) =>

@@ -21,6 +21,9 @@ define (require) ->
       @renderer.autoClear = false
 
       renderModel = new THREE.RenderPass( @scene, @camera )
+      # There will only be 1 rendermodel and we need to be able
+      # to swith camera from the orchestrator.
+      window.renderModel = renderModel
       @effectFXAA = new THREE.ShaderPass( THREE.FXAAShader )
       @effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight )
 
