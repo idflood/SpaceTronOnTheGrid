@@ -131,8 +131,6 @@ define (require) ->
       #object.rotation.set(Math.PI / -2, 0, 0)
       @scene.add( object )
 
-
-
       #object = new THREE.Mesh( new THREE.SphereGeometry( 75, 20, 10 ), material );
       #object = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 2, 2 ), material2 );
       object = new THREE.Mesh( new THREE.RingGeometry( 40, 50, 4, 1, 0, Math.PI * 2 ), material2 );
@@ -180,4 +178,3 @@ define (require) ->
       @postfx.render(delta)
 
       @time = newTime
-
