@@ -3,12 +3,18 @@ define (require) ->
   _ = require 'lodash'
 
   class Audio
+    @instance = false
+
     constructor: (mp3Url, @onLoadedCallback) ->
       @fftSize = 512
       @filters = {}
       @playing = false
       @now = 0.0
       @timeDelay = 0.0
+
+      @bass = 0
+      @mid = 0
+      @high = 0
 
       @context = false
       if typeof AudioContext != "undefined"
@@ -105,6 +111,9 @@ define (require) ->
 
       @load(mp3Url)
 
+      # i know, ....
+      Audio.instance = this
+
     update: () =>
       if @playing == false then return
       @analyser.smoothingTimeConstant = 0
@@ -165,7 +174,8 @@ define (require) ->
 
     pause: () =>
       if @source
-        @source.stop(0)
+        if @playing
+          @source.stop(0)
         @source.disconnect(0)
         @source = false
       @playing = false

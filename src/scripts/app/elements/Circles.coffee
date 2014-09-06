@@ -130,11 +130,11 @@ define (require) ->
       if force || @valueChanged("x", values) || @valueChanged("y", values) || @valueChanged("z", values)
         @container.position.set(values.x, values.y, values.z)
 
-      if force || @valueChanged("progression", values)
-        progression = values.progression / 2
-        @timeline.seek(@totalDuration * progression)
-        for item in @items
-          item.update(seconds, {progression: values.progression})
+      #if force || @valueChanged("progression", values)
+      progression = values.progression / 2
+      @timeline.seek(@totalDuration * progression)
+      for item in @items
+        item.update(seconds, {progression: values.progression})
 
       if force || @valueChanged("depth", values)
         for item, key in @items

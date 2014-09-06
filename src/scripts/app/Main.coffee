@@ -61,12 +61,12 @@ define (require) ->
       @renderer.setSize( window.innerWidth, window.innerHeight )
 
       #@renderer.setClearColor( 0xe1d8c7, 1)
-      @renderer.setClearColor( 0x000000, 1)
+      @renderer.setClearColor( 0x111111, 1)
 
       #circles = new Circles(@scene, 10, 4323, 130, 20, 50)
       #circles2 = new Circles(@scene, 20, 51232, 180, 4, 10)
 
-      #@createElements()
+      @createElements()
 
       container.appendChild( @renderer.domElement )
 
@@ -82,21 +82,30 @@ define (require) ->
       $('body').addClass('is-audio-loaded')
 
     createElements: () ->
-      material = new THREE.MeshBasicMaterial({color: 0xebddc8, transparent: true, depthWrite: false, depthTest: false})
-      material.blending = THREE.AdditiveBlending
+      material = new THREE.MeshPhongMaterial({color: 0x111111, specular: 0x666666, shininess: 30, shading: THREE.SmoothShading})
+      #material.blending = THREE.AdditiveBlending
 
-      object = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 50, 1, 1 ), material )
-      object.position.set( 20, 0, 350 )
-      object.rotation.set(0, 0.8, 0.7)
+      object = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 650, 1, 1 ), material )
+      object.position.set( 420, 0, -350 )
+      object.rotation.set(0.1, 0.8, 0.7)
       @scene.add( object )
 
-      material2 = new THREE.MeshBasicMaterial({color: 0x6f9787, transparent: true, depthWrite: false, depthTest: false})
-      material2.blending = THREE.AdditiveBlending
+      object2 = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 650, 1, 1 ), material )
+      object2.position.set( 320, 0, -450 )
+      object2.rotation.set(0.17, 0.85, 0.78)
+      @scene.add( object2 )
 
-      object = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 50, 1, 1 ), material2 )
-      object.position.set( 20, 40, 350 )
-      object.rotation.set(0, -1, -0.6)
-      @scene.add( object )
+
+
+      object3 = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 650, 1, 1 ), material )
+      object3.position.set( -120, -600, -950 )
+      object3.rotation.set(0.17, 0.35, -0.38)
+      @scene.add( object3 )
+
+      light1 = new THREE.PointLight( 0xffffff, 3, 1400 )
+      light1.position.set(100, 100, 200)
+      @scene.add(light1)
+
 
     __createElementsBackup: () ->
       #material = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide } )

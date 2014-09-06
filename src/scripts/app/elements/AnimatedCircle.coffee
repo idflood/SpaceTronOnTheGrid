@@ -7,6 +7,9 @@ define (require) ->
 
   Colors = require 'cs!app/components/Colors'
 
+  # should not be a dependency.
+  Audio = require 'cs!app/components/Audio'
+
   class AnimatedCircle
     @circleGeom = new THREE.CircleGeometry( 10, 30, 0, Math.PI * 2 )
     @ringGeom = new THREE.RingGeometry( 10 - 1, 10 + 1, 30, 1, 0, Math.PI * 2 )
@@ -33,6 +36,11 @@ define (require) ->
       @container = new THREE.Object3D()
       @container.scale.set(0.001,0.001,0.001)
       @container.position.set(@values.x, @values.y, @values.z)
+      @offset = new THREE.Vector3()
+      @velocity = new THREE.Vector3()
+      @weight = Math.random() * 0.5 + 0.5
+      @direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, 0)
+      @speed = 0
       @animatedProperties =
         scale: 0.001
       @timeline = new TimelineMax()
@@ -66,6 +74,17 @@ define (require) ->
       @container = null
 
     update: (seconds, progression) ->
+      #if Audio.instance.high > 0.002
+      #  @speed += Audio.instance.high
+      #console.log Audio.instance.high
+
+      #if Math.random() > 0.9 && Audio.instance.high > 0.09
+      #  @velocity.add(@direction.clone().multiplyScalar(Audio.instance.high * 12 * @weight))
+      @container.position.add(@velocity)
+
+      @velocity = @velocity.multiplyScalar(0.94)
+
+      #@speed *= 0.95
       #console.log "ok"
       # Progression goes from 0 to 2, we want to be a percent of total
 

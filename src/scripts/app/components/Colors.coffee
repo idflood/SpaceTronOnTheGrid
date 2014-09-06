@@ -4,6 +4,12 @@ define (require) ->
 
   items = [
     new THREE.Color(0xffffff),
+    new THREE.Color(0x86d1b8),
+    new THREE.Color(0x65c282),
+  ]
+
+  items2 = [
+    new THREE.Color(0xffffff),
     new THREE.Color(0x023750),
     new THREE.Color(0x028A9E),
     new THREE.Color(0x0EBFA9),
