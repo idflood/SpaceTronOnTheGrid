@@ -165,6 +165,7 @@
     "label": "Circles 3",
     "start": 4.514,
     "end": 12.172,
+    "collapsed": true,
     "properties": [
       {
         "name": "progression",
@@ -321,6 +322,113 @@
         "keys": [],
         "name": "percent_color",
         "val": 0.4
+      }
+    ]
+  },
+  {
+    "id": "item5",
+    "type": "Camera",
+    "label": "Camera 5",
+    "start": 0,
+    "end": 10.136,
+    "collapsed": false,
+    "properties": [
+      {
+        "keys": [
+          {
+            "time": 0,
+            "val": 200
+          },
+          {
+            "time": 10.098,
+            "val": 20
+          }
+        ],
+        "name": "x",
+        "val": 200
+      },
+      {
+        "keys": [],
+        "name": "y",
+        "val": 0
+      },
+      {
+        "keys": [
+          {
+            "time": 0,
+            "val": 600
+          },
+          {
+            "time": 10.098,
+            "val": 350
+          }
+        ],
+        "name": "z",
+        "val": 600
+      },
+      {
+        "keys": [
+          {
+            "time": 0,
+            "val": 60
+          },
+          {
+            "time": 10.098,
+            "val": 37
+          }
+        ],
+        "name": "target_x",
+        "val": 60
+      },
+      {
+        "keys": [],
+        "name": "target_y",
+        "val": 0
+      },
+      {
+        "keys": [],
+        "name": "target_z",
+        "val": 0
+      }
+    ]
+  },
+  {
+    "id": "item6",
+    "type": "Camera",
+    "label": "Camera 6",
+    "start": 10.13,
+    "end": 14.156,
+    "collapsed": false,
+    "properties": [
+      {
+        "keys": [],
+        "name": "x",
+        "val": -20
+      },
+      {
+        "keys": [],
+        "name": "y",
+        "val": 100
+      },
+      {
+        "keys": [],
+        "name": "z",
+        "val": 300
+      },
+      {
+        "keys": [],
+        "name": "target_x",
+        "val": 0
+      },
+      {
+        "keys": [],
+        "name": "target_y",
+        "val": 0
+      },
+      {
+        "keys": [],
+        "name": "target_z",
+        "val": 0
       }
     ]
   }
