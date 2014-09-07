@@ -38063,6 +38063,11 @@ define("vendors/three.js-extras/shaders/DigitalGlitch", function(){});
           name: 'target_z',
           label: 'target z',
           val: 0
+        },
+        fov: {
+          name: 'fov',
+          label: 'fov',
+          val: 45
         }
       };
 
@@ -38073,7 +38078,7 @@ define("vendors/three.js-extras/shaders/DigitalGlitch", function(){});
         }
         this.isCamera = true;
         this.target = new THREE.Vector3(this.values.target_x, this.values.target_y, this.values.target_z);
-        this.container = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+        this.container = new THREE.PerspectiveCamera(this.values.fov, window.innerWidth / window.innerHeight, 1, 2000);
         this.container.position.set(this.values.x, this.values.y, this.values.z);
       }
 
@@ -38084,6 +38089,7 @@ define("vendors/three.js-extras/shaders/DigitalGlitch", function(){});
         if (force == null) {
           force = false;
         }
+        this.container.fov = values.fov;
         this.container.position.set(values.x, values.y, values.z);
         this.target.set(values.target_x, values.target_y, values.target_z);
         return this.container.lookAt(this.target);
