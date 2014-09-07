@@ -1,3 +1,5 @@
+#http://www.clicktorelease.com/blog/vertex-displacement-noise-3d-webgl-glsl-three-js
+#
 define (require) ->
   _ = require 'lodash'
   THREE = require 'threejs'
@@ -9,6 +11,9 @@ define (require) ->
 
   # should not be a dependency.
   Audio = require 'cs!app/components/Audio'
+
+  ShaderVertex = require 'text!app/shaders/BasicNoise.vert'
+  ShaderFragement = require 'text!app/shaders/BasicNoise.frag'
 
   class AnimatedCircle
     @circleGeom = new THREE.CircleGeometry( 10, 30, 0, Math.PI * 2 )
@@ -36,6 +41,9 @@ define (require) ->
       @container = new THREE.Object3D()
       @container.scale.set(0.001,0.001,0.001)
       @container.position.set(@values.x, @values.y, @values.z)
+      @materials = []
+      @start = Date.now()
+
       @offset = new THREE.Vector3()
       @velocity = new THREE.Vector3()
       @weight = Math.random() * 0.5 + 0.5
@@ -73,6 +81,29 @@ define (require) ->
 
       @container = null
 
+    getMaterial: (color) ->
+      uniforms = {
+        time: {
+          type: 'f',
+          value: 0.0
+        },
+        color: {
+          type: 'c',
+          value: color
+        }
+      }
+      material = new THREE.ShaderMaterial({
+        vertexShader: ShaderVertex,
+        fragmentShader: ShaderFragement,
+        uniforms: uniforms,
+        transparent: true,
+        depthWrite: false,
+        depthTest: false
+        })
+
+      material.blending = THREE.AdditiveBlending
+      return material
+
     update: (seconds, progression) ->
       #if Audio.instance.high > 0.002
       #  @speed += Audio.instance.high
@@ -88,14 +119,20 @@ define (require) ->
       #console.log "ok"
       # Progression goes from 0 to 2, we want to be a percent of total
 
+      timeDiff = Date.now() - @start
+      for material in @materials
+        material.uniforms['time'].value = 0.00025 * ( timeDiff )
+
+
       #@timeline.seek(@timeline.duration() * progression)
       scale = @animatedProperties.scale * @values.size * 0.1
       @container.scale.set(scale, scale, scale)
 
     renderCircle: (size, color) =>
       #color = color.clone().multiplyScalar(@rng.random(0.3, 0.5))
-      material = new THREE.MeshBasicMaterial({color: color, wireframe: false, transparent: true, depthWrite: false, depthTest: false})
-      material.blending = THREE.AdditiveBlending
+      #material = new THREE.MeshBasicMaterial({color: color, wireframe: false, transparent: true, depthWrite: false, depthTest: false})
+      material = @getMaterial(color)
+      @materials.push(material)
 
       numSegments = parseInt(size / 1.5, 10) + 4
       #new THREE.CircleGeometry( size, numSegments, 0, Math.PI * 2 )
@@ -109,9 +146,11 @@ define (require) ->
       geom = AnimatedCircle.ringGeom
       if outlineWidth > 1
         geom = AnimatedCircle.ringGeom2
-      material = new THREE.MeshBasicMaterial({color: color, transparent: true, depthWrite: false, depthTest: false})
-      material.blending = THREE.AdditiveBlending
+      #material = new THREE.MeshBasicMaterial({color: color, transparent: true, depthWrite: false, depthTest: false})
+
       #new THREE.RingGeometry( size - 1, size + outlineWidth, 50, 1, 0, Math.PI * 2 )
+      material = @getMaterial(color)
+      @materials.push(material)
       object = new THREE.Mesh( geom, material )
       #object.position.set(x, y, 0 )
       @container.add( object )
