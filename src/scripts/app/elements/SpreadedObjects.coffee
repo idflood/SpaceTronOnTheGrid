@@ -67,12 +67,18 @@ define (require) ->
       @rngOutline = new RNG(@values.seed)
 
       for i in [0..@values.numItems - 1]
+        rndtype = @rng.random(0, 1000) / 1000
+        draw_outline = if rndtype < 0.8 then true else false
+        draw_circle = if rndtype > 0.5 then true else false
+
         color = Colors.get(@rng.random(0, 1000))
         if @rng.random(0, 1000) > @values.percent_color * 1000
           color = Colors.get(0)
 
-        fillColor = color.clone().multiplyScalar(@rng.random(0.1, 0.5))
-        rndtype = @rng.random(0, 1000) / 1000
+        fillColor = color.clone()
+        if draw_outline
+          fillColor.multiplyScalar(@rng.random(0.1, 0.5))
+
         size = @rng.random(@values.circleRadius, @values.circleRadiusMax)
         x = @getRandomPosition(@values.randX)
         y = @getRandomPosition(@values.randY)
@@ -84,8 +90,7 @@ define (require) ->
         duration *= 4
         border_radius = @rngOutline.random(1, 400) / 100
 
-        draw_outline = if rndtype < 0.8 then true else false
-        draw_circle = if rndtype > 0.5 then true else false
+
         if draw_outline == false
           # more fill opacity if no outline
           fillColor.multiplyScalar(3)
