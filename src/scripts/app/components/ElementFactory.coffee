@@ -12,16 +12,9 @@ define (require) ->
       Circles:
         classObject: Circles
 
-        create: (values, time) ->
-          item = new Circles(values)
-          return item
-
       Camera:
         classObject: Camera
 
-        create: (values, time) ->
-          item = new Camera(values)
-          return item
 
     getTypeClass: (itemType) =>
       ElementFactory.elements[itemType].classObject
@@ -32,8 +25,7 @@ define (require) ->
       if !item
         console.warn("Can't create item: " + itemName)
         return false
-      console.log("will create a " + itemName)
-      console.log values
-      return item.create(values, time)
+
+      return new item.classObject(values)
 
   window.ElementFactory = ElementFactory
