@@ -1,6 +1,7 @@
 define (require) ->
   Camera = require 'cs!app/elements/Camera'
   Circles = require 'cs!app/elements/Circles'
+  Boxes = require 'cs!app/elements/Boxes'
 
   extend = (object, properties) ->
     for key, val of properties
@@ -11,6 +12,9 @@ define (require) ->
     @elements:
       Circles:
         classObject: Circles
+
+      Boxes:
+        classObject: Boxes
 
       Camera:
         classObject: Camera
