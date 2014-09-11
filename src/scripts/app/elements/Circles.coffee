@@ -9,9 +9,11 @@ define (require) ->
 
   class Circles
     @properties:
-      numItems: {name: 'numItems', label: 'num items', val: 20}
+      numItems: {name: 'numItems', label: 'num items', val: 20, triggerRebuild: true}
       seed: {name: 'seed', label: 'seed', val: 12002, triggerRebuild: true}
-      radius: {name: 'radius', label: 'radius', val: 80}
+      randX: {name: 'randX', label: 'random x', val: 80, triggerRebuild: true}
+      randY: {name: 'randY', label: 'random y', val: 80, triggerRebuild: true}
+      randZ: {name: 'randZ', label: 'random z', val: 0, triggerRebuild: true}
       circleRadius: {name: 'circleRadius', label: 'circle radius', val: 20}
       circleRadiusMax: {name: 'circleRadiusMax', label: 'circle radius max', val: 20}
       progression: {name: 'progression', label: 'progression', val: 1}
@@ -20,6 +22,9 @@ define (require) ->
       x: {name: 'x', label: 'x', val: 0}
       y: {name: 'y', label: 'y', val: 0}
       z: {name: 'z', label: 'z', val: 0}
+      rotX: {name: 'rotX', label: 'rotation x', val: 0}
+      rotY: {name: 'rotY', label: 'rotation y', val: 0}
+      rotZ: {name: 'rotZ', label: 'rotation z', val: 0}
 
     constructor: (@values = {}, time = 0) ->
       # Set the default value of instance properties.
@@ -68,9 +73,9 @@ define (require) ->
         fillColor = color.clone().multiplyScalar(@rng.random(0.1, 0.5))
         rndtype = @rng.random(0, 1000) / 1000
         size = @rng.random(@values.circleRadius, @values.circleRadiusMax)
-        x = @getRandomPosition()
-        y = @getRandomPosition()
-        z = @getRandomPosition()
+        x = @getRandomPosition(@values.randX)
+        y = @getRandomPosition(@values.randY)
+        z = @getRandomPosition(@values.randZ)
         pos = {x: x, y: y, z: z}
 
         delay = @rngAnimation.random(0, 2400) / 1000
@@ -130,6 +135,9 @@ define (require) ->
       if force || @valueChanged("x", values) || @valueChanged("y", values) || @valueChanged("z", values)
         @container.position.set(values.x, values.y, values.z)
 
+      if force || @valueChanged("rotX", values) || @valueChanged("rotY", values) || @valueChanged("rotZ", values)
+        @container.rotation.set(values.rotX, values.rotY, values.rotZ)
+
       #if force || @valueChanged("progression", values)
       progression = values.progression / 2
       @timeline.seek(@totalDuration * progression)
@@ -141,11 +149,14 @@ define (require) ->
           pos = @items_position[key]
           item.container.position.set(pos.x, pos.y, pos.z * values.depth)
 
+      # save the new values
+      @values = _.merge(@values, values)
+
       if needs_rebuild == true
         @rebuild(seconds)
 
-    getRandomPosition: () ->
-      return @rng.random(-@values.radius, @values.radius)
+    getRandomPosition: (scale = 1) ->
+      return @rng.random(-scale, scale)
 
     destroy: () ->
       # clean up...

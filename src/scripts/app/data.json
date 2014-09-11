@@ -37,7 +37,12 @@
       },
       {
         "keys": [],
-        "name": "radius",
+        "name": "randX",
+        "val": 84
+      },
+      {
+        "keys": [],
+        "name": "randY",
         "val": 84
       },
       {
@@ -119,7 +124,12 @@
       },
       {
         "keys": [],
-        "name": "radius",
+        "name": "randX",
+        "val": 265
+      },
+      {
+        "keys": [],
+        "name": "randY",
         "val": 265
       },
       {
@@ -222,7 +232,12 @@
       },
       {
         "keys": [],
-        "name": "radius",
+        "name": "randX",
+        "val": 80
+      },
+      {
+        "keys": [],
+        "name": "randY",
         "val": 80
       },
       {
@@ -267,7 +282,12 @@
       },
       {
         "keys": [],
-        "name": "radius",
+        "name": "randX",
+        "val": 150
+      },
+      {
+        "keys": [],
+        "name": "randY",
         "val": 150
       },
       {
