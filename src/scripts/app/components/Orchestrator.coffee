@@ -61,8 +61,6 @@ define (require) ->
 
             item.values[property.name] = item_property.val
 
-          #console.log item
-
         # Handle adding keys to previously emptry properties
         #if item.isDirty && item.values
         #  for key, prop of item.properties
@@ -76,16 +74,12 @@ define (require) ->
           item.isDirty = true
 
         if item.timeline and item.isDirty and item.properties
-          console.log "dirty timeline"
-          console.log item
           item.isDirty = false
           item.timeline.clear()
-          #console.log item
+
           for property in item.properties
             propertyTimeline = new TimelineMax()
             propName = property.name
-            #console.log "rebuilding object.."
-            #console.log item
             # Add a inital key, even if there is no animation to set the value from time 0.
             first_key = if property.keys.length > 0 then property.keys[0] else false
             tween_time = 0
