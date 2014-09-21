@@ -16,7 +16,7 @@
 # Soundjs music visualizer
 # https://github.com/CreateJS/SoundJS/blob/master/examples/MusicVisualizer.html
 define (require) ->
-  $ = require 'jquery'
+  #$ = require 'jquery'
 
   tpl_timeline = require 'text!app/templates/timeline.tpl.html'
   EditorTimeline = require 'cs!timeline/Timeline'

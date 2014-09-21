@@ -13,7 +13,8 @@ require.config({
     Signal: "bower_components/js-signals/dist/signals",
     TweenMax: "bower_components/gsap/src/uncompressed/TweenMax",
     TimelineMax: "bower_components/gsap/src/uncompressed/TimelineMax",
-    lodash: "bower_components/lodash/dist/lodash"
+    lodash: "bower_components/lodash/dist/lodash",
+    draggablenumber: "bower_components/draggable-number.js/dist/draggable-number"
   },
   shim: {
     TimelineMax: {

@@ -3,6 +3,7 @@ define (require) ->
   Signals = require 'Signal'
   _ = require 'lodash'
   d3 = require 'd3'
+  DraggableNumber = require 'draggablenumber'
 
   Mustache = require 'Mustache'
   tpl_property = require 'text!app/templates/propertyNumber.tpl.html'
@@ -71,7 +72,9 @@ define (require) ->
       view = Mustache.render(tpl_property, data)
       @$el.html(view)
       @$el.find('.property__key').click(@onKeyClick)
-      @$el.find('input').change (e) =>
+
+      $input = @$el.find('input')
+      onInputChange = (e) =>
         current_value = @getInputVal()
         currentTime = @timer.getCurrentTime() / 1000
         current_property = @getProperty()
@@ -98,3 +101,7 @@ define (require) ->
             currentTime = @timer.getCurrentTime() / 1000
             # Set the property on the instance object.
             @object.object.update(currentTime - @object.start)
+      draggable = new DraggableNumber($input.get(0), {
+        changeCallback: onInputChange
+      })
+      $input.change(onInputChange)
