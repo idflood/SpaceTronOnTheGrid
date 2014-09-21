@@ -55,6 +55,7 @@ define (require) ->
     empty: () ->
       if !@items || !@items.length then return
       @timeline.clear()
+      @items_position = []
 
       for item in @items
         @container.remove(item.container)

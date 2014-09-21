@@ -12,7 +12,6 @@ define (require) ->
 
     constructor: () ->
       super
-      console.log AnimatedCircle.properties
 
     getGeometry: () ->
       return AnimatedCircle.circleGeom
