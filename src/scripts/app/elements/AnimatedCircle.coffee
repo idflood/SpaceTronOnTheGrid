@@ -1,5 +1,3 @@
-#http://www.clicktorelease.com/blog/vertex-displacement-noise-3d-webgl-glsl-three-js
-#
 define (require) ->
   _ = require 'lodash'
   THREE = require 'threejs'

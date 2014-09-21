@@ -68,9 +68,14 @@ define (require) ->
       @rngOutline = new RNG(@values.seed)
 
       for i in [0..@values.numItems - 1]
+        itemClass = @getItemClass()
         rndtype = @rng.random(0, 1000) / 1000
         draw_outline = if rndtype < 0.8 then true else false
         draw_circle = if rndtype > 0.5 then true else false
+
+        if itemClass.noOutline
+          draw_outline = false
+          draw_circle = true
 
         color = Colors.get(@rng.random(0, 1000))
         if @rng.random(0, 1000) > @values.percent_color * 1000
@@ -95,7 +100,7 @@ define (require) ->
         if draw_outline == false
           # more fill opacity if no outline
           fillColor.multiplyScalar(3)
-        itemClass = @getItemClass()
+
         item = new itemClass({
           size: size,
           outlineWidth: border_radius,
