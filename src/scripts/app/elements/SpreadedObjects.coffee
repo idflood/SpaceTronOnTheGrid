@@ -131,6 +131,8 @@ define (require) ->
       @cache[key] = new_val
       return has_changed
 
+    degreeToRadian: (degree) -> Math.PI * degree / 180
+
     update: (seconds, values = false, force = false) ->
       if values == false then values = @values
       needs_rebuild = false
@@ -144,7 +146,7 @@ define (require) ->
         @container.position.set(values.x, values.y, values.z)
 
       if force || @valueChanged("rotX", values) || @valueChanged("rotY", values) || @valueChanged("rotZ", values)
-        @container.rotation.set(values.rotX, values.rotY, values.rotZ)
+        @container.rotation.set(@degreeToRadian(values.rotX), @degreeToRadian(values.rotY), @degreeToRadian(values.rotZ))
 
       #if force || @valueChanged("progression", values)
       progression = values.progression / 2
