@@ -89,6 +89,10 @@ define (require) ->
           type: 'f',
           value: 0.0
         },
+        strength: {
+          type: 'f',
+          value: 0.2
+        },
         color: {
           type: 'c',
           value: color
