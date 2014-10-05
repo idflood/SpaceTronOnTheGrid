@@ -1,6 +1,7 @@
 define (require) ->
   d3 = require 'd3'
   Signals = require 'Signal'
+  Utils = require 'cs!timeline/components/Utils'
 
   class Keys
     constructor: (@timeline) ->
@@ -13,6 +14,7 @@ define (require) ->
       sortKeys = (keys) -> keys.sort((a, b) -> d3.ascending(a.time, b.time))
 
       dragmove = (d) ->
+        sourceEvent = d3.event.sourceEvent
         propertyObject = this.parentNode.parentNode
         lineObject = propertyObject.parentNode.parentNode
         propertyData = d3.select(propertyObject).datum()
@@ -22,8 +24,16 @@ define (require) ->
         mouse = d3.mouse(this)
         dx = self.timeline.x.invert(mouse[0])
         dx = dx.getTime()
-        d.time += dx / 1000 - currentDomainStart / 1000
+        dx = dx / 1000 - currentDomainStart / 1000
+        dx = d.time + dx
 
+        timeMatch = false
+        if sourceEvent.shiftKey
+          timeMatch = Utils.getClosestTime(dx, lineData.id, propertyData.name)
+        if !timeMatch
+          timeMatch = dx
+
+        d.time = timeMatch
         propertyData.keys = sortKeys(propertyData.keys)
         lineData.isDirty = true
         self.onKeyUpdated.dispatch()

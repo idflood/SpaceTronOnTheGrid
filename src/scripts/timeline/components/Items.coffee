@@ -2,6 +2,7 @@ define (require) ->
   d3 = require 'd3'
   Signals = require 'Signal'
   _ = require 'lodash'
+  Utils = require 'cs!timeline/components/Utils'
 
   class Items
     constructor: (@timeline, @container) ->
@@ -59,17 +60,32 @@ define (require) ->
 
       dragmoveLeft = (d) ->
         d3.event.sourceEvent.stopPropagation()
+        sourceEvent = d3.event.sourceEvent
         dx = self.timeline.x.invert(d3.event.x).getTime() / 1000
-        diff = (dx - d.start)
-        d.start += diff
+        timeMatch = false
+
+        if sourceEvent.shiftKey
+          timeMatch = Utils.getClosestTime(dx, d.id)
+        if !timeMatch
+          diff = (dx - d.start)
+          timeMatch = d.start + diff
+
+        d.start = timeMatch
         d.isDirty = true
         self.onUpdate.dispatch()
 
       dragmoveRight = (d) ->
         d3.event.sourceEvent.stopPropagation()
+        sourceEvent = d3.event.sourceEvent
         dx = self.timeline.x.invert(d3.event.x).getTime() / 1000
-        diff = (dx - d.end)
-        d.end += diff
+        timeMatch = false
+        if sourceEvent.shiftKey
+          timeMatch = Utils.getClosestTime(dx)
+        if !timeMatch
+          diff = (dx - d.end)
+          timeMatch = d.end + diff
+
+        d.end = timeMatch
         d.isDirty = true
         self.onUpdate.dispatch()
 
