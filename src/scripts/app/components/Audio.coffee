@@ -85,7 +85,7 @@ define (require) ->
 
       volume = false
       if volume
-        gain2 = @context.createGainNode()
+        gain2 = @context.createGain()
         @delay.connect(gain2)
         gain2.gain.value = 0.00
         gain2.connect(@context.destination)
