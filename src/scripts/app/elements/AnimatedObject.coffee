@@ -124,6 +124,7 @@ define (require) ->
       timeDiff = Date.now() - @start
       for material in @materials
         material.uniforms['time'].value = 0.00025 * ( timeDiff )
+        material.uniforms['strength'].value = window.app.audio.mid
 
       scale = @animatedProperties.scale * @values.size * 0.1
       @container.scale.set(scale, scale, scale)
