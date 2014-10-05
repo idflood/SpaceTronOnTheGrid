@@ -37,11 +37,11 @@ define (require) ->
             item.object.destroy()
             delete item.object
 
-        # If object doesn't exist skip the update.
-        if should_exist == false then continue
-
         # Assign the object class to be able to access all object properties in propertiesEditor
         if !item.classObject then item.classObject = @factory.getTypeClass(item.type)
+
+        # If object doesn't exist skip the update.
+        if should_exist == false then continue
 
         # create the values object to contain all properties
         if !item.values
