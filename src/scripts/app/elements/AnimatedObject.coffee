@@ -30,6 +30,7 @@ define (require) ->
       x: {name: 'x', label: 'x', val: 0}
       y: {name: 'y', label: 'y', val: 0}
       z: {name: 'z', label: 'z', val: 0}
+      randRotZ: {name: 'randRotZ', label: 'random rotation z', val: 0}
 
     constructor: (@values = {}, time = 0) ->
       for key, prop of AnimatedObject.properties
@@ -39,6 +40,7 @@ define (require) ->
       @container = new THREE.Object3D()
       @container.scale.set(0.001,0.001,0.001)
       @container.position.set(@values.x, @values.y, @values.z)
+      @container.rotation.set(0, 0, @values.randRotZ)
       @materials = []
       @start = Date.now()
 
