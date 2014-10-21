@@ -31,6 +31,8 @@ define (require) ->
       y: {name: 'y', label: 'y', val: 0}
       z: {name: 'z', label: 'z', val: 0}
       randRotZ: {name: 'randRotZ', label: 'random rotation z', val: 0}
+      randScaleX: {name: 'randScaleX', label: 'random scale x', val: 0}
+      randScaleY: {name: 'randScaleY', label: 'random scale y', val: 0}
 
     constructor: (@values = {}, time = 0) ->
       for key, prop of AnimatedObject.properties
@@ -129,7 +131,7 @@ define (require) ->
         material.uniforms['strength'].value = window.app.audio.mid
 
       scale = @animatedProperties.scale * @values.size * 0.1
-      @container.scale.set(scale, scale, scale)
+      @container.scale.set(scale * (1 + @values.randScaleX), scale * (1 + @values.randScaleY), scale)
 
     renderCircle: (size, color) =>
       material = @getMaterial(color)

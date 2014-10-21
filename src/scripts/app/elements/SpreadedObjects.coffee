@@ -14,6 +14,8 @@ define (require) ->
       randY: {name: 'randY', label: 'random y', val: 80, triggerRebuild: true}
       randZ: {name: 'randZ', label: 'random z', val: 0, triggerRebuild: true}
       randRotZ: {name: 'randRotZ', label: 'random rotation z', val: 0, triggerRebuild: true}
+      randScaleX: {name: 'randScaleX', label: 'random scale x', val: 0, triggerRebuild: true}
+      randScaleY: {name: 'randScaleY', label: 'random scale y', val: 0, triggerRebuild: true}
       circleRadius: {name: 'circleRadius', label: 'circle radius', val: 20}
       circleRadiusMax: {name: 'circleRadiusMax', label: 'circle radius max', val: 20}
       progression: {name: 'progression', label: 'progression', val: 1}
@@ -91,6 +93,8 @@ define (require) ->
         y = @getRandomPosition(@values.randY)
         z = @getRandomPosition(@values.randZ)
         randRotZ = @rng.random(0, 1000) / 1000 * Math.PI * @values.randRotZ
+        randScaleX = @rng.random(0, 1000) / 1000 * @values.randScaleX
+        randScaleY = @rng.random(0, 1000) / 1000 * @values.randScaleY
         pos = {x: x, y: y, z: z}
 
         delay = @rngAnimation.random(0, 2400) / 1000
@@ -116,7 +120,9 @@ define (require) ->
           x: pos.x,
           y: pos.y,
           z: pos.z,
-          randRotZ: randRotZ
+          randRotZ: randRotZ,
+          randScaleX: randScaleX,
+          randScaleY: randScaleY
         })
         @container.add(item.container)
         @timeline.add(item.timeline, 0)
