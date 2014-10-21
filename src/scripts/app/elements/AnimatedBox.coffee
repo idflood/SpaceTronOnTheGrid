@@ -10,7 +10,6 @@ define (require) ->
 
     constructor: () ->
       super
-      console.log AnimatedBox.properties
 
     getGeometry: () ->
       return AnimatedBox.circleGeom
