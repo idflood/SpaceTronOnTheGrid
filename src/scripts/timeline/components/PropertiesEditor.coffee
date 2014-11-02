@@ -19,17 +19,19 @@ define (require) ->
     onKeyAdded: () =>
       @keyAdded.dispatch()
 
-    onSelect: (selectedObject) =>
+    onSelect: (selectedObject, data = false, propertyData = false) =>
       @$container.empty()
+      # data and propertyData are defined on key select.
+      property_name = false
+      if propertyData
+        property_name = propertyData.name
 
-      console.log "selected:"
-      console.log selectedObject
       type_properties = selectedObject.classObject.properties
 
       for key, prop of type_properties
-        instance_prop = _.find(selectedObject.properties, (d) -> d.name == key)
-        prop = new PropertyNumber(prop, instance_prop, selectedObject, @timer)
-        prop.keyAdded.add(@onKeyAdded)
-        @$container.append(prop.$el)
-
-
+        # show all properties or only 1 if we selected a key.
+        if !property_name || key == property_name
+          instance_prop = _.find(selectedObject.properties, (d) -> d.name == key)
+          prop = new PropertyNumber(prop, instance_prop, selectedObject, @timer, data)
+          prop.keyAdded.add(@onKeyAdded)
+          @$container.append(prop.$el)

@@ -12,7 +12,8 @@ define (require) ->
     # @property: Static property definition (ex: {name: 'x', label: 'x', val: 0})
     # @instance_property: The current property on the data object.
     # @object: The parent object.
-    constructor: (@property, @instance_property, @object, @timer) ->
+    constructor: (@property, @instance_property, @object, @timer, @key_val = false) ->
+      # key_val is defined if we selected a key
       @$el = $(tpl_property)
       @keyAdded = new Signals.Signal()
       @render()
@@ -27,6 +28,10 @@ define (require) ->
 
     getCurrentVal: () =>
       val = @property.val
+
+      # if we selected a key simply return it's value
+      if @key_val
+        return @key_val.val
 
       if @values[@property.name]?
         # If defined in the instance values use that instead (keys)
@@ -77,6 +82,9 @@ define (require) ->
       onInputChange = (e) =>
         current_value = @getInputVal()
         currentTime = @timer.getCurrentTime() / 1000
+        # if we selected a key simply get the time from it.
+        if @key_val
+          currentTime = @key_val.time
         current_property = @getProperty()
 
         if current_property.keys && current_property.keys.length
@@ -101,6 +109,11 @@ define (require) ->
             currentTime = @timer.getCurrentTime() / 1000
             # Set the property on the instance object.
             @object.object.update(currentTime - @object.start)
+
+        # if we selected a key we need to trigger a linedata rebuild
+        if @key_val && @object
+          @object.isDirty = true
+
       draggable = new DraggableNumber($input.get(0), {
         changeCallback: onInputChange
       })

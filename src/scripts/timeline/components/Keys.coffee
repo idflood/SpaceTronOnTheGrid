@@ -50,12 +50,9 @@ define (require) ->
         propertyObject = this.parentNode.parentNode
         lineObject = propertyObject.parentNode.parentNode
         lineData = d3.select(lineObject).datum()
+        propertyData = d3.select(propertyObject).datum()
 
-        if window.gui then window.gui.destroy()
-        gui = new dat.GUI()
-        controller = gui.add(d, "val")
-        controller.onChange (v) -> lineData.isDirty = true
-        window.gui = gui
+        self.timeline.onSelect.dispatch(lineData, d, propertyData)
 
       key_size = 6
       keys.enter()
