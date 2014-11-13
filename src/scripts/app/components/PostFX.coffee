@@ -24,8 +24,11 @@ define (require) ->
       # There will only be 1 rendermodel and we need to be able
       # to swith camera from the orchestrator.
       window.renderModel = renderModel
+
+      dpr = if window.devicePixelRatio? then window.devicePixelRatio else 1
+
       @effectFXAA = new THREE.ShaderPass( THREE.FXAAShader )
-      @effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight )
+      @effectFXAA.uniforms[ 'resolution' ].value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr))
 
       @bloom = new THREE.BloomPass(0.9, 25, 4)
 
@@ -39,6 +42,7 @@ define (require) ->
       @filmShader.renderToScreen = true
 
       @composer = new THREE.EffectComposer( @renderer )
+      @composer.setSize(window.innerWidth * dpr, window.innerHeight * dpr)
       @composer.addPass( renderModel )
       @composer.addPass( @effectFXAA )
       @composer.addPass( @bloom )
@@ -47,8 +51,9 @@ define (require) ->
       @composer.addPass( @filmShader )
 
     resize: (SCREEN_WIDTH, SCREEN_HEIGHT) ->
-      @composer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT )
-      @effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT )
+      dpr = if window.devicePixelRatio? then window.devicePixelRatio else 1
+      @composer.setSize(SCREEN_WIDTH * dpr, SCREEN_HEIGHT * dpr)
+      @effectFXAA.uniforms[ 'resolution' ].value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr))
 
     render: (delta) ->
       @renderer.clear()

@@ -149,16 +149,19 @@ define (require) ->
         SCREEN_HEIGHT -= timelineheight
         SCREEN_WIDTH -= propertieswidth
 
+      #console.log {width: SCREEN_WIDTH, height: SCREEN_HEIGHT}
       return {width: SCREEN_WIDTH, height: SCREEN_HEIGHT}
 
     updateCameraAspect: (camera, size = false) =>
-      if size == false
-        size = @getScreenSize()
-      camera.aspect = size.width / size.height
+      #if size == false
+      #  size = @getScreenSize()
+      #camera.aspect = size.width / size.height
+      camera.aspect = window.innerWidth / window.innerHeight
       camera.updateProjectionMatrix()
 
     onWindowResize: () =>
       size = @getScreenSize()
+
       @updateCameraAspect(@camera, size)
       @updateCameraAspect(window.activeCamera, size)
 
