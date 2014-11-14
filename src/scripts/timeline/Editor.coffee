@@ -139,10 +139,11 @@ define (require) ->
 
     playPause: () =>
       @timer.toggle()
-      if @timer.is_playing
-        @app.audio.play()
-      else
-        @app.audio.pause()
+      if @app.audio
+        if @timer.is_playing
+          @app.audio.play()
+        else
+          @app.audio.pause()
       console.log "toggle " + @timer.is_playing
 
     initControls: () ->
