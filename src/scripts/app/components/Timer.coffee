@@ -9,6 +9,7 @@ define (require) ->
       @time = [2400]
       @is_playing = false
       @last_timeStamp = -1
+      @last_time = -1
       @updated = new Signals.Signal()
       window.requestAnimationFrame(@update)
 
@@ -34,9 +35,11 @@ define (require) ->
       if @is_playing
         @time[0] += elapsed
 
-      @updated.dispatch(@time[0])
+      if @last_time != @time[0]
+        @updated.dispatch(@time[0])
 
       @last_timeStamp = timestamp
+      @last_time = @time[0]
 
       window.requestAnimationFrame(@update)
 
