@@ -66,7 +66,9 @@ define (require) ->
 
       dragTimeMove = (d) ->
         d3.event.sourceEvent.stopPropagation()
-        dx = self.xDisplayed.invert(d3.event.sourceEvent.x - self.margin.left)
+        event = d3.event.sourceEvent
+        event_x = if event.x? then event.x else event.clientX
+        dx = self.xDisplayed.invert(event_x - self.margin.left)
         dx = dx.getTime()
         dx = Math.max(0, dx)
         self.currentTime[0] = dx
