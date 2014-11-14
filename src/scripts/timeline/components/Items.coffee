@@ -152,13 +152,20 @@ define (require) ->
 
         return "translate(0," + y + ")"
 
+      barWithStartAndEnd = (d) ->
+        if d.start? && d.end? then return true
+        return false
+
       bar.selectAll('.bar-anchor--left')
+        .filter(barWithStartAndEnd)
         .attr("x", (d) -> return self.timeline.x(d.start * 1000) - 1)
 
       bar.selectAll('.bar-anchor--right')
+        .filter(barWithStartAndEnd)
         .attr("x", (d) -> return self.timeline.x(d.end * 1000) - 1)
 
       bar.selectAll('.bar')
+        .filter(barWithStartAndEnd)
         .attr("x", (d) -> return self.timeline.x(d.start * 1000) + bar_border)
         .attr("width", (d) ->
           return Math.max(0, (self.timeline.x(d.end) - self.timeline.x(d.start)) * 1000 - bar_border)
