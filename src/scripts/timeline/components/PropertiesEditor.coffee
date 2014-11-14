@@ -26,12 +26,20 @@ define (require) ->
       if propertyData
         property_name = propertyData.name
 
-      type_properties = selectedObject.classObject.properties
+      if selectedObject.classObject
+        # if we uuse the ElementFactory we have access to more informations
+        type_properties = selectedObject.classObject.properties
 
-      for key, prop of type_properties
-        # show all properties or only 1 if we selected a key.
-        if !property_name || key == property_name
-          instance_prop = _.find(selectedObject.properties, (d) -> d.name == key)
-          prop = new PropertyNumber(prop, instance_prop, selectedObject, @timer, data)
+        for key, prop of type_properties
+          # show all properties or only 1 if we selected a key.
+          if !property_name || key == property_name
+            instance_prop = _.find(selectedObject.properties, (d) -> d.name == key)
+            prop = new PropertyNumber(prop, instance_prop, selectedObject, @timer, data)
+            prop.keyAdded.add(@onKeyAdded)
+            @$container.append(prop.$el)
+      else
+        # Basic data, loop through properties.
+        for key, instance_prop of selectedObject.properties
+          prop = new PropertyNumber({label: instance_prop.name}, instance_prop, selectedObject, @timer, data)
           prop.keyAdded.add(@onKeyAdded)
           @$container.append(prop.$el)
