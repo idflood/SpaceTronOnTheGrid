@@ -26,7 +26,7 @@ define (require) ->
     constructor: () ->
       @app = window.app
       @timer = @app.timer
-      @app.audio.playing = false
+      if @app.audio then @app.audio.playing = false
 
       @$timeline = $(tpl_timeline)
       $('body').append(@$timeline)
@@ -78,6 +78,7 @@ define (require) ->
       @propertiesEditor.keyAdded.add(@onKeyAdded)
 
     initAdd: () ->
+      if !window.ElementFactory then return
       $container = @$timeline.find('.submenu--add')
       elements = window.ElementFactory.elements
       self = this
