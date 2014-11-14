@@ -4,7 +4,7 @@ define (require) ->
   Signals = require 'Signal'
   PropertyNumber = require 'cs!timeline/components/PropertyNumber'
 
-  tpl_propertiesEditor = require 'text!app/templates/propertiesEditor.tpl.html'
+  tpl_propertiesEditor = require 'text!timeline/templates/propertiesEditor.tpl.html'
 
   class PropertiesEditor
     constructor: (@timeline, @timer) ->
