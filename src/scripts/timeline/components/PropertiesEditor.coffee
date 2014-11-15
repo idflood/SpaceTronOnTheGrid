@@ -26,6 +26,9 @@ define (require) ->
       if propertyData
         property_name = propertyData.name
 
+      if selectedObject.label
+        @$container.append('<h2 class="properties-editor__title">' + selectedObject.label + '</h2>')
+
       if selectedObject.classObject
         # if we uuse the ElementFactory we have access to more informations
         type_properties = selectedObject.classObject.properties
