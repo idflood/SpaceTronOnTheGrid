@@ -14,7 +14,7 @@ define (require) ->
   require 'vendors/three.js-extras/shaders/FilmShader'
   require 'vendors/three.js-extras/shaders/ConvolutionShader'
   require 'vendors/three.js-extras/shaders/VignetteShader'
-  require 'vendors/three.js-extras/shaders/DigitalGlitch'
+  require 'app/shaders/DigitalGlitch2'
 
   class PostFX
     constructor: (@scene, @camera, @renderer, size) ->
@@ -37,6 +37,7 @@ define (require) ->
 
       @glitchPass = new THREE.GlitchPass2()
       @glitchPass.intensity = 0.3;
+      @glitchPass.uniforms.tScratch.value = THREE.ImageUtils.loadTexture( "src/images/lensflare_dirt.jpg" )
 
       @vignettePass = new THREE.ShaderPass(THREE.VignetteShader)
       @vignettePass.uniforms['darkness'].value = 2
@@ -49,7 +50,7 @@ define (require) ->
       @composer.addPass( renderModel )
       @composer.addPass( @effectFXAA )
       @composer.addPass( @bloom )
-      #@composer.addPass( @glitchPass )
+      @composer.addPass( @glitchPass )
       @composer.addPass( @vignettePass )
       @composer.addPass( @filmShader )
 

@@ -1,14 +1,14 @@
 THREE.GlitchPass2 = function ( dt_size ) {
 
-  if ( THREE.DigitalGlitch === undefined ) console.error( "THREE.GlitchPass relies on THREE.DigitalGlitch" );
+  if ( THREE.DigitalGlitch2 === undefined ) console.error( "THREE.GlitchPass relies on THREE.DigitalGlitch" );
 
-  var shader = THREE.DigitalGlitch;
+  var shader = THREE.DigitalGlitch2;
   this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
   if(dt_size==undefined) dt_size=64;
 
   this.intensity = 1;
-  this.uniforms[ "tDisp"].value=this.generateHeightmap(dt_size);
+  this.uniforms["tDisp"].value=this.generateHeightmap(dt_size);
 
 
   this.material = new THREE.ShaderMaterial({
