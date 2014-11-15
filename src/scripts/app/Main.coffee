@@ -47,7 +47,8 @@ define (require) ->
       @data = JSON.parse(dataJson)
       #@data = []
 
-      @camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 )
+      size = @getScreenSize()
+      @camera = new THREE.PerspectiveCamera( 45, size.width / size.height, 1, 2000 )
       @camera.position.z = 600
       window.activeCamera = @camera
 
@@ -60,7 +61,7 @@ define (require) ->
       document.body.appendChild( container )
 
       @renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } )
-      @renderer.setSize( window.innerWidth, window.innerHeight )
+      @renderer.setSize(size.width, size.height)
 
       #@renderer.setClearColor( 0xe1d8c7, 1)
       @renderer.setClearColor( 0x111111, 1)
@@ -74,7 +75,7 @@ define (require) ->
 
       window.addEventListener('resize', @onWindowResize, false)
 
-      @postfx = new PostFX(@scene, @camera, @renderer)
+      @postfx = new PostFX(@scene, @camera, @renderer, size)
       #new Background(@scene)
 
       @animate()
@@ -153,10 +154,9 @@ define (require) ->
       return {width: SCREEN_WIDTH, height: SCREEN_HEIGHT}
 
     updateCameraAspect: (camera, size = false) =>
-      #if size == false
-      #  size = @getScreenSize()
-      #camera.aspect = size.width / size.height
-      camera.aspect = window.innerWidth / window.innerHeight
+      if size == false
+        size = @getScreenSize()
+      camera.aspect = size.width / size.height
       camera.updateProjectionMatrix()
 
     onWindowResize: () =>

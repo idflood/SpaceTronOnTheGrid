@@ -17,7 +17,7 @@ define (require) ->
   require 'vendors/three.js-extras/shaders/DigitalGlitch'
 
   class PostFX
-    constructor: (@scene, @camera, @renderer) ->
+    constructor: (@scene, @camera, @renderer, size) ->
       @renderer.autoClear = false
 
       renderModel = new THREE.RenderPass( @scene, @camera )
@@ -27,10 +27,13 @@ define (require) ->
 
       dpr = if window.devicePixelRatio? then window.devicePixelRatio else 1
 
-      @effectFXAA = new THREE.ShaderPass( THREE.FXAAShader )
-      @effectFXAA.uniforms[ 'resolution' ].value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr))
+      @renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false }
+      @renderTarget = new THREE.WebGLRenderTarget(size.width * dpr, size.height * dpr, @renderTargetParameters)
 
-      @bloom = new THREE.BloomPass(0.9, 25, 4)
+      @effectFXAA = new THREE.ShaderPass( THREE.FXAAShader )
+      @effectFXAA.uniforms[ 'resolution' ].value.set(1 / (size.width * dpr), 1 / (size.height * dpr))
+
+      @bloom = new THREE.BloomPass(0.6, 25, 4)
 
       @glitchPass = new THREE.GlitchPass2()
       @glitchPass.intensity = 0.3;
@@ -41,8 +44,8 @@ define (require) ->
       @filmShader = new THREE.FilmPass( 0.34, 0.01, 648, false )
       @filmShader.renderToScreen = true
 
-      @composer = new THREE.EffectComposer( @renderer )
-      @composer.setSize(window.innerWidth * dpr, window.innerHeight * dpr)
+      @composer = new THREE.EffectComposer( @renderer, @renderTarget )
+      @composer.setSize(size.width * dpr, size.height * dpr)
       @composer.addPass( renderModel )
       @composer.addPass( @effectFXAA )
       @composer.addPass( @bloom )
@@ -52,8 +55,10 @@ define (require) ->
 
     resize: (SCREEN_WIDTH, SCREEN_HEIGHT) ->
       dpr = if window.devicePixelRatio? then window.devicePixelRatio else 1
-      @composer.setSize(SCREEN_WIDTH * dpr, SCREEN_HEIGHT * dpr)
-      @effectFXAA.uniforms[ 'resolution' ].value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr))
+      #@composer.setSize(SCREEN_WIDTH * dpr, SCREEN_HEIGHT * dpr)
+      @renderTarget = new THREE.WebGLRenderTarget(SCREEN_WIDTH * dpr, SCREEN_HEIGHT * dpr, @renderTargetParameters)
+      @composer.reset(@renderTarget)
+      @effectFXAA.uniforms[ 'resolution' ].value.set(1 / (SCREEN_WIDTH * dpr), 1 / (SCREEN_HEIGHT * dpr))
 
     render: (delta) ->
       @renderer.clear()
