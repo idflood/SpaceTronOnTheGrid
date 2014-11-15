@@ -43,6 +43,7 @@ define (require) ->
       else
         # Basic data, loop through properties.
         for key, instance_prop of selectedObject.properties
-          prop = new PropertyNumber({label: instance_prop.name}, instance_prop, selectedObject, @timer, data)
-          prop.keyAdded.add(@onKeyAdded)
-          @$container.append(prop.$el)
+          if !property_name || instance_prop.name == property_name
+            prop = new PropertyNumber({label: instance_prop.name}, instance_prop, selectedObject, @timer, data)
+            prop.keyAdded.add(@onKeyAdded)
+            @$container.append(prop.$el)
