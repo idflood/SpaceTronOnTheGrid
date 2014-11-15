@@ -7,8 +7,9 @@
   border-left: 1px solid #1d1d1d
   background: #111
   font-size: 11px
-  color: #fafafa
+  color: #888
   overflow: auto
+  //-webkit-font-smoothing: antialiased
 
   .properties-is-closed &
     right: -281px
@@ -18,13 +19,14 @@
     bottom: 97px
 
   &__main
-    padding: 20px 10px
+    padding: 10px 10px
 
   .property
     +pie-clearfix
     min-height: 25px
 
   &__title
+    margin-top: 0
     margin-bottom: 5px
     color: #fff
     &:after
@@ -41,16 +43,20 @@
   display: inline-block
   min-width: 50px
   margin-right: 10px
+  color: #fff
 
 .property__key
   display: inline-block
-  width: 6px
-  height: 6px
+  position: relative
+  top: 1px
+  width: 8px
+  height: 8px
   padding: 0
-  margin-right: 5px
+  margin-right: 7px
   background: #333
   border: 0
-  border-radius: 3px
+  border-radius: 4px
+  z-index: 500
   &:focus
     outline: 0
 
@@ -62,11 +68,12 @@
 
 a.menu-item--toggle-side
   position: absolute
-  top: 4px
-  left: 10px
+  top: 8px
+  right: -3px
 
   .properties-is-closed &
-    left: -20px
+    right: auto
+    left: -27px
 
   i
     &:before
