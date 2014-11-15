@@ -50,7 +50,7 @@ define (require) ->
       @composer.addPass( renderModel )
       @composer.addPass( @effectFXAA )
       @composer.addPass( @bloom )
-      @composer.addPass( @glitchPass )
+      #@composer.addPass( @glitchPass )
       @composer.addPass( @vignettePass )
       @composer.addPass( @filmShader )
 
