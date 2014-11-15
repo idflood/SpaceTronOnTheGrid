@@ -3,6 +3,7 @@ define (require) ->
   _ = require 'lodash'
   Signals = require 'Signal'
   PropertyNumber = require 'cs!timeline/components/PropertyNumber'
+  PropertyTween = require 'cs!timeline/components/PropertyTween'
 
   tpl_propertiesEditor = require 'text!timeline/templates/propertiesEditor.tpl.html'
 
@@ -47,3 +48,8 @@ define (require) ->
             prop = new PropertyNumber({label: instance_prop.name}, instance_prop, selectedObject, @timer, data)
             prop.keyAdded.add(@onKeyAdded)
             @$container.append(prop.$el)
+
+      if property_name
+        # Add tween select if we are editing a key.
+        tween = new PropertyTween({label: instance_prop.name}, instance_prop, selectedObject, @timer, data)
+        @$container.append(tween.$el)

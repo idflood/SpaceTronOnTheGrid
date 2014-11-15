@@ -21,6 +21,13 @@ define (require) ->
 
       @update(0)
 
+    getEasing: (key = false) ->
+      if key && key.ease
+        ease_index = key.ease.split('.')
+        if ease_index.length == 2 && window[ease_index[0]] && window[ease_index[0]][ease_index[1]]
+          return window[ease_index[0]][ease_index[1]]
+      return Quad.easeOut
+
     update: (timestamp) =>
       activeCamera = @defaultCamera
       seconds = timestamp / 1000
@@ -89,6 +96,8 @@ define (require) ->
             tween_duration = 0
             val = {}
             val[propName] = if first_key then first_key.val else property.val
+            easing = @getEasing()
+            val.ease = easing
             tween = TweenLite.to(item.values, tween_duration, val)
             propertyTimeline.add(tween, tween_time)
 
@@ -100,6 +109,8 @@ define (require) ->
 
                 val = {}
                 val[propName] = next_key.val
+                easing = @getEasing(next_key)
+                val.ease = easing
                 tween = TweenLite.to(item.values, tween_duration, val)
                 propertyTimeline.add(tween, key.time)
 
