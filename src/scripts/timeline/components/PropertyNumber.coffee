@@ -43,7 +43,7 @@ define (require) ->
 
     getProperty: () =>
       properties = @object.properties
-      return _.find(properties, (prop) => prop.name == @property.name)
+      return _.find(properties, (prop) => prop.name == @instance_property.name)
 
     addKey: (val) =>
       property = @getProperty()
