@@ -9,10 +9,11 @@
 define (require) ->
   THREE = require 'threejs'
 
+  Timer = require 'cs!app/components/Timer'
+  Orchestrator = require 'cs!timeline/components/Orchestrator'
+
   Background = require 'cs!app/components/Background'
   PostFX = require 'cs!app/components/PostFX'
-  Timer = require 'cs!app/components/Timer'
-  Orchestrator = require 'cs!app/components/Orchestrator'
   SceneManager = require 'cs!app/components/SceneManager'
   Audio = require 'cs!app/components/Audio'
 
