@@ -4,7 +4,7 @@ define (require) ->
   _ = require 'lodash'
 
   Mustache = require 'Mustache'
-  tpl_property = require 'text!timeline/templates/propertyTween.tpl.html'
+  tpl_property = require 'text!TweenTime/templates/propertyTween.tpl.html'
 
   class PropertyTween
     # @property: Static property definition (ex: {name: 'x', label: 'x', val: 0})

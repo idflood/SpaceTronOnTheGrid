@@ -3,20 +3,20 @@ define (require) ->
   d3 = require 'd3'
   Signals = require 'Signal'
 
-  Utils = require 'cs!timeline/components/Utils'
-  Header = require 'cs!timeline/components/Header'
-  TimeIndicator = require 'cs!timeline/components/TimeIndicator'
+  Utils = require 'cs!TweenTime/core/Utils'
+  Header = require 'cs!TweenTime/graph/Header'
+  TimeIndicator = require 'cs!TweenTime/graph/TimeIndicator'
+  Items = require 'cs!TweenTime/graph/Items'
 
-  Items = require 'cs!timeline/components/Items'
-  Properties = require 'cs!timeline/components/Properties'
-  Keys = require 'cs!timeline/components/Keys'
+  Properties = require 'cs!TweenTime/graph/Properties'
+  Keys = require 'cs!TweenTime/graph/Keys'
 
   extend = (object, properties) ->
     for key, val of properties
       object[key] = val
     object
 
-  class Timeline
+  class TweenTime
     constructor: () ->
       @app = window.app
       @isDirty = true

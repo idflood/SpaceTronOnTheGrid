@@ -1,14 +1,15 @@
 define (require) ->
   _ = require 'lodash'
+
   Signals = require 'Signal'
   TweenMax = require 'TweenMax'
   TimelineMax = require 'TimelineMax'
 
-  # The Orchestrator is only responsible to update the values
-  # in the main data array and apply tween to them when necessary.
   class Orchestrator
     constructor: (@timer, @data) ->
       @mainTimeline = new TimelineMax({paused: true})
+      #@mainTimeline.duration(@timer.totalDuration / 1000)
+
       @onUpdate = new Signals.Signal()
       @timer.updated.add(@update)
       @update(0)
@@ -26,6 +27,7 @@ define (require) ->
       seconds = timestamp / 1000
       has_dirty_items = false
 
+      #return false
       for item in @data
         # create the values object to contain all properties
         if !item.values

@@ -18,9 +18,9 @@
 define (require) ->
   #$ = require 'jquery'
 
-  tpl_timeline = require 'text!timeline/templates/timeline.tpl.html'
-  EditorTimeline = require 'cs!timeline/Timeline'
-  PropertiesEditor = require 'cs!timeline/components/PropertiesEditor'
+  tpl_timeline = require 'text!TweenTime/templates/timeline.tpl.html'
+  EditorTimeline = require 'cs!TweenTime/TweenTime'
+  PropertiesEditor = require 'cs!TweenTime/editor/PropertiesEditor'
 
   class Editor
     constructor: () ->

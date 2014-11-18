@@ -2,10 +2,10 @@ define (require) ->
   $ = require 'jquery'
   _ = require 'lodash'
   Signals = require 'Signal'
-  PropertyNumber = require 'cs!timeline/components/PropertyNumber'
-  PropertyTween = require 'cs!timeline/components/PropertyTween'
+  PropertyNumber = require 'cs!TweenTime/editor/PropertyNumber'
+  PropertyTween = require 'cs!TweenTime/editor/PropertyTween'
 
-  tpl_propertiesEditor = require 'text!timeline/templates/propertiesEditor.tpl.html'
+  tpl_propertiesEditor = require 'text!TweenTime/templates/propertiesEditor.tpl.html'
 
   class PropertiesEditor
     constructor: (@timeline, @timer) ->

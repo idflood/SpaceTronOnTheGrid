@@ -3,7 +3,7 @@ define (require) ->
   d3 = require 'd3'
 
   Signals = require 'Signal'
-  Utils = require 'cs!timeline/components/Utils'
+  Utils = require 'cs!TweenTime/core/Utils'
 
   class Header
     constructor: (@app, @timer, @initialDomain, width) ->

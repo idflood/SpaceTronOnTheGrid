@@ -6,7 +6,7 @@ define (require) ->
   DraggableNumber = require 'draggablenumber'
 
   Mustache = require 'Mustache'
-  tpl_property = require 'text!timeline/templates/propertyNumber.tpl.html'
+  tpl_property = require 'text!TweenTime/templates/propertyNumber.tpl.html'
 
   class PropertyNumber
     # @property: Static property definition (ex: {name: 'x', label: 'x', val: 0})

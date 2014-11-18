@@ -8,6 +8,6 @@ require.config({
   }
 });
 
-require(['cs!app/Editor'], function (Editor) {
+require(['cs!TweenTime/Editor'], function (Editor) {
   var editor = new Editor();
 });

@@ -2,7 +2,7 @@ define (require) ->
   d3 = require 'd3'
   Signals = require 'Signal'
   _ = require 'lodash'
-  Utils = require 'cs!timeline/components/Utils'
+  Utils = require 'cs!TweenTime/core/Utils'
 
   class Items
     constructor: (@timeline, @container) ->
