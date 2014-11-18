@@ -144,10 +144,12 @@ define (require) ->
           @app.audio.play()
         else
           @app.audio.pause()
-      console.log "toggle " + @timer.is_playing
+      $play_pause = @$timeline.find('.control--play-pause')
+      $play_pause.toggleClass('icon-pause', @timer.is_playing)
+      $play_pause.toggleClass('icon-play', !@timer.is_playing)
 
     initControls: () ->
-      $play_pause = @$timeline.find('.control.icon-play')
+      $play_pause = @$timeline.find('.control--play-pause')
       $play_pause.click (e) =>
         e.preventDefault()
         @playPause()
