@@ -111,6 +111,7 @@ define (require) ->
         depthTest: false
         })
 
+      #material = new THREE.MeshPhongMaterial({ ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading })
       material.blending = THREE.AdditiveBlending
       return material
 

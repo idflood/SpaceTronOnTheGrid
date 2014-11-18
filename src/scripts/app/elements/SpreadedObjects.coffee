@@ -30,10 +30,9 @@ define (require) ->
 
     constructor: (@values = {}, time = 0) ->
       # Set the default value of instance properties.
-      # Should not happen when created with the orchestrator (so never really...)
-      #for key, prop of SpreadedObjects.properties
-      #  if !@values[key]?
-      #    @values[key] = prop.val
+      for key, prop of SpreadedObjects.properties
+        if !@values[key]?
+          @values[key] = prop.val
 
       @timeline = new TimelineMax()
       @container = new THREE.Object3D()

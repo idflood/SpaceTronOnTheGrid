@@ -13,6 +13,7 @@ define (require) ->
   PostFX = require 'cs!app/components/PostFX'
   Timer = require 'cs!app/components/Timer'
   Orchestrator = require 'cs!app/components/Orchestrator'
+  SceneManager = require 'cs!app/components/SceneManager'
   Audio = require 'cs!app/components/Audio'
 
   dataJson = require 'text!app/data.json'
@@ -54,7 +55,7 @@ define (require) ->
 
       @scene = new THREE.Scene()
       @orchestrator = new Orchestrator(@timer, @data, @scene, @camera)
-
+      @sceneManager = new SceneManager(@timer, @data, @scene, @camera)
 
       @time = Date.now() * 0.0001
       container = document.createElement( 'div' )

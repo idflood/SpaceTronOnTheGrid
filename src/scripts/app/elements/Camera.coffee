@@ -18,7 +18,7 @@ define (require) ->
       @container.position.set(@values.x, @values.y, @values.z)
 
     update: (seconds, values = false, force = false) ->
-      @container.fov = values.fov
+      if values.fov? then @container.fov = values.fov
       @container.position.set(values.x, values.y, values.z)
       @target.set(values.target_x, values.target_y, values.target_z)
       @container.lookAt( @target )
