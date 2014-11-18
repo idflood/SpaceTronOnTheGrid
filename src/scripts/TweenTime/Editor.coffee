@@ -90,11 +90,11 @@ define (require) ->
         e.preventDefault()
         element_name = $(this).data('key')
         if ElementFactory.elements[element_name]
-          all_data = window.app.data
+          all_data = self.tweenTime.data
           next_id = all_data.length + 1
           id = "item" + next_id
           label = element_name + " " + next_id
-          current_time = window.app.timer.time[0] / 1000
+          current_time = self.tweenTime.timer.time[0] / 1000
           data =
             isDirty: true
             id: id
@@ -106,10 +106,11 @@ define (require) ->
             properties: []
             #options: window.ElementFactory.elements[element_name].default_attributes()
             #properties: window.ElementFactory.elements[element_name].default_properties(current_time)
-          window.app.data.push(data)
+          self.tweenTime.data.push(data)
           self.timeline.isDirty = true
 
     initExport: () ->
+      self = this
       copyAndClean = (source) ->
         target = []
         for obj in source
@@ -128,7 +129,8 @@ define (require) ->
         return target
       @$timeline.find('[data-action="export"]').click (e) ->
         e.preventDefault()
-        export_data = copyAndClean(window.app.data)
+        # @todo: use second parameter of JSON.stringify to export clean json.
+        export_data = copyAndClean(self.tweenTime.data)
         #data = JSON.stringify(export_data)
         # Alternative to heave nice looking json string.
         data = JSON.stringify(export_data, null, 2)
