@@ -90,8 +90,6 @@ a.menu-item--toggle-side
       &:before
         content: "\f053"
 
-
-
 .property--tween
   .property__label
     margin-left: 18px
@@ -111,3 +109,25 @@ a.menu-item--toggle-side
     font-family: 'icomoon'
     position: relative
     left: -20px
+
+.actions
+  +vertical-separator
+  margin-left: -10px
+  margin-right: -10px
+  padding-left: 10px
+  padding-right: 10px
+  margin-top: 40px
+  padding-top: 20px
+  text-align: right
+
+.actions__item
+  +transition(background 0.3s)
+  display: inline-block
+  padding: 4px 10px
+  background: #CF3938
+  text-decoration: none
+  &, &:hover, &:focus, &:active, &:link
+    color: #fff
+
+  &:hover
+    background: darken(#CF3938, 8%)
