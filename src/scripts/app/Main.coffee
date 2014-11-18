@@ -9,7 +9,7 @@
 define (require) ->
   THREE = require 'threejs'
 
-  Timer = require 'cs!app/components/Timer'
+  Timer = require 'cs!timeline/components/Timer'
   Orchestrator = require 'cs!timeline/components/Orchestrator'
 
   Background = require 'cs!app/components/Background'
