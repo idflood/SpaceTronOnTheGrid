@@ -11,21 +11,27 @@ define (require) ->
       @last_timeStamp = -1
       @last_time = -1
       @updated = new Signals.Signal()
+      @statusChanged = new Signals.Signal()
+      @seeked = new Signals.Signal()
       window.requestAnimationFrame(@update)
 
     getCurrentTime: () => @time[0]
 
     play: () ->
       @is_playing = true
+      @statusChanged.dispatch(@is_playing)
 
     stop: () ->
       @is_playing = false
+      @statusChanged.dispatch(@is_playing)
 
     toggle: () ->
       @is_playing = !@is_playing
+      @statusChanged.dispatch(@is_playing)
 
     seek: (time) ->
-      @time = time
+      @time[0] = time[0]
+      @seeked.dispatch(@time[0])
 
     update: (timestamp) =>
       # Init timestamp

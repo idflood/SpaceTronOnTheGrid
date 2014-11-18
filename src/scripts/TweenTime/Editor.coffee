@@ -26,7 +26,6 @@ define (require) ->
     constructor: (@tweenTime) ->
       @app = window.app
       @timer = @tweenTime.timer
-      if @app.audio then @app.audio.playing = false
 
       @$timeline = $(tpl_timeline)
       $('body').append(@$timeline)
@@ -139,11 +138,6 @@ define (require) ->
 
     playPause: () =>
       @timer.toggle()
-      if @app.audio
-        if @timer.is_playing
-          @app.audio.play()
-        else
-          @app.audio.pause()
       $play_pause = @$timeline.find('.control--play-pause')
       $play_pause.toggleClass('icon-pause', @timer.is_playing)
       $play_pause.toggleClass('icon-play', !@timer.is_playing)

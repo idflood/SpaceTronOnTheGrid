@@ -47,6 +47,8 @@ define (require) ->
       # Convert loaded data
       @data = JSON.parse(dataJson)
       @tweenTime = new TweenTime(@data)
+      @tweenTime.timer.statusChanged.add(@onTimerStatusChanged)
+      @tweenTime.timer.seeked.add(@onTimerSeeked)
 
       size = @getScreenSize()
       @camera = new THREE.PerspectiveCamera( 45, size.width / size.height, 1, 2000 )
@@ -80,6 +82,15 @@ define (require) ->
       #new Background(@scene)
 
       @animate()
+
+    onTimerStatusChanged: (is_playing) =>
+      if is_playing
+        @audio.play()
+      else
+        @audio.pause()
+
+    onTimerSeeked: (time) =>
+      @audio.seek(time / 1000)
 
     onAudioLoaded: () =>
       console.log "audio loaded"

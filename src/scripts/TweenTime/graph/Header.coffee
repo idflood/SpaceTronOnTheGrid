@@ -71,12 +71,7 @@ define (require) ->
         dx = self.xDisplayed.invert(event_x - self.margin.left)
         dx = dx.getTime()
         dx = Math.max(0, dx)
-        self.currentTime[0] = dx
-
-        seconds = dx / 1000
-        if window.app.audio
-          window.app.audio.seek(seconds)
-        #self.render()
+        self.timer.seek([dx])
 
       dragTime = d3.behavior.drag()
         .origin((d) -> return d;)
@@ -95,11 +90,7 @@ define (require) ->
           dx = self.xDisplayed.invert(mouse[0])
           dx = dx.getTime()
           dx = Math.max(0, dx)
-          self.currentTime[0] = dx
-          seconds = dx / 1000
-          if window.app.audio
-            window.app.audio.seek(seconds)
-          )
+          self.timer.seek([dx])
 
       timeGrp = timeSelection.enter().append("g")
         .attr('class', "time-indicator")
