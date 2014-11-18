@@ -20,7 +20,6 @@ define (require) ->
 
       dy = 0
       subGrp = properties.enter()
-
         .append('g')
         .filter(visibleProperties)
         .attr("class", 'line--sub')
@@ -54,6 +53,30 @@ define (require) ->
           lineValue.isDirty = true
           self.onKeyAdded.dispatch()
 
+      # Errors
+      propertiesWithError = (d) -> d.errors?
+      errorsGrp = subGrp.append('svg')
+        .attr('class','property__errors')
+        .attr('width', window.innerWidth - self.timeline.label_position_x)
+        .attr('height', self.timeline.lineHeight)
+      errorsValue = (d,i,j) -> d.errors
+      errorTime = (d, k) -> d.time
+      errors = properties.filter(propertiesWithError).select('.property__errors').selectAll('.error').data(errorsValue, errorTime)
+      errors.enter().append('rect')
+        .attr('class', 'error')
+        .attr('width', 4)
+        .attr('height', self.timeline.lineHeight)
+        .attr('fill', '#CF3938')
+        .attr('y', '1')
+
+      properties.selectAll('.error')
+        .attr 'x', (d) ->
+          dx = self.timeline.x(d.time * 1000)
+          return dx
+
+      errors.exit().remove()
+
+      # Mask
       subGrp.append('svg')
         .attr('class','keys--wrapper timeline__right-mask')
         .attr('width', window.innerWidth - self.timeline.label_position_x)

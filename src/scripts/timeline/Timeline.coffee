@@ -49,11 +49,14 @@ define (require) ->
       @svgContainer = @svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
+      @svgContainerTime = @svg.append("g")
+        .attr("transform", "translate(" + margin.left + ",0)")
+
       @linesContainer = @svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + (margin.top + 10) + ")")
 
       @header = new Header(@app, @timer, @initialDomain, width)
-      @timeIndicator = new TimeIndicator(this, @svgContainer)
+      @timeIndicator = new TimeIndicator(this, @svgContainerTime)
 
       @items = new Items(this, @linesContainer)
       @items.onUpdate.add () => @isDirty = true

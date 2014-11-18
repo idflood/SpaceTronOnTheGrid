@@ -8,13 +8,13 @@ define (require) ->
   Mustache = require 'Mustache'
   tpl_property = require 'text!timeline/templates/propertyNumber.tpl.html'
 
-  class PropertyIndicator
+  class PropertyNumber
     # @property: Static property definition (ex: {name: 'x', label: 'x', val: 0})
     # @instance_property: The current property on the data object.
     # @object: The parent object.
     constructor: (@property, @instance_property, @object, @timer, @key_val = false) ->
       # key_val is defined if we selected a key
-      @$el = $(tpl_property)
+      @$el = false
       @keyAdded = new Signals.Signal()
       @render()
 
@@ -75,7 +75,7 @@ define (require) ->
 
 
       view = Mustache.render(tpl_property, data)
-      @$el.html(view)
+      @$el = $(view)
       @$el.find('.property__key').click(@onKeyClick)
 
       $input = @$el.find('input')
@@ -103,16 +103,14 @@ define (require) ->
           # Also directly set the object value.
           @object.values[@property.name] = current_value
 
-          #@object.isDirty = true
           # Simply update the custom object with new values.
           if @object.object
             currentTime = @timer.getCurrentTime() / 1000
             # Set the property on the instance object.
             @object.object.update(currentTime - @object.start)
 
-        # if we selected a key we need to trigger a linedata rebuild
-        if @key_val && @object
-          @object.isDirty = true
+        # Something changed, make the object dirty to rebuild things.
+        @object.isDirty = true
 
       draggable = new DraggableNumber($input.get(0), {
         changeCallback: onInputChange

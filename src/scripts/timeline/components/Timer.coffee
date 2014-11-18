@@ -6,7 +6,7 @@ define (require) ->
       # in millisecond
       @totalDuration = 240 * 1000
       # Use an array for the time for easier d3.js integration (used as data for timeseeker).
-      @time = [2400]
+      @time = [0]
       @is_playing = false
       @last_timeStamp = -1
       @last_time = -1
@@ -35,11 +35,10 @@ define (require) ->
       if @is_playing
         @time[0] += elapsed
 
-      if @last_time != @time[0]
-        @updated.dispatch(@time[0])
+      #if @last_time != @time[0]
+      @updated.dispatch(@time[0])
 
       @last_timeStamp = timestamp
       @last_time = @time[0]
-
       window.requestAnimationFrame(@update)
 

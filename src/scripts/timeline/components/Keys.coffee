@@ -52,7 +52,9 @@ define (require) ->
         lineData = d3.select(lineObject).datum()
         propertyData = d3.select(propertyObject).datum()
 
-        self.timeline.onSelect.dispatch(lineData, d, propertyData)
+        d3.selectAll('.line--key--selected').classed('line--key--selected', false)
+        d3.select(this).selectAll('rect').classed('line--key--selected', true)
+        self.timeline.onSelect.dispatch(lineData, d, propertyData, this)
 
       key_size = 6
       keys.enter()
@@ -69,9 +71,12 @@ define (require) ->
         .attr('class', 'line--key')
         .attr('transform', 'rotate(45)')
 
+      #keys.exit().remove()
+
       keys.selectAll('.key__item')
         .attr 'transform', (d) ->
           dx = self.timeline.x(d.time * 1000) + 3
           dy = 9
           return "translate(" + dx + "," + dy + ")"
+
       keys.exit().remove()

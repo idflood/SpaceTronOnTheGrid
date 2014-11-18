@@ -11,6 +11,7 @@ define (require) ->
     constructor: (@timeline, @timer) ->
       @$el = $(tpl_propertiesEditor)
       @$container = @$el.find('.properties-editor__main')
+      # todo: rename keyAdded to updated
       @keyAdded = new Signals.Signal()
 
       $('body').append(@$el)
@@ -20,7 +21,8 @@ define (require) ->
     onKeyAdded: () =>
       @keyAdded.dispatch()
 
-    onSelect: (selectedObject, data = false, propertyData = false) =>
+    # todo: rename data to key
+    onSelect: (selectedObject, data = false, propertyData = false, d3Object = false) =>
       @$container.empty()
       # data and propertyData are defined on key select.
       property_name = false
@@ -53,3 +55,18 @@ define (require) ->
         # Add tween select if we are editing a key.
         tween = new PropertyTween({label: instance_prop.name}, instance_prop, selectedObject, @timer, data)
         @$container.append(tween.$el)
+
+        # Add a remove key button
+        $actions = $('<div class="properties-editor__actions actions"></div>')
+        $remove_bt = $('<a href="#" class="actions__item">Remove key</a>')
+        $actions.append($remove_bt)
+        @$container.append($actions)
+
+        $remove_bt.click (e) =>
+          e.preventDefault()
+          index = propertyData.keys.indexOf(data)
+          if index > -1
+            propertyData.keys.splice(index, 1)
+            selectedObject.isDirty = true
+            @keyAdded.dispatch()
+            #if d3Object then $(d3Object).remove()
