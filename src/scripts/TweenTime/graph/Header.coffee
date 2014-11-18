@@ -6,7 +6,7 @@ define (require) ->
   Utils = require 'cs!TweenTime/core/Utils'
 
   class Header
-    constructor: (@app, @timer, @initialDomain, width) ->
+    constructor: (@timer, @initialDomain, width) ->
       @onBrush = new Signals.Signal()
       @margin = {top: 10, right: 20, bottom: 0, left: 190}
       @height = 50 - @margin.top - @margin.bottom + 20

@@ -24,7 +24,6 @@ define (require) ->
 
   class Editor
     constructor: (@tweenTime) ->
-      @app = window.app
       @timer = @tweenTime.timer
 
       @$timeline = $(tpl_timeline)

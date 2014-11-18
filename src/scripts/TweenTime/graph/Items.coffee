@@ -109,7 +109,7 @@ define (require) ->
 
       bar_border = 1
       bar = @container.selectAll(".line-grp")
-        .data(@timeline.app.data, (d) -> d.id)
+        .data(@timeline.tweenTime.data, (d) -> d.id)
 
       barEnter = bar.enter()
         .append('g').attr('class', 'line-grp')
