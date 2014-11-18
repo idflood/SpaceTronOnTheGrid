@@ -91,6 +91,7 @@ define (require) ->
           dx = dx.getTime()
           dx = Math.max(0, dx)
           self.timer.seek([dx])
+        )
 
       timeGrp = timeSelection.enter().append("g")
         .attr('class', "time-indicator")
@@ -119,6 +120,7 @@ define (require) ->
     resize: (width) =>
       width = width - @margin.left - @margin.right
       @svg.attr("width", width + @margin.left + @margin.right)
+
 
       @x.range([0, width])
       @xDisplayed.range([0, width])
