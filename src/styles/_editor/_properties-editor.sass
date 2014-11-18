@@ -4,10 +4,10 @@
   right: 0
   width: 280px
   bottom: 297px
-  border-left: 1px solid #1d1d1d
-  background: #111
+  border-left: 1px solid $editor_border
+  background: $editor_bg
   font-size: 11px
-  color: #888
+  color: #aaa
   overflow: auto
   //-webkit-font-smoothing: antialiased
 
@@ -26,22 +26,23 @@
     min-height: 25px
 
   &__title
+    +vertical-separator(bottom)
+    position: relative
     margin-top: 0
-    margin-bottom: 5px
+    margin-bottom: 10px
+    margin-left: -10px
+    margin-right: -10px
+    padding-left: 10px
+    padding-right: 10px
+    padding-bottom: 5px
     color: #fff
-    &:after
-      content: ""
-      display: block
-      margin-top: 5px
-      margin-left: -10px
-      margin-right: -10px
-      height: 1px
-      background: #222
+    text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.8)
 
 .property__label
   position: relative
   display: inline-block
   min-width: 50px
+  min-height: 19px
   margin-right: 10px
   color: #fff
 
@@ -53,7 +54,7 @@
   height: 8px
   padding: 0
   margin-right: 7px
-  background: #333
+  background: #666
   border: 0
   border-radius: 4px
   z-index: 500
@@ -61,18 +62,23 @@
     outline: 0
 
 .property__input
-  background: #111
-  border: 1px solid #333
+  background: #57595a
+  border: 1px solid #2f3132
   color: #fff
   padding: 2px 5px
+
+.property--number span
+  +inline-block
+  min-width: 100px
+  min-height: 19px
 
 a.menu-item--toggle-side
   position: absolute
   top: 8px
   right: -3px
+  z-index: 99999
 
   .properties-is-closed &
-    right: auto
     left: -27px
 
   i
@@ -83,3 +89,25 @@ a.menu-item--toggle-side
     i
       &:before
         content: "\f053"
+
+
+
+.property--tween
+  .property__label
+    margin-left: 18px
+
+  .property__select
+    display: inline-block
+    padding-right: 20px
+    border: 0
+    border-radius: 0
+    color: #aaa
+    background: transparent
+    -webkit-appearance: none
+
+  &::after
+    content: "\f078" !important
+    display: inline !important
+    font-family: 'icomoon'
+    position: relative
+    left: -20px

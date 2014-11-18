@@ -5,10 +5,9 @@
   right: 0
   bottom: 0
   overflow-y: scroll
+  background: $editor_bg
 
 .brush .extent
-  stroke: #fff
-  stroke-opacity: 0.1
   fill: #fff
   fill-opacity: .05
 
@@ -20,13 +19,13 @@
   cursor: pointer
 
 .editor__time
+  +vertical-separator()
   position: fixed
   bottom: 0
   left: 0
   right: 0
   height: 270px
-  border-top: 1px solid #1C1B1B
-  background: #111
+  background: $editor_bg
   z-index: 9000
 
   .timeline-is-closed &
@@ -39,21 +38,25 @@
     shape-rendering: crispEdges
 
   .line--separator
-    stroke: #333
+    stroke: lighten($editor_bg, 15%)
 
   .line--separator-secondary
-    stroke: #222
+    stroke: lighten($editor_bg, 7%)
 
   .line--label
     font-size: 11px
 
   .line--label-small
     font-size: 10px
-    fill: #999
+    fill: #919191
 
   .line--key
-    fill: #999
+    fill: #919191
     cursor: move
+
+    &--selected
+      //fill: #32B6C8
+      fill: #fff
 
   .axis
     path, line
@@ -64,10 +67,10 @@
     path
       display: none
     line
-      stroke: #2E2E2E
+      stroke: lighten($editor_bg, 15%)
     text
       font-size: 10px
-      fill: #666
+      fill: #919191
       font-weight: bold
       -webkit-font-smoothing: antialiased
 
@@ -75,7 +78,7 @@
     text
       display: none
     line
-      stroke: #171717
+      stroke: lighten($editor_bg, 7%)
 
   .line
     fill: none
@@ -83,8 +86,8 @@
     stroke-width: 1.5px
 
   .bar
-    fill: #333
-    stroke: #666
+    fill: rgba(lighten($editor_bg, 20%), 0.5)
+    stroke: rgba(lighten($editor_bg, 20%), 0.9)
     cursor: move
 
   .bar-anchor
@@ -96,7 +99,7 @@
     fill-opacity: 0
 
   .time-indicator__line
-    fill: #666
+    fill: lighten($editor_bg, 35%)
   .time-indicator__handle
-    fill: #666
-    stroke: #2F2F2F
+    fill: #fff
+    stroke: lighten($editor_bg, 17%)

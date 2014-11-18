@@ -1,18 +1,19 @@
 $menu_height: 25px
 
 .graph-mask
-  fill: #111
+  fill: $editor_bg
 
 .editor__menu
+  +vertical-separator()
   position: absolute
   top: -$menu_height - 2px
   left: 0
   right: 0
   height: $menu_height
-  border-top: 1px solid #1d1d1d
+  //border-top: 1px solid $editor_border
   padding: 0 20px
-  background: #111
-  background: linear-gradient(to bottom, #121212 0%, #111 100%)
+  background: $editor_bg
+  //background: linear-gradient(to bottom, #121212 0%, #111 100%)
 
 .menu-item,
 a.menu-item
