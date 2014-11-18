@@ -19,20 +19,20 @@ define (require) ->
   #$ = require 'jquery'
 
   tpl_timeline = require 'text!TweenTime/templates/timeline.tpl.html'
-  EditorTimeline = require 'cs!TweenTime/TweenTime'
+  Timeline = require 'cs!TweenTime/graph/Timeline'
   PropertiesEditor = require 'cs!TweenTime/editor/PropertiesEditor'
 
   class Editor
-    constructor: () ->
+    constructor: (@tweenTime) ->
       @app = window.app
-      @timer = @app.timer
+      @timer = @tweenTime.timer
       if @app.audio then @app.audio.playing = false
 
       @$timeline = $(tpl_timeline)
       $('body').append(@$timeline)
       $('body').addClass('has-editor')
 
-      @timeline = new EditorTimeline()
+      @timeline = new Timeline(@tweenTime)
       @initControls()
       @initExport()
       @initAdd()

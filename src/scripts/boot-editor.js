@@ -9,5 +9,5 @@ require.config({
 });
 
 require(['cs!TweenTime/Editor'], function (Editor) {
-  var editor = new Editor();
+  var editor = new Editor(window.app.tweenTime);
 });

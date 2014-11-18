@@ -9,8 +9,7 @@
 define (require) ->
   THREE = require 'threejs'
 
-  Timer = require 'cs!TweenTime/core/Timer'
-  Orchestrator = require 'cs!TweenTime/core/Orchestrator'
+  TweenTime = require 'cs!TweenTime/TweenTime'
 
   Background = require 'cs!app/components/Background'
   PostFX = require 'cs!app/components/PostFX'
@@ -27,7 +26,7 @@ define (require) ->
       # Make the app accessible for the editor.
       window.app = this
       window.updateCameraAspect = @updateCameraAspect
-      @timer = new Timer()
+
       audio_url = 'http://localhost/SpaceTronOnTheGrid CB2.mp3'
       @audio = new Audio(audio_url, @onAudioLoaded)
 
@@ -47,7 +46,7 @@ define (require) ->
 
       # Convert loaded data
       @data = JSON.parse(dataJson)
-      #@data = []
+      @tweenTime = new TweenTime(@data)
 
       size = @getScreenSize()
       @camera = new THREE.PerspectiveCamera( 45, size.width / size.height, 1, 2000 )
@@ -55,8 +54,8 @@ define (require) ->
       window.activeCamera = @camera
 
       @scene = new THREE.Scene()
-      @orchestrator = new Orchestrator(@timer, @data, @scene, @camera)
-      @sceneManager = new SceneManager(@timer, @data, @scene, @camera)
+      #@orchestrator = new Orchestrator(@timer, @data, @scene, @camera)
+      @sceneManager = new SceneManager(@tweenTime.timer, @data, @scene, @camera)
 
       @time = Date.now() * 0.0001
       container = document.createElement( 'div' )
