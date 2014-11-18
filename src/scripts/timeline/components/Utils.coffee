@@ -25,8 +25,8 @@ define (require) ->
         # Test properties keys
         for prop in item.properties
           # Don't match property with itself.
-          if item.id != objectId || prop.name != property_name
-            for key in prop
+          if prop.keys && (item.id != objectId || prop.name != property_name)
+            for key in prop.keys
               if Math.abs(key.time - time) <= tolerance
                 return key.time
 
