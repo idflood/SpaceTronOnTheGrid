@@ -6,7 +6,7 @@ define (require) ->
     @instance = false
 
     constructor: (mp3Url, @onLoadedCallback) ->
-      volume = true
+      muted = true
       @fftSize = 512
       @filters = {}
       @playing = false
@@ -85,7 +85,7 @@ define (require) ->
       @analyser.connect(@delay)
 
 
-      if volume
+      if muted
         gain2 = @context.createGain()
         @delay.connect(gain2)
         gain2.gain.value = 0.00
