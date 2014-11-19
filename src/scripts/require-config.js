@@ -14,7 +14,9 @@ require.config({
     TweenMax: "bower_components/gsap/src/uncompressed/TweenMax",
     TimelineMax: "bower_components/gsap/src/uncompressed/TimelineMax",
     lodash: "bower_components/lodash/dist/lodash",
-    draggablenumber: "bower_components/draggable-number.js/dist/draggable-number"
+    draggablenumber: "bower_components/draggable-number.js/dist/draggable-number",
+    TweenTime: "vendors/TweenTime/dist/scripts/TweenTime",
+    Editor: "vendors/TweenTime/dist/scripts/Editor"
   },
   shim: {
     TimelineMax: {

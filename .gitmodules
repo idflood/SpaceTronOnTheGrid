@@ -1,0 +1,3 @@
+[submodule "src/scripts/vendors/TweenTime"]
+	path = src/scripts/vendors/TweenTime
+	url = git@gitlab.stimul.io:stimul/tweentime.git

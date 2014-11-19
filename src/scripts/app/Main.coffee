@@ -9,7 +9,7 @@
 define (require) ->
   THREE = require 'threejs'
 
-  TweenTime = require 'cs!TweenTime/TweenTime'
+  TweenTime = require 'TweenTime'
 
   Background = require 'cs!app/components/Background'
   PostFX = require 'cs!app/components/PostFX'
