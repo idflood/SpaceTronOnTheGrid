@@ -1,21 +1,19 @@
 define (require) ->
   d3 = require 'd3'
   Signals = require 'Signal'
+  Utils = require 'cs!TweenTime/core/Utils'
 
   class Properties
     constructor: (@timeline) ->
-      # console.log "test"
       @onKeyAdded = new Signals.Signal()
 
     render: (bar) ->
       self = this
-      # Properties
 
-      propVal = (d,i) ->
-        if d.properties then d.properties else []
+      propVal = (d,i) -> if d.properties then d.properties else []
       propKey = (d) -> d.name
-      visibleProperties = (d) ->
-        return d.keys.length
+      visibleProperties = (d) -> d.keys.length
+
       properties = bar.selectAll('.line--sub').data(propVal, propKey)
 
       dy = 0
@@ -23,7 +21,6 @@ define (require) ->
         .append('g')
         .filter(visibleProperties)
         .attr("class", 'line--sub')
-
 
       properties.filter(visibleProperties)
         .attr "transform", (d, i) ->
@@ -45,6 +42,9 @@ define (require) ->
           mouse = d3.mouse(this)
           dx = self.timeline.x.invert(mouse[0])
           dx = dx.getTime() / 1000
+          prevKey = Utils.getPreviousKey(d.keys, dx)
+          # set the value to match the previous key if we found one
+          if prevKey then def = prevKey.val
           newKey = {time: dx, val: def}
           d.keys.push(newKey)
           # Sort the keys for tweens creation

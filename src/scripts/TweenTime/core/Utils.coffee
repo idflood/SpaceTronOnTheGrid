@@ -30,3 +30,12 @@ define (require) ->
                 return key.time
 
       return false
+
+    @getPreviousKey: (keys, time) ->
+      prevKey = false
+      for key in keys
+        if key.time < time
+          prevKey = key
+        else
+          return prevKey
+      return prevKey
