@@ -8,7 +8,6 @@ define (require) ->
   class Orchestrator
     constructor: (@timer, @data) ->
       @mainTimeline = new TimelineMax({paused: true})
-      #@mainTimeline.duration(@timer.totalDuration / 1000)
 
       @onUpdate = new Signals.Signal()
       @timer.updated.add(@update)
@@ -27,7 +26,6 @@ define (require) ->
       seconds = timestamp / 1000
       has_dirty_items = false
 
-      #return false
       for item in @data
         # create the values object to contain all properties
         if !item.values

@@ -18,14 +18,12 @@ define (require) ->
         # Merge attributes with existing ones on click, so if we add
         # an attribute we don't have to edit the json manually to allow
         # existing object to use it.
-        # todo: find a way to get the value as current time (at time between previous and next key)
         factory = window.ElementFactory
         type_properties = {}
         if d.object then type_properties = d.object.constructor.properties
 
         existing_options = _.map(d.properties, (prop) -> prop.name)
-        #console.log existing_options
-        #console.log type_properties
+
         for key, property of type_properties
           has_prop = if existing_options.indexOf(key) != -1 then true else false
           # if prorperty doesn't exists in the d.options array create it
@@ -34,17 +32,6 @@ define (require) ->
             d.properties.push({keys: [], name: key, val: property.val})
 
         self.onSelect.dispatch(d)
-        #if el_type
-        #  d.options = extend(el_type.default_attributes(), d.options)
-        #if window.gui then window.gui.destroy()
-        #gui = new dat.GUI()
-
-        #for key, value in d.properties
-        #  controller = gui.add(d.properties, key)
-        #  controller.onChange (v) -> d.isDirtyObject = true
-        #for key, prop in d.properties
-        #  controller = gui.add(d.properties, key)
-        #window.gui = gui
 
       dragmove = (d) ->
         dx = self.timeline.x.invert(d3.event.x).getTime() / 1000

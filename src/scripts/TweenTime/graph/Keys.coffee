@@ -5,7 +5,6 @@ define (require) ->
 
   class Keys
     constructor: (@timeline) ->
-      # console.log "test2"
       @onKeyUpdated = new Signals.Signal()
 
     render: (properties) ->
@@ -71,8 +70,6 @@ define (require) ->
         .attr('height', key_size)
         .attr('class', 'line--key')
         .attr('transform', 'rotate(45)')
-
-      #keys.exit().remove()
 
       keys.selectAll('.key__item')
         .attr 'transform', (d) ->

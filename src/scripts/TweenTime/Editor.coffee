@@ -16,8 +16,6 @@
 # Soundjs music visualizer
 # https://github.com/CreateJS/SoundJS/blob/master/examples/MusicVisualizer.html
 define (require) ->
-  #$ = require 'jquery'
-
   tpl_timeline = require 'text!TweenTime/templates/timeline.tpl.html'
   Timeline = require 'cs!TweenTime/graph/Timeline'
   PropertiesEditor = require 'cs!TweenTime/editor/PropertiesEditor'
@@ -131,7 +129,6 @@ define (require) ->
         e.preventDefault()
         # @todo: use second parameter of JSON.stringify to export clean json.
         export_data = copyAndClean(self.tweenTime.data)
-        #data = JSON.stringify(export_data)
         # Alternative to heave nice looking json string.
         data = JSON.stringify(export_data, null, 2)
 

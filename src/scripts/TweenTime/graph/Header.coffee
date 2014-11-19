@@ -106,7 +106,6 @@ define (require) ->
       timeGrp.append('path')
         .attr('class', 'time-indicator__handle')
         .attr('d', 'M -5 -3 L -5 5 L 0 10 L 5 5 L 5 -3 L -5 -3')
-        #.attr('d', 'M -10 0 L 0 10 L 10 0 L -10 0')
 
       # Mask time indicator
       # todo: remove the mask.

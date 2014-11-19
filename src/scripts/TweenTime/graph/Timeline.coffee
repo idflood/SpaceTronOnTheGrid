@@ -45,7 +45,7 @@ define (require) ->
       @svg = d3.select('.editor__time-main').append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", 600)
-        #.attr("height", height + margin.top + margin.bottom)
+
       @svgContainer = @svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
