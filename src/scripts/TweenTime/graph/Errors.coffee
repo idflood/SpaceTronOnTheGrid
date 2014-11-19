@@ -16,7 +16,7 @@ define (require) ->
         .attr('height', self.timeline.lineHeight)
       errorsValue = (d,i,j) -> d.errors
       errorTime = (d, k) -> d.time
-      errors = properties.filter(propertiesWithError).select('.property__errors').selectAll('.error').data(errorsValue, errorTime)
+      errors = properties.filter(propertiesWithError).selectAll('.property__error').data(errorsValue, errorTime)
       errors.enter().append('rect')
         .attr('class', 'property__error')
         .attr('width', 4)
