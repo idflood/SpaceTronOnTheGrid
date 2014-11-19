@@ -23,8 +23,6 @@ define (require) ->
 
   class App
     constructor: () ->
-      # Make the app accessible for the editor.
-      window.app = this
       window.updateCameraAspect = @updateCameraAspect
 
       audio_url = 'http://localhost/SpaceTronOnTheGrid CB2.mp3'

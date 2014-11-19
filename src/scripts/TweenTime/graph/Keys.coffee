@@ -10,6 +10,7 @@ define (require) ->
 
     render: (properties) ->
       self = this
+      tweenTime = self.timeline.tweenTime
 
       sortKeys = (keys) -> keys.sort((a, b) -> d3.ascending(a.time, b.time))
 
@@ -29,7 +30,7 @@ define (require) ->
 
         timeMatch = false
         if sourceEvent.shiftKey
-          timeMatch = Utils.getClosestTime(dx, lineData.id, propertyData.name)
+          timeMatch = Utils.getClosestTime(tweenTime.data, dx, lineData.id, propertyData.name)
         if !timeMatch
           timeMatch = dx
 

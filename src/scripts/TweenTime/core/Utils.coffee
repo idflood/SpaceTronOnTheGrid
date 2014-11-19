@@ -11,8 +11,7 @@ define (require) ->
       output = hours + "h " + output  if hours
       return output
 
-    @getClosestTime: (time, objectId = false, property_name = false, tolerance = 0.1) ->
-      data = window.app.data
+    @getClosestTime: (data, time, objectId = false, property_name = false, tolerance = 0.1) ->
       for item in data
         # Don't match item with itself, but allow property to match item start/end.
         if item.id != objectId || property_name
