@@ -10,6 +10,7 @@ define (require) ->
 
   Properties = require 'cs!TweenTime/graph/Properties'
   Keys = require 'cs!TweenTime/graph/Keys'
+  Errors = require 'cs!TweenTime/graph/Errors'
 
   extend = (object, properties) ->
     for key, val of properties
@@ -63,6 +64,7 @@ define (require) ->
       @items.onSelect.add (d) => @onSelect.dispatch(d)
       @properties = new Properties(this)
       @properties.onKeyAdded.add () => @isDirty = true
+      @errors = new Errors(this)
       @keys = new Keys(this)
       @keys.onKeyUpdated.add () => @isDirty = true
 
@@ -113,6 +115,7 @@ define (require) ->
         # No need to call this on each frames, but only on brush, key drag, ...
         bar = @items.render()
         properties = @properties.render(bar)
+        @errors.render(properties)
         @keys.render(properties)
         @isDirty = false
 
