@@ -23,7 +23,8 @@
 
   .property
     +pie-clearfix
-    min-height: 25px
+    min-height: 26px
+    line-height: 25px
 
   &__title
     +vertical-separator(bottom)
@@ -42,7 +43,7 @@
   position: relative
   display: inline-block
   min-width: 50px
-  min-height: 19px
+  min-height: 25px
   margin-right: 10px
   color: #fff
 
@@ -57,6 +58,7 @@
   background: #666
   border: 0
   border-radius: 4px
+  cursor: pointer
   z-index: 500
   &:focus
     outline: 0
@@ -66,11 +68,12 @@
   border: 1px solid #2f3132
   color: #fff
   padding: 2px 5px
+  &:focus
+    outline: 0
 
 .property--number span
   +inline-block
   min-width: 100px
-  min-height: 19px
 
 a.menu-item--toggle-side
   position: absolute
@@ -102,6 +105,9 @@ a.menu-item--toggle-side
     color: #aaa
     background: transparent
     -webkit-appearance: none
+
+    &:focus
+      outline: 0
 
   &::after
     content: "\f078" !important
