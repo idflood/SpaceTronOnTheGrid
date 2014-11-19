@@ -18,13 +18,12 @@ define (require) ->
       errorTime = (d, k) -> d.time
       errors = properties.filter(propertiesWithError).select('.property__errors').selectAll('.error').data(errorsValue, errorTime)
       errors.enter().append('rect')
-        .attr('class', 'error')
+        .attr('class', 'property__error')
         .attr('width', 4)
         .attr('height', self.timeline.lineHeight)
-        .attr('fill', '#CF3938')
         .attr('y', '1')
 
-      properties.selectAll('.error')
+      properties.selectAll('.property__error')
         .attr 'x', (d) ->
           dx = self.timeline.x(d.time * 1000)
           return dx
