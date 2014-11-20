@@ -20,7 +20,6 @@ define (require) ->
 
   #Circles = require 'cs!app/elements/Circles'
 
-
   class App
     constructor: () ->
       window.updateCameraAspect = @updateCameraAspect
