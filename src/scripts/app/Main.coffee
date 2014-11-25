@@ -15,6 +15,8 @@ define (require) ->
   PostFX = require 'cs!app/components/PostFX'
   SceneManager = require 'cs!app/components/SceneManager'
   Audio = require 'cs!app/components/Audio'
+  ElementFactory = require 'cs!app/components/ElementFactory'
+  DataNormalizer = require 'cs!app/components/DataNormalizer'
 
   dataJson = require 'text!app/data.json'
 
@@ -26,6 +28,7 @@ define (require) ->
 
       audio_url = 'http://localhost/SpaceTronOnTheGrid CB2.mp3'
       @audio = new Audio(audio_url, @onAudioLoaded)
+      @factory = new ElementFactory()
 
       @dataSample = [
         {
@@ -37,12 +40,13 @@ define (require) ->
           properties: [
             {name: 'progression', keys: [{time: 2, val: 7}, {time: 3, val: 42}, {time: 5, val: -40}]}
           ]
-
         }
       ]
 
       # Convert loaded data
       @data = JSON.parse(dataJson)
+      @data = DataNormalizer.normalizeData(@data, @factory)
+      console.log @data
       @tweenTime = new TweenTime(@data)
       @tweenTime.timer.statusChanged.add(@onTimerStatusChanged)
       @tweenTime.timer.seeked.add(@onTimerSeeked)
@@ -54,7 +58,7 @@ define (require) ->
 
       @scene = new THREE.Scene()
       #@orchestrator = new Orchestrator(@timer, @data, @scene, @camera)
-      @sceneManager = new SceneManager(@tweenTime.timer, @data, @scene, @camera)
+      @sceneManager = new SceneManager(@tweenTime.timer, @data, @scene, @camera, @factory)
 
       @time = Date.now() * 0.0001
       container = document.createElement( 'div' )

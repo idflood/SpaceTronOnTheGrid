@@ -1,11 +1,9 @@
 define (require) ->
   _ = require 'lodash'
   Signals = require 'Signal'
-  ElementFactory = require 'cs!app/components/ElementFactory'
 
   class SceneManager
-    constructor: (@timer, @data, @scene, @defaultCamera) ->
-      @factory = new ElementFactory()
+    constructor: (@timer, @data, @scene, @defaultCamera, @factory) ->
       @timer.updated.add(@update)
       @update(0)
 
