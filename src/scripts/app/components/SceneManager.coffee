@@ -11,7 +11,6 @@ define (require) ->
     update: (timestamp) =>
       activeCamera = @defaultCamera
       seconds = timestamp / 1000
-      if @tweenTime.isUpdating() then return
 
       for item in @data
         should_exist = if seconds >= item.start && seconds <= item.end then true else false
