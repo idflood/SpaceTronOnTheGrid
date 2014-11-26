@@ -58,7 +58,7 @@ define (require) ->
 
       @scene = new THREE.Scene()
       #@orchestrator = new Orchestrator(@timer, @data, @scene, @camera)
-      @sceneManager = new SceneManager(@tweenTime.timer, @data, @scene, @camera, @factory)
+      @sceneManager = new SceneManager(@tweenTime, @data, @scene, @camera, @factory)
 
       @time = Date.now() * 0.0001
       container = document.createElement( 'div' )
