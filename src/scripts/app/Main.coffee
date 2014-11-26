@@ -30,23 +30,12 @@ define (require) ->
       @audio = new Audio(audio_url, @onAudioLoaded)
       @factory = new ElementFactory()
 
-      @dataSample = [
-        {
-          id: 'item1',
-          label: 'Test circles',
-          type: 'Circles'
-          start: 1, end: 10,
-          options: {numItems: 12, seed: 12002, radius: 84},
-          properties: [
-            {name: 'progression', keys: [{time: 2, val: 7}, {time: 3, val: 42}, {time: 5, val: -40}]}
-          ]
-        }
-      ]
-
       # Convert loaded data
-      @data = JSON.parse(dataJson)
-      @data = DataNormalizer.normalizeData(@data, @factory)
-      console.log @data
+      conf = JSON.parse(dataJson)
+      console.log conf
+      @settings = conf.settings
+      @data = DataNormalizer.normalizeData(conf.data, @factory)
+
       @tweenTime = new TweenTime(@data)
       @tweenTime.timer.statusChanged.add(@onTimerStatusChanged)
       @tweenTime.timer.seeked.add(@onTimerSeeked)

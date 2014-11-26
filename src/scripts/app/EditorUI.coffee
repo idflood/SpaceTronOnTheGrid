@@ -5,7 +5,15 @@ define (require) ->
     constructor: () ->
       @tweenTime = window.tweenTime
       @editor = new Editor(@tweenTime, {
-        onMenuCreated: @onMenuCreated
+        onMenuCreated: @onMenuCreated,
+        json_replacer: (key, val) ->
+          # filter some circular values
+          if key == 'container' then return undefined
+          if key == 'parent' then return undefined
+          if key == 'children' then return undefined
+          if key == 'object' then return undefined
+          if key == 'classObject' then return undefined
+          return val
       })
 
     onMenuCreated: ($el) =>

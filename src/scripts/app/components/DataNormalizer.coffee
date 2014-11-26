@@ -9,7 +9,6 @@ define (require) ->
       static_properties = data_item.classObject.properties
       if !static_properties then return
       for key, static_prop of static_properties
-        # body...
         existing_prop = _.find(data_item.properties, (prop) -> prop.name == static_prop.name)
         if !existing_prop
           new_prop = {}
