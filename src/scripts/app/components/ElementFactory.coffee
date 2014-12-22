@@ -6,7 +6,10 @@ define (require) ->
 
   extend = (object, properties) ->
     for key, val of properties
-      object[key] = val
+      if typeof(object[key]) == 'object' && object[key] != null
+        object[key] = extend({}, val)
+      else
+        object[key] = val
     object
 
   class ElementFactory
@@ -27,6 +30,19 @@ define (require) ->
     getTypeClass: (itemType) =>
       ElementFactory.elements[itemType].classObject
 
+    @getTypeProperties: (itemName) =>
+      item = ElementFactory.elements[itemName]
+      if item
+        element_class = item.classObject
+        if element_class
+          properties = []
+          for key, prop_definition of item.classObject.properties
+            prop = extend({}, prop_definition)
+            prop.keys = []
+            properties.push(prop)
+          console.log properties
+          return properties
+      return
 
     create: (itemName, values, time) ->
       item = ElementFactory.elements[itemName]

@@ -50,8 +50,10 @@ define (require) ->
             start: current_time
             end: current_time + 2
             collapsed: false
-            properties: []
+            #properties: []
             #options: window.ElementFactory.elements[element_name].default_attributes()
             #properties: window.ElementFactory.elements[element_name].default_properties(current_time)
+            properties: ElementFactory.getTypeProperties(element_name)
+
           self.tweenTime.data.push(data)
-          self.editor.timeline.isDirty = true
+          self.editor.timeline._isDirty = true
