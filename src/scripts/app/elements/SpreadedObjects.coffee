@@ -17,7 +17,7 @@ define (require) ->
       randScaleY: {name: 'randScaleY', label: 'random scale y', val: 0, triggerRebuild: true}
       circleRadius: {name: 'circleRadius', label: 'circle radius', val: 20}
       circleRadiusMax: {name: 'circleRadiusMax', label: 'circle radius max', val: 20}
-      progression: {name: 'progression', label: 'progression', val: 1}
+      progression: {name: 'progression', label: 'progression', val: 1, min: 0, max: 2}
       depth: {name: 'depth', label: 'depth', val: 0}
       percent_color: {name: 'percent_color', label: 'percent color', val: 0.4, triggerRebuild: true}
       x: {name: 'x', label: 'x', val: 0}
