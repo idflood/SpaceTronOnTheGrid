@@ -1,6 +1,5 @@
 // We need to configure cs! and require.js plugins to boot.
 // @see: require-config.js
-
 require.config({
   paths: {
     "coffee-script": "bower_components/coffee-script/extras/coffee-script",
