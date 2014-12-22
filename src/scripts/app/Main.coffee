@@ -22,6 +22,8 @@ define (require) ->
 
   #Circles = require 'cs!app/elements/Circles'
 
+  #Particles = require 'cs!app/elements/Particles'
+
   class App
     constructor: () ->
       window.updateCameraAspect = @updateCameraAspect
@@ -71,6 +73,9 @@ define (require) ->
       @postfx = new PostFX(@scene, @camera, @renderer, size)
       #new Background(@scene)
 
+      #@particles = new Particles()
+      #@scene.add(@particles.container)
+
       @animate()
 
     onTimerStatusChanged: (is_playing) =>
@@ -106,7 +111,7 @@ define (require) ->
       @scene.add( object3 )
 
       light1 = new THREE.PointLight( 0xffffff, 3, 1400 )
-      light1.position.set(100, 100, 200)
+      light1.position.set(100, 300, 200)
       @scene.add(light1)
 
 
@@ -179,6 +184,7 @@ define (require) ->
       newTime = Date.now() * 0.0001
       delta = newTime - @time
 
+      if @particles then @particles.update()
       @camera.lookAt( @scene.position )
       @postfx.render(delta)
 

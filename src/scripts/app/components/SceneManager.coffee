@@ -1,6 +1,6 @@
 define (require) ->
   _ = require 'lodash'
-  Signals = require 'Signal'
+  Signals = require 'signals'
 
   class SceneManager
     constructor: (@tweenTime, @data, @scene, @defaultCamera, @factory) ->

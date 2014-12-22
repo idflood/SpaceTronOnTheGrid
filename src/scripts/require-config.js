@@ -10,20 +10,18 @@ require.config({
     rng: "bower_components/rng-js/rng",
     d3: "bower_components/d3/d3",
     Mustache: "bower_components/mustache.js/mustache",
-    Signal: "bower_components/js-signals/dist/signals",
+    signals: "bower_components/js-signals/dist/signals",
     TweenMax: "bower_components/gsap/src/uncompressed/TweenMax",
-    TimelineMax: "bower_components/gsap/src/uncompressed/TimelineMax",
     lodash: "bower_components/lodash/dist/lodash",
-    draggablenumber: "bower_components/draggable-number.js/dist/draggable-number",
-    TweenTime: "vendors/TweenTime/dist/scripts/TweenTime",
-    Editor: "vendors/TweenTime/dist/scripts/Editor"
+    DraggableNumber: "bower_components/draggable-number.js/dist/draggable-number",
+    TweenTime: "vendors/TweenTime/dist/scripts/TweenTime.Core",
+    Editor: "vendors/TweenTime/dist/scripts/TweenTime.Editor",
+    spectrum: "bower_components/spectrum/spectrum",
   },
   shim: {
-    TimelineMax: {
-      exports: 'TimelineLite',
-      deps: ['TweenMax']
+    TweenMax: {
+      exports: 'TweenMax'
     },
-
     threejs: {
       exports: 'THREE' // This match something in path section.
     },

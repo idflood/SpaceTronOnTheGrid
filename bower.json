@@ -16,6 +16,7 @@
     "dat-gui": "~0.5.0",
     "mustache.js": "~0.8.2",
     "lodash": "~2.4.1",
-    "draggable-number.js": "~0.3.4"
+    "draggable-number.js": "~0.3.4",
+    "spectrum": "~1.6.0"
   }
 }

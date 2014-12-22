@@ -2,8 +2,7 @@ define (require) ->
   _ = require 'lodash'
   THREE = require 'threejs'
   RNG = require 'rng'
-  TimelineMax = require 'TimelineMax'
-
+  TweenMax = require 'TweenMax'
   Colors = require 'cs!app/components/Colors'
 
   class SpreadedObjects

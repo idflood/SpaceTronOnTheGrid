@@ -48,7 +48,7 @@ define (require) ->
       @composer = new THREE.EffectComposer( @renderer, @renderTarget )
       @composer.setSize(size.width * dpr, size.height * dpr)
       @composer.addPass( renderModel )
-      @composer.addPass( @effectFXAA )
+      #@composer.addPass( @effectFXAA )
       @composer.addPass( @bloom )
       #@composer.addPass( @glitchPass )
       @composer.addPass( @vignettePass )

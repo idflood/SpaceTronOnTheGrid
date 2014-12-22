@@ -3,7 +3,6 @@ define (require) ->
   THREE = require 'threejs'
   RNG = require 'rng'
   TweenMax = require 'TweenMax'
-  TimelineMax = require 'TimelineMax'
 
   Colors = require 'cs!app/components/Colors'
 
