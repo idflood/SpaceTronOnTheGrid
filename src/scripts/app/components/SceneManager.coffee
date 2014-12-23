@@ -34,7 +34,10 @@ define (require) ->
           type = item.type
           el = @factory.create(type, item.values, seconds - item.start)
           @scene.add(el.container)
+          # Save reference to the custom object class in data
           item.object = el
+          # And a reference to the data from the 3d container
+          el.container._data = item
 
         # If this is a camera set it as the active camera.
         if item.object && item.object.isCamera

@@ -53,6 +53,7 @@ define (require) ->
 
       @time = Date.now() * 0.0001
       container = document.createElement( 'div' )
+      @containerWebgl = container # Save for use in EditorUI for object picking.
       document.body.appendChild( container )
 
       @renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } )

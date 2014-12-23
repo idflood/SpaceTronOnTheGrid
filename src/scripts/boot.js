@@ -8,6 +8,6 @@ require.config({
 });
 
 require(['cs!app/Main'], function (Main) {
-  var app = new Main();
+  window.app = new Main();
   window.tweenTime = app.tweenTime;
 });

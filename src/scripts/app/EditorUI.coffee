@@ -1,4 +1,5 @@
 define (require) ->
+  THREE = window.THREE
   Editor = require 'Editor'
   d3 = require 'd3'
 
@@ -17,7 +18,19 @@ define (require) ->
           return val
       })
       @onMenuCreated($('.timeline__menu'))
-      console.log @
+
+      $container = $(window.app.containerWebgl)
+      projector = new THREE.Projector()
+      mouseVector = new THREE.Vector3(0, 0, 0.5)
+      $container.mousemove (e) =>
+        mouseVector.x = ( e.clientX / $container.width() ) * 2 - 1
+        mouseVector.y = -( e.clientY / $container.height() ) * 2 + 1
+        raycaster = projector.pickingRay( mouseVector.clone(), window.activeCamera )
+        intersects = raycaster.intersectObjects( window.app.scene.children )
+        if intersects.length
+          element = intersects[0].object
+          if element._data
+            console.log element
 
     onMenuCreated: ($el) =>
       $el.append('<a class="menu-item menu-item--remove">Remove</a>')
