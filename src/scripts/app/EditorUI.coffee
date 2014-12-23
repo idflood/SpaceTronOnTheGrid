@@ -17,8 +17,7 @@ define (require) ->
       })
 
     onMenuCreated: ($el) =>
-      console.log "menu created 2"
-      console.log $el
+      $el.append('<span class="menu-item">Remove<div class="submenu submenu--remove"></div></span>')
       $el.prepend('<span class="menu-item">Add<div class="submenu submenu--add"></div></span>')
 
       @initAdd($el)

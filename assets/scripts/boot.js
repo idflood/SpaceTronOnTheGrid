@@ -36274,1839 +36274,6 @@ define("threejs", (function (global) {
     };
 }(this)));
 
-
-(function() {
-  define('cs!app/components/Background',['require','threejs'],function(require) {
-    var Background, THREE;
-    THREE = require('threejs');
-    return Background = (function() {
-      function Background(scene) {
-        var bg, bgMat, texture;
-        this.scene = scene;
-        texture = THREE.ImageUtils.loadTexture('src/images/background.jpg');
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.set(2, 2);
-        bgMat = new THREE.MeshBasicMaterial({
-          map: texture
-        });
-        bg = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600, 4, 4), bgMat);
-        bg.material.depthTest = false;
-        bg.material.depthWrite = false;
-        bg.position.set(0, 0, -10);
-        this.scene.add(bg);
-      }
-
-      return Background;
-
-    })();
-  });
-
-}).call(this);
-
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
-THREE.EffectComposer = function ( renderer, renderTarget ) {
-
-	this.renderer = renderer;
-
-	if ( renderTarget === undefined ) {
-
-		var width = window.innerWidth || 1;
-		var height = window.innerHeight || 1;
-		var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
-
-		renderTarget = new THREE.WebGLRenderTarget( width, height, parameters );
-
-	}
-
-	this.renderTarget1 = renderTarget;
-	this.renderTarget2 = renderTarget.clone();
-
-	this.writeBuffer = this.renderTarget1;
-	this.readBuffer = this.renderTarget2;
-
-	this.passes = [];
-
-	if ( THREE.CopyShader === undefined )
-		console.error( "THREE.EffectComposer relies on THREE.CopyShader" );
-
-	this.copyPass = new THREE.ShaderPass( THREE.CopyShader );
-
-};
-
-THREE.EffectComposer.prototype = {
-
-	swapBuffers: function() {
-
-		var tmp = this.readBuffer;
-		this.readBuffer = this.writeBuffer;
-		this.writeBuffer = tmp;
-
-	},
-
-	addPass: function ( pass ) {
-
-		this.passes.push( pass );
-
-	},
-
-	insertPass: function ( pass, index ) {
-
-		this.passes.splice( index, 0, pass );
-
-	},
-
-	render: function ( delta ) {
-
-		this.writeBuffer = this.renderTarget1;
-		this.readBuffer = this.renderTarget2;
-
-		var maskActive = false;
-
-		var pass, i, il = this.passes.length;
-
-		for ( i = 0; i < il; i ++ ) {
-
-			pass = this.passes[ i ];
-
-			if ( !pass.enabled ) continue;
-
-			pass.render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
-
-			if ( pass.needsSwap ) {
-
-				if ( maskActive ) {
-
-					var context = this.renderer.context;
-
-					context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
-
-					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, delta );
-
-					context.stencilFunc( context.EQUAL, 1, 0xffffffff );
-
-				}
-
-				this.swapBuffers();
-
-			}
-
-			if ( pass instanceof THREE.MaskPass ) {
-
-				maskActive = true;
-
-			} else if ( pass instanceof THREE.ClearMaskPass ) {
-
-				maskActive = false;
-
-			}
-
-		}
-
-	},
-
-	reset: function ( renderTarget ) {
-
-		if ( renderTarget === undefined ) {
-
-			renderTarget = this.renderTarget1.clone();
-
-			renderTarget.width = window.innerWidth;
-			renderTarget.height = window.innerHeight;
-
-		}
-
-		this.renderTarget1 = renderTarget;
-		this.renderTarget2 = renderTarget.clone();
-
-		this.writeBuffer = this.renderTarget1;
-		this.readBuffer = this.renderTarget2;
-
-	},
-
-	setSize: function ( width, height ) {
-
-		var renderTarget = this.renderTarget1.clone();
-
-		renderTarget.width = width;
-		renderTarget.height = height;
-
-		this.reset( renderTarget );
-
-	}
-
-};
-
-define("vendors/three.js-extras/postprocessing/EffectComposer", function(){});
-
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
-THREE.MaskPass = function ( scene, camera ) {
-
-	this.scene = scene;
-	this.camera = camera;
-
-	this.enabled = true;
-	this.clear = true;
-	this.needsSwap = false;
-
-	this.inverse = false;
-
-};
-
-THREE.MaskPass.prototype = {
-
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
-
-		var context = renderer.context;
-
-		// don't update color or depth
-
-		context.colorMask( false, false, false, false );
-		context.depthMask( false );
-
-		// set up stencil
-
-		var writeValue, clearValue;
-
-		if ( this.inverse ) {
-
-			writeValue = 0;
-			clearValue = 1;
-
-		} else {
-
-			writeValue = 1;
-			clearValue = 0;
-
-		}
-
-		context.enable( context.STENCIL_TEST );
-		context.stencilOp( context.REPLACE, context.REPLACE, context.REPLACE );
-		context.stencilFunc( context.ALWAYS, writeValue, 0xffffffff );
-		context.clearStencil( clearValue );
-
-		// draw into the stencil buffer
-
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
-		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
-
-		// re-enable update of color and depth
-
-		context.colorMask( true, true, true, true );
-		context.depthMask( true );
-
-		// only render where stencil is set to 1
-
-		context.stencilFunc( context.EQUAL, 1, 0xffffffff );  // draw if == 1
-		context.stencilOp( context.KEEP, context.KEEP, context.KEEP );
-
-	}
-
-};
-
-
-THREE.ClearMaskPass = function () {
-
-	this.enabled = true;
-
-};
-
-THREE.ClearMaskPass.prototype = {
-
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
-
-		var context = renderer.context;
-
-		context.disable( context.STENCIL_TEST );
-
-	}
-
-};
-
-define("vendors/three.js-extras/postprocessing/MaskPass", function(){});
-
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
-THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
-
-	strength = ( strength !== undefined ) ? strength : 1;
-	kernelSize = ( kernelSize !== undefined ) ? kernelSize : 25;
-	sigma = ( sigma !== undefined ) ? sigma : 4.0;
-	resolution = ( resolution !== undefined ) ? resolution : 256;
-
-	// render targets
-
-	var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
-
-	this.renderTargetX = new THREE.WebGLRenderTarget( resolution, resolution, pars );
-	this.renderTargetY = new THREE.WebGLRenderTarget( resolution, resolution, pars );
-
-	// copy material
-
-	if ( THREE.CopyShader === undefined )
-		console.error( "THREE.BloomPass relies on THREE.CopyShader" );
-
-	var copyShader = THREE.CopyShader;
-
-	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
-
-	this.copyUniforms[ "opacity" ].value = strength;
-
-	this.materialCopy = new THREE.ShaderMaterial( {
-
-		uniforms: this.copyUniforms,
-		vertexShader: copyShader.vertexShader,
-		fragmentShader: copyShader.fragmentShader,
-		blending: THREE.AdditiveBlending,
-		transparent: true
-
-	} );
-
-	// convolution material
-
-	if ( THREE.ConvolutionShader === undefined )
-		console.error( "THREE.BloomPass relies on THREE.ConvolutionShader" );
-
-	var convolutionShader = THREE.ConvolutionShader;
-
-	this.convolutionUniforms = THREE.UniformsUtils.clone( convolutionShader.uniforms );
-
-	this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurx;
-	this.convolutionUniforms[ "cKernel" ].value = THREE.ConvolutionShader.buildKernel( sigma );
-
-	this.materialConvolution = new THREE.ShaderMaterial( {
-
-		uniforms: this.convolutionUniforms,
-		vertexShader:  convolutionShader.vertexShader,
-		fragmentShader: convolutionShader.fragmentShader,
-		defines: {
-			"KERNEL_SIZE_FLOAT": kernelSize.toFixed( 1 ),
-			"KERNEL_SIZE_INT": kernelSize.toFixed( 0 )
-		}
-
-	} );
-
-	this.enabled = true;
-	this.needsSwap = false;
-	this.clear = false;
-
-
-	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
-	this.scene  = new THREE.Scene();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
-	this.scene.add( this.quad );
-
-};
-
-THREE.BloomPass.prototype = {
-
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
-
-		if ( maskActive ) renderer.context.disable( renderer.context.STENCIL_TEST );
-
-		// Render quad with blured scene into texture (convolution pass 1)
-
-		this.quad.material = this.materialConvolution;
-
-		this.convolutionUniforms[ "tDiffuse" ].value = readBuffer;
-		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurX;
-
-		renderer.render( this.scene, this.camera, this.renderTargetX, true );
-
-
-		// Render quad with blured scene into texture (convolution pass 2)
-
-		this.convolutionUniforms[ "tDiffuse" ].value = this.renderTargetX;
-		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurY;
-
-		renderer.render( this.scene, this.camera, this.renderTargetY, true );
-
-		// Render original scene with superimposed blur to texture
-
-		this.quad.material = this.materialCopy;
-
-		this.copyUniforms[ "tDiffuse" ].value = this.renderTargetY;
-
-		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
-
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
-
-	}
-
-};
-
-THREE.BloomPass.blurX = new THREE.Vector2( 0.001953125, 0.0 );
-THREE.BloomPass.blurY = new THREE.Vector2( 0.0, 0.001953125 );
-
-define("vendors/three.js-extras/postprocessing/BloomPass", function(){});
-
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
-THREE.ShaderPass = function ( shader, textureID ) {
-
-	this.textureID = ( textureID !== undefined ) ? textureID : "tDiffuse";
-
-	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-	this.material = new THREE.ShaderMaterial( {
-
-		uniforms: this.uniforms,
-		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader
-
-	} );
-
-	this.renderToScreen = false;
-
-	this.enabled = true;
-	this.needsSwap = true;
-	this.clear = false;
-
-
-	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
-	this.scene  = new THREE.Scene();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
-	this.scene.add( this.quad );
-
-};
-
-THREE.ShaderPass.prototype = {
-
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
-
-		if ( this.uniforms[ this.textureID ] ) {
-
-			this.uniforms[ this.textureID ].value = readBuffer;
-
-		}
-
-		this.quad.material = this.material;
-
-		if ( this.renderToScreen ) {
-
-			renderer.render( this.scene, this.camera );
-
-		} else {
-
-			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
-
-		}
-
-	}
-
-};
-
-define("vendors/three.js-extras/postprocessing/ShaderPass", function(){});
-
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
-THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
-
-	this.scene = scene;
-	this.camera = camera;
-
-	this.overrideMaterial = overrideMaterial;
-
-	this.clearColor = clearColor;
-	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 1;
-
-	this.oldClearColor = new THREE.Color();
-	this.oldClearAlpha = 1;
-
-	this.enabled = true;
-	this.clear = true;
-	this.needsSwap = false;
-
-};
-
-THREE.RenderPass.prototype = {
-
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
-
-		this.scene.overrideMaterial = this.overrideMaterial;
-
-		if ( this.clearColor ) {
-
-			this.oldClearColor.copy( renderer.getClearColor() );
-			this.oldClearAlpha = renderer.getClearAlpha();
-
-			renderer.setClearColor( this.clearColor, this.clearAlpha );
-
-		}
-
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
-
-		if ( this.clearColor ) {
-
-			renderer.setClearColor( this.oldClearColor, this.oldClearAlpha );
-
-		}
-
-		this.scene.overrideMaterial = null;
-
-	}
-
-};
-
-define("vendors/three.js-extras/postprocessing/RenderPass", function(){});
-
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
-THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale ) {
-
-	if ( THREE.FilmShader === undefined )
-		console.error( "THREE.FilmPass relies on THREE.FilmShader" );
-
-	var shader = THREE.FilmShader;
-
-	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-	this.material = new THREE.ShaderMaterial( {
-
-		uniforms: this.uniforms,
-		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader
-
-	} );
-
-	if ( grayscale !== undefined )	this.uniforms.grayscale.value = grayscale;
-	if ( noiseIntensity !== undefined ) this.uniforms.nIntensity.value = noiseIntensity;
-	if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlinesIntensity;
-	if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
-
-	this.enabled = true;
-	this.renderToScreen = false;
-	this.needsSwap = true;
-
-
-	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
-	this.scene  = new THREE.Scene();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
-	this.scene.add( this.quad );
-
-};
-
-THREE.FilmPass.prototype = {
-
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
-
-		this.uniforms[ "tDiffuse" ].value = readBuffer;
-		this.uniforms[ "time" ].value += delta;
-
-		this.quad.material = this.material;
-
-		if ( this.renderToScreen ) {
-
-			renderer.render( this.scene, this.camera );
-
-		} else {
-
-			renderer.render( this.scene, this.camera, writeBuffer, false );
-
-		}
-
-	}
-
-};
-
-define("vendors/three.js-extras/postprocessing/FilmPass", function(){});
-
-THREE.GlitchPass2 = function ( dt_size ) {
-
-  if ( THREE.DigitalGlitch === undefined ) console.error( "THREE.GlitchPass relies on THREE.DigitalGlitch" );
-
-  var shader = THREE.DigitalGlitch;
-  this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-  if(dt_size==undefined) dt_size=64;
-
-  this.intensity = 1;
-  this.uniforms[ "tDisp"].value=this.generateHeightmap(dt_size);
-
-
-  this.material = new THREE.ShaderMaterial({
-    uniforms: this.uniforms,
-    vertexShader: shader.vertexShader,
-    fragmentShader: shader.fragmentShader
-  });
-
-  this.enabled = true;
-  this.renderToScreen = false;
-  this.needsSwap = true;
-
-  this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
-  this.scene  = new THREE.Scene();
-
-  this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
-  this.scene.add( this.quad );
-
-  this.goWild=false;
-  this.curF=0;
-  this.generateTrigger();
-
-};
-
-THREE.GlitchPass2.prototype = {
-
-  render: function ( renderer, writeBuffer, readBuffer, delta )
-  {
-    this.uniforms[ "tDiffuse" ].value = readBuffer;
-    this.uniforms[ 'seed' ].value=Math.random();//default seeding
-    //this.uniforms[ 'byp' ].value=0;
-
-    this.uniforms[ 'amount' ].value = (Math.random()/420) * this.intensity;
-    this.uniforms[ 'angle' ].value=THREE.Math.randFloat(-Math.PI,Math.PI);
-    this.uniforms[ 'seed_x' ].value=THREE.Math.randFloat(-1,1);
-    this.uniforms[ 'seed_y' ].value=THREE.Math.randFloat(-1,1);
-    this.uniforms[ 'seed_x' ].value *= 0.001;
-    this.uniforms[ 'seed_y' ].value *= 0.001;
-    this.uniforms[ 'distortion_x' ].value=THREE.Math.randFloat(0,0.001);
-    this.uniforms[ 'distortion_y' ].value=THREE.Math.randFloat(0,0.001);
-    //this.curF=0;
-    this.generateTrigger();
-
-    this.uniforms[ 'byp' ].value=0;
-    this.curF++;
-
-    this.quad.material = this.material;
-    if ( this.renderToScreen )
-    {
-      renderer.render( this.scene, this.camera );
-    }
-    else
-    {
-      renderer.render( this.scene, this.camera, writeBuffer, false );
-    }
-  },
-  generateTrigger:function()
-  {
-    this.randX=THREE.Math.randInt(120,240);
-  },
-  generateHeightmap:function(dt_size)
-  {
-    var data_arr = new Float32Array( dt_size*dt_size * 3 );
-    var length=dt_size*dt_size;
-
-    for ( var i = 0; i < length; i++)
-    {
-      var val=THREE.Math.randFloat(0,1);
-      data_arr[ i*3 + 0 ] = val;
-      data_arr[ i*3 + 1 ] = val;
-      data_arr[ i*3 + 2 ] = val;
-    }
-
-    var texture = new THREE.DataTexture( data_arr, dt_size, dt_size, THREE.RGBFormat, THREE.FloatType );
-    texture.minFilter = THREE.NearestFilter;
-    texture.magFilter = THREE.NearestFilter;
-    texture.needsUpdate = true;
-    texture.flipY = false;
-    return texture;
-  }
-};
-
-
-define("app/postprocessing/GlitchPass2", function(){});
-
-/**
- * @author alteredq / http://alteredqualia.com/
- *
- * Full-screen textured quad shader
- */
-
-THREE.CopyShader = {
-
-	uniforms: {
-
-		"tDiffuse": { type: "t", value: null },
-		"opacity":  { type: "f", value: 1.0 }
-
-	},
-
-	vertexShader: [
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-		"}"
-
-	].join("\n"),
-
-	fragmentShader: [
-
-		"uniform float opacity;",
-
-		"uniform sampler2D tDiffuse;",
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vec4 texel = texture2D( tDiffuse, vUv );",
-			"gl_FragColor = opacity * texel;",
-
-		"}"
-
-	].join("\n")
-
-};
-
-define("vendors/three.js-extras/shaders/CopyShader", function(){});
-
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author davidedc / http://www.sketchpatch.net/
- *
- * NVIDIA FXAA by Timothy Lottes
- * http://timothylottes.blogspot.com/2011/06/fxaa3-source-released.html
- * - WebGL port by @supereggbert
- * http://www.glge.org/demos/fxaa/
- */
-
-THREE.FXAAShader = {
-
-	uniforms: {
-
-		"tDiffuse":   { type: "t", value: null },
-		"resolution": { type: "v2", value: new THREE.Vector2( 1 / 1024, 1 / 512 )  }
-
-	},
-
-	vertexShader: [
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-		"}"
-
-	].join("\n"),
-
-	fragmentShader: [
-
-		"uniform sampler2D tDiffuse;",
-		"uniform vec2 resolution;",
-
-		"varying vec2 vUv;",
-
-		"#define FXAA_REDUCE_MIN   (1.0/128.0)",
-		"#define FXAA_REDUCE_MUL   (1.0/8.0)",
-		"#define FXAA_SPAN_MAX     8.0",
-
-		"void main() {",
-
-			"vec3 rgbNW = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( -1.0, -1.0 ) ) * resolution ).xyz;",
-			"vec3 rgbNE = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( 1.0, -1.0 ) ) * resolution ).xyz;",
-			"vec3 rgbSW = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( -1.0, 1.0 ) ) * resolution ).xyz;",
-			"vec3 rgbSE = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( 1.0, 1.0 ) ) * resolution ).xyz;",
-			"vec4 rgbaM  = texture2D( tDiffuse,  gl_FragCoord.xy  * resolution );",
-			"vec3 rgbM  = rgbaM.xyz;",
-			"float opacity  = rgbaM.w;",
-
-			"vec3 luma = vec3( 0.299, 0.587, 0.114 );",
-
-			"float lumaNW = dot( rgbNW, luma );",
-			"float lumaNE = dot( rgbNE, luma );",
-			"float lumaSW = dot( rgbSW, luma );",
-			"float lumaSE = dot( rgbSE, luma );",
-			"float lumaM  = dot( rgbM,  luma );",
-			"float lumaMin = min( lumaM, min( min( lumaNW, lumaNE ), min( lumaSW, lumaSE ) ) );",
-			"float lumaMax = max( lumaM, max( max( lumaNW, lumaNE) , max( lumaSW, lumaSE ) ) );",
-
-			"vec2 dir;",
-			"dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));",
-			"dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));",
-
-			"float dirReduce = max( ( lumaNW + lumaNE + lumaSW + lumaSE ) * ( 0.25 * FXAA_REDUCE_MUL ), FXAA_REDUCE_MIN );",
-
-			"float rcpDirMin = 1.0 / ( min( abs( dir.x ), abs( dir.y ) ) + dirReduce );",
-			"dir = min( vec2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),",
-				  "max( vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),",
-						"dir * rcpDirMin)) * resolution;",
-
-			"vec3 rgbA = texture2D( tDiffuse, gl_FragCoord.xy  * resolution + dir * ( 1.0 / 3.0 - 0.5 ) ).xyz;",
-			"rgbA += texture2D( tDiffuse, gl_FragCoord.xy  * resolution + dir * ( 2.0 / 3.0 - 0.5 ) ).xyz;",
-			"rgbA *= 0.5;",
-
-			"vec3 rgbB = texture2D( tDiffuse, gl_FragCoord.xy  * resolution + dir * -0.5 ).xyz;",
-			"rgbB += texture2D( tDiffuse, gl_FragCoord.xy  * resolution + dir * 0.5 ).xyz;",
-			"rgbB *= 0.25;",
-			"rgbB += rgbA * 0.5;",
-
-			"float lumaB = dot( rgbB, luma );",
-
-			"if ( ( lumaB < lumaMin ) || ( lumaB > lumaMax ) ) {",
-
-				"gl_FragColor = vec4( rgbA, opacity );",
-
-			"} else {",
-
-				"gl_FragColor = vec4( rgbB, opacity );",
-
-			"}",
-
-		"}"
-
-	].join("\n")
-
-};
-
-define("vendors/three.js-extras/shaders/FXAAShader", function(){});
-
-/**
- * @author alteredq / http://alteredqualia.com/
- *
- * Film grain & scanlines shader
- *
- * - ported from HLSL to WebGL / GLSL
- * http://www.truevision3d.com/forums/showcase/staticnoise_colorblackwhite_scanline_shaders-t18698.0.html
- *
- * Screen Space Static Postprocessor
- *
- * Produces an analogue noise overlay similar to a film grain / TV static
- *
- * Original implementation and noise algorithm
- * Pat 'Hawthorne' Shearon
- *
- * Optimized scanlines + noise version with intensity scaling
- * Georg 'Leviathan' Steinrohder
- *
- * This version is provided under a Creative Commons Attribution 3.0 License
- * http://creativecommons.org/licenses/by/3.0/
- */
-
-THREE.FilmShader = {
-
-	uniforms: {
-
-		"tDiffuse":   { type: "t", value: null },
-		"time":       { type: "f", value: 0.0 },
-		"nIntensity": { type: "f", value: 0.5 },
-		"sIntensity": { type: "f", value: 0.05 },
-		"sCount":     { type: "f", value: 4096 },
-		"grayscale":  { type: "i", value: 1 }
-
-	},
-
-	vertexShader: [
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-		"}"
-
-	].join("\n"),
-
-	fragmentShader: [
-
-		// control parameter
-		"uniform float time;",
-
-		"uniform bool grayscale;",
-
-		// noise effect intensity value (0 = no effect, 1 = full effect)
-		"uniform float nIntensity;",
-
-		// scanlines effect intensity value (0 = no effect, 1 = full effect)
-		"uniform float sIntensity;",
-
-		// scanlines effect count value (0 = no effect, 4096 = full effect)
-		"uniform float sCount;",
-
-		"uniform sampler2D tDiffuse;",
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			// sample the source
-			"vec4 cTextureScreen = texture2D( tDiffuse, vUv );",
-
-			// make some noise
-			"float x = vUv.x * vUv.y * time *  1000.0;",
-			"x = mod( x, 13.0 ) * mod( x, 123.0 );",
-			"float dx = mod( x, 0.01 );",
-
-			// add noise
-			"vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx * 100.0, 0.0, 1.0 );",
-
-			// get us a sine and cosine
-			"vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );",
-
-			// add scanlines
-			"cResult += cTextureScreen.rgb * vec3( sc.x, sc.y, sc.x ) * sIntensity;",
-
-			// interpolate between source and result by intensity
-			"cResult = cTextureScreen.rgb + clamp( nIntensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );",
-
-			// convert to grayscale if desired
-			"if( grayscale ) {",
-
-				"cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );",
-
-			"}",
-
-			"gl_FragColor =  vec4( cResult, cTextureScreen.a );",
-
-		"}"
-
-	].join("\n")
-
-};
-
-define("vendors/three.js-extras/shaders/FilmShader", function(){});
-
-/**
- * @author alteredq / http://alteredqualia.com/
- *
- * Convolution shader
- * ported from o3d sample to WebGL / GLSL
- * http://o3d.googlecode.com/svn/trunk/samples/convolution.html
- */
-
-THREE.ConvolutionShader = {
-
-	defines: {
-
-		"KERNEL_SIZE_FLOAT": "25.0",
-		"KERNEL_SIZE_INT": "25",
-
-	},
-
-	uniforms: {
-
-		"tDiffuse":        { type: "t", value: null },
-		"uImageIncrement": { type: "v2", value: new THREE.Vector2( 0.001953125, 0.0 ) },
-		"cKernel":         { type: "fv1", value: [] }
-
-	},
-
-	vertexShader: [
-
-		"uniform vec2 uImageIncrement;",
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vUv = uv - ( ( KERNEL_SIZE_FLOAT - 1.0 ) / 2.0 ) * uImageIncrement;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-		"}"
-
-	].join("\n"),
-
-	fragmentShader: [
-
-		"uniform float cKernel[ KERNEL_SIZE_INT ];",
-
-		"uniform sampler2D tDiffuse;",
-		"uniform vec2 uImageIncrement;",
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vec2 imageCoord = vUv;",
-			"vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );",
-
-			"for( int i = 0; i < KERNEL_SIZE_INT; i ++ ) {",
-
-				"sum += texture2D( tDiffuse, imageCoord ) * cKernel[ i ];",
-				"imageCoord += uImageIncrement;",
-
-			"}",
-
-			"gl_FragColor = sum;",
-
-		"}"
-
-
-	].join("\n"),
-
-	buildKernel: function ( sigma ) {
-
-		// We lop off the sqrt(2 * pi) * sigma term, since we're going to normalize anyway.
-
-		function gauss( x, sigma ) {
-
-			return Math.exp( - ( x * x ) / ( 2.0 * sigma * sigma ) );
-
-		}
-
-		var i, values, sum, halfWidth, kMaxKernelSize = 25, kernelSize = 2 * Math.ceil( sigma * 3.0 ) + 1;
-
-		if ( kernelSize > kMaxKernelSize ) kernelSize = kMaxKernelSize;
-		halfWidth = ( kernelSize - 1 ) * 0.5;
-
-		values = new Array( kernelSize );
-		sum = 0.0;
-		for ( i = 0; i < kernelSize; ++i ) {
-
-			values[ i ] = gauss( i - halfWidth, sigma );
-			sum += values[ i ];
-
-		}
-
-		// normalize the kernel
-
-		for ( i = 0; i < kernelSize; ++i ) values[ i ] /= sum;
-
-		return values;
-
-	}
-
-};
-
-define("vendors/three.js-extras/shaders/ConvolutionShader", function(){});
-
-/**
- * @author alteredq / http://alteredqualia.com/
- *
- * Vignette shader
- * based on PaintEffect postprocess from ro.me
- * http://code.google.com/p/3-dreams-of-black/source/browse/deploy/js/effects/PaintEffect.js
- */
-
-THREE.VignetteShader = {
-
-  uniforms: {
-
-    "tDiffuse": { type: "t", value: null },
-    "offset":   { type: "f", value: 1.0 },
-    "darkness": { type: "f", value: 1.0 }
-
-  },
-
-  vertexShader: [
-
-    "varying vec2 vUv;",
-
-    "void main() {",
-
-      "vUv = uv;",
-      "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-    "}"
-
-  ].join("\n"),
-
-  fragmentShader: [
-
-    "uniform float offset;",
-    "uniform float darkness;",
-
-    "uniform sampler2D tDiffuse;",
-
-    "varying vec2 vUv;",
-
-    "void main() {",
-
-      // Eskil's vignette
-
-      "vec4 texel = texture2D( tDiffuse, vUv );",
-      "vec2 uv = ( vUv - vec2( 0.5 ) ) * vec2( offset );",
-      "gl_FragColor = vec4( mix( texel.rgb, vec3( 1.0 - darkness ), dot( uv, uv ) ), texel.a );",
-
-      /*
-      // alternative version from glfx.js
-      // this one makes more "dusty" look (as opposed to "burned")
-
-      "vec4 color = texture2D( tDiffuse, vUv );",
-      "float dist = distance( vUv, vec2( 0.5 ) );",
-      "color.rgb *= smoothstep( 0.8, offset * 0.799, dist *( darkness + offset ) );",
-      "gl_FragColor = color;",
-      */
-
-    "}"
-
-  ].join("\n")
-
-};
-
-
-define("vendors/three.js-extras/shaders/VignetteShader", function(){});
-
-/**
- * @author felixturner / http://airtight.cc/
- *
- * RGB Shift Shader
- * Shifts red and blue channels from center in opposite directions
- * Ported from http://kriss.cx/tom/2009/05/rgb-shift/
- * by Tom Butterworth / http://kriss.cx/tom/
- *
- * amount: shift distance (1 is width of input)
- * angle: shift angle in radians
- */
-
-THREE.DigitalGlitch = {
-
-  uniforms: {
-
-    "tDiffuse":   { type: "t", value: null },//diffuse texture
-    "tDisp":    { type: "t", value: null },//displacement texture for digital glitch squares
-    "byp":      { type: "i", value: 0 },//apply the glitch ?
-    "amount":   { type: "f", value: 0.08 },
-    "angle":    { type: "f", value: 0.02 },
-    "seed":     { type: "f", value: 0.02 },
-    "seed_x":   { type: "f", value: 0.02 },//-1,1
-    "seed_y":   { type: "f", value: 0.02 },//-1,1
-    "distortion_x": { type: "f", value: 0.5 },
-    "distortion_y": { type: "f", value: 0.6 },
-    "col_s":    { type: "f", value: 0.05 }
-  },
-
-  vertexShader: [
-
-    "varying vec2 vUv;",
-    "void main() {",
-      "vUv = uv;",
-      "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-    "}"
-  ].join("\n"),
-
-  fragmentShader: [
-    "uniform int byp;",//should we apply the glitch ?
-
-    "uniform sampler2D tDiffuse;",
-    "uniform sampler2D tDisp;",
-
-    "uniform float amount;",
-    "uniform float angle;",
-    "uniform float seed;",
-    "uniform float seed_x;",
-    "uniform float seed_y;",
-    "uniform float distortion_x;",
-    "uniform float distortion_y;",
-    "uniform float col_s;",
-
-    "varying vec2 vUv;",
-
-
-    "float rand(vec2 co){",
-      "return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);",
-    "}",
-
-    "void main() {",
-      "if(byp<1) {",
-        "vec2 p = vUv;",
-        "float xs = floor(gl_FragCoord.x / 0.5);",
-        "float ys = floor(gl_FragCoord.y / 0.5);",
-        //based on staffantans glitch shader for unity https://github.com/staffantan/unityglitch
-        "vec4 normal = texture2D (tDisp, p*seed*seed);",
-        "if(p.y<distortion_x+col_s && p.y>distortion_x-col_s*seed) {",
-          "if(seed_x>0.){",
-            "p.y = 1. - (p.y + distortion_y);",
-          "}",
-          "else {",
-            "p.y = distortion_y;",
-          "}",
-        "}",
-        "if(p.x<distortion_y+col_s && p.x>distortion_y-col_s*seed) {",
-          "if(seed_y>0.){",
-            "p.x=distortion_x;",
-          "}",
-          "else {",
-            "p.x = 1. - (p.x + distortion_x);",
-          "}",
-        "}",
-        "p.x+=normal.x*seed_x*(seed/5.);",
-        "p.y+=normal.y*seed_y*(seed/5.);",
-        //base from RGB shift shader
-        "vec2 offset = amount * vec2( cos(angle), sin(angle));",
-        "vec4 cr = texture2D(tDiffuse, p + offset);",
-        "vec4 cga = texture2D(tDiffuse, p);",
-        "vec4 cb = texture2D(tDiffuse, p - offset);",
-        "gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);",
-        //add noise
-        "vec4 snow = 200.*amount*vec4(rand(vec2(xs * seed,ys * seed*50.))*0.2);",
-        "gl_FragColor = gl_FragColor+ snow;",
-      "}",
-      "else {",
-        "gl_FragColor=texture2D (tDiffuse, vUv);",
-      "}",
-    "}"
-
-  ].join("\n")
-
-};
-
-
-define("vendors/three.js-extras/shaders/DigitalGlitch", function(){});
-
-
-(function() {
-  define('cs!app/components/PostFX',['require','threejs','vendors/three.js-extras/postprocessing/EffectComposer','vendors/three.js-extras/postprocessing/MaskPass','vendors/three.js-extras/postprocessing/BloomPass','vendors/three.js-extras/postprocessing/ShaderPass','vendors/three.js-extras/postprocessing/RenderPass','vendors/three.js-extras/postprocessing/FilmPass','app/postprocessing/GlitchPass2','vendors/three.js-extras/shaders/CopyShader','vendors/three.js-extras/shaders/FXAAShader','vendors/three.js-extras/shaders/FilmShader','vendors/three.js-extras/shaders/ConvolutionShader','vendors/three.js-extras/shaders/VignetteShader','vendors/three.js-extras/shaders/DigitalGlitch'],function(require) {
-    var PostFX, THREE;
-    THREE = require('threejs');
-    require('vendors/three.js-extras/postprocessing/EffectComposer');
-    require('vendors/three.js-extras/postprocessing/MaskPass');
-    require('vendors/three.js-extras/postprocessing/BloomPass');
-    require('vendors/three.js-extras/postprocessing/ShaderPass');
-    require('vendors/three.js-extras/postprocessing/RenderPass');
-    require('vendors/three.js-extras/postprocessing/FilmPass');
-    require('app/postprocessing/GlitchPass2');
-    require('vendors/three.js-extras/shaders/CopyShader');
-    require('vendors/three.js-extras/shaders/FXAAShader');
-    require('vendors/three.js-extras/shaders/FilmShader');
-    require('vendors/three.js-extras/shaders/ConvolutionShader');
-    require('vendors/three.js-extras/shaders/VignetteShader');
-    require('vendors/three.js-extras/shaders/DigitalGlitch');
-    return PostFX = (function() {
-      function PostFX(scene, camera, renderer) {
-        var renderModel;
-        this.scene = scene;
-        this.camera = camera;
-        this.renderer = renderer;
-        this.renderer.autoClear = false;
-        renderModel = new THREE.RenderPass(this.scene, this.camera);
-        window.renderModel = renderModel;
-        this.effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
-        this.effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
-        this.bloom = new THREE.BloomPass(0.9, 25, 4);
-        this.glitchPass = new THREE.GlitchPass2();
-        this.glitchPass.intensity = 0.3;
-        this.vignettePass = new THREE.ShaderPass(THREE.VignetteShader);
-        this.vignettePass.uniforms['darkness'].value = 2;
-        this.filmShader = new THREE.FilmPass(0.34, 0.01, 648, false);
-        this.filmShader.renderToScreen = true;
-        this.composer = new THREE.EffectComposer(this.renderer);
-        this.composer.addPass(renderModel);
-        this.composer.addPass(this.effectFXAA);
-        this.composer.addPass(this.bloom);
-        this.composer.addPass(this.vignettePass);
-        this.composer.addPass(this.filmShader);
-      }
-
-      PostFX.prototype.resize = function(SCREEN_WIDTH, SCREEN_HEIGHT) {
-        this.composer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-        return this.effectFXAA.uniforms['resolution'].value.set(1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT);
-      };
-
-      PostFX.prototype.render = function(delta) {
-        this.renderer.clear();
-        return this.composer.render(delta);
-      };
-
-      return PostFX;
-
-    })();
-  });
-
-}).call(this);
-
-/*jslint onevar:true, undef:true, newcap:true, regexp:true, bitwise:true, maxerr:50, indent:4, white:false, nomen:false, plusplus:false */
-/*global define:false, require:false, exports:false, module:false, signals:false */
-
-/** @license
- * JS Signals <http://millermedeiros.github.com/js-signals/>
- * Released under the MIT license
- * Author: Miller Medeiros
- * Version: 1.0.0 - Build: 268 (2012/11/29 05:48 PM)
- */
-
-(function(global){
-
-    // SignalBinding -------------------------------------------------
-    //================================================================
-
-    /**
-     * Object that represents a binding between a Signal and a listener function.
-     * <br />- <strong>This is an internal constructor and shouldn't be called by regular users.</strong>
-     * <br />- inspired by Joa Ebert AS3 SignalBinding and Robert Penner's Slot classes.
-     * @author Miller Medeiros
-     * @constructor
-     * @internal
-     * @name SignalBinding
-     * @param {Signal} signal Reference to Signal object that listener is currently bound to.
-     * @param {Function} listener Handler function bound to the signal.
-     * @param {boolean} isOnce If binding should be executed just once.
-     * @param {Object} [listenerContext] Context on which listener will be executed (object that should represent the `this` variable inside listener function).
-     * @param {Number} [priority] The priority level of the event listener. (default = 0).
-     */
-    function SignalBinding(signal, listener, isOnce, listenerContext, priority) {
-
-        /**
-         * Handler function bound to the signal.
-         * @type Function
-         * @private
-         */
-        this._listener = listener;
-
-        /**
-         * If binding should be executed just once.
-         * @type boolean
-         * @private
-         */
-        this._isOnce = isOnce;
-
-        /**
-         * Context on which listener will be executed (object that should represent the `this` variable inside listener function).
-         * @memberOf SignalBinding.prototype
-         * @name context
-         * @type Object|undefined|null
-         */
-        this.context = listenerContext;
-
-        /**
-         * Reference to Signal object that listener is currently bound to.
-         * @type Signal
-         * @private
-         */
-        this._signal = signal;
-
-        /**
-         * Listener priority
-         * @type Number
-         * @private
-         */
-        this._priority = priority || 0;
-    }
-
-    SignalBinding.prototype = {
-
-        /**
-         * If binding is active and should be executed.
-         * @type boolean
-         */
-        active : true,
-
-        /**
-         * Default parameters passed to listener during `Signal.dispatch` and `SignalBinding.execute`. (curried parameters)
-         * @type Array|null
-         */
-        params : null,
-
-        /**
-         * Call listener passing arbitrary parameters.
-         * <p>If binding was added using `Signal.addOnce()` it will be automatically removed from signal dispatch queue, this method is used internally for the signal dispatch.</p>
-         * @param {Array} [paramsArr] Array of parameters that should be passed to the listener
-         * @return {*} Value returned by the listener.
-         */
-        execute : function (paramsArr) {
-            var handlerReturn, params;
-            if (this.active && !!this._listener) {
-                params = this.params? this.params.concat(paramsArr) : paramsArr;
-                handlerReturn = this._listener.apply(this.context, params);
-                if (this._isOnce) {
-                    this.detach();
-                }
-            }
-            return handlerReturn;
-        },
-
-        /**
-         * Detach binding from signal.
-         * - alias to: mySignal.remove(myBinding.getListener());
-         * @return {Function|null} Handler function bound to the signal or `null` if binding was previously detached.
-         */
-        detach : function () {
-            return this.isBound()? this._signal.remove(this._listener, this.context) : null;
-        },
-
-        /**
-         * @return {Boolean} `true` if binding is still bound to the signal and have a listener.
-         */
-        isBound : function () {
-            return (!!this._signal && !!this._listener);
-        },
-
-        /**
-         * @return {boolean} If SignalBinding will only be executed once.
-         */
-        isOnce : function () {
-            return this._isOnce;
-        },
-
-        /**
-         * @return {Function} Handler function bound to the signal.
-         */
-        getListener : function () {
-            return this._listener;
-        },
-
-        /**
-         * @return {Signal} Signal that listener is currently bound to.
-         */
-        getSignal : function () {
-            return this._signal;
-        },
-
-        /**
-         * Delete instance properties
-         * @private
-         */
-        _destroy : function () {
-            delete this._signal;
-            delete this._listener;
-            delete this.context;
-        },
-
-        /**
-         * @return {string} String representation of the object.
-         */
-        toString : function () {
-            return '[SignalBinding isOnce:' + this._isOnce +', isBound:'+ this.isBound() +', active:' + this.active + ']';
-        }
-
-    };
-
-
-/*global SignalBinding:false*/
-
-    // Signal --------------------------------------------------------
-    //================================================================
-
-    function validateListener(listener, fnName) {
-        if (typeof listener !== 'function') {
-            throw new Error( 'listener is a required param of {fn}() and should be a Function.'.replace('{fn}', fnName) );
-        }
-    }
-
-    /**
-     * Custom event broadcaster
-     * <br />- inspired by Robert Penner's AS3 Signals.
-     * @name Signal
-     * @author Miller Medeiros
-     * @constructor
-     */
-    function Signal() {
-        /**
-         * @type Array.<SignalBinding>
-         * @private
-         */
-        this._bindings = [];
-        this._prevParams = null;
-
-        // enforce dispatch to aways work on same context (#47)
-        var self = this;
-        this.dispatch = function(){
-            Signal.prototype.dispatch.apply(self, arguments);
-        };
-    }
-
-    Signal.prototype = {
-
-        /**
-         * Signals Version Number
-         * @type String
-         * @const
-         */
-        VERSION : '1.0.0',
-
-        /**
-         * If Signal should keep record of previously dispatched parameters and
-         * automatically execute listener during `add()`/`addOnce()` if Signal was
-         * already dispatched before.
-         * @type boolean
-         */
-        memorize : false,
-
-        /**
-         * @type boolean
-         * @private
-         */
-        _shouldPropagate : true,
-
-        /**
-         * If Signal is active and should broadcast events.
-         * <p><strong>IMPORTANT:</strong> Setting this property during a dispatch will only affect the next dispatch, if you want to stop the propagation of a signal use `halt()` instead.</p>
-         * @type boolean
-         */
-        active : true,
-
-        /**
-         * @param {Function} listener
-         * @param {boolean} isOnce
-         * @param {Object} [listenerContext]
-         * @param {Number} [priority]
-         * @return {SignalBinding}
-         * @private
-         */
-        _registerListener : function (listener, isOnce, listenerContext, priority) {
-
-            var prevIndex = this._indexOfListener(listener, listenerContext),
-                binding;
-
-            if (prevIndex !== -1) {
-                binding = this._bindings[prevIndex];
-                if (binding.isOnce() !== isOnce) {
-                    throw new Error('You cannot add'+ (isOnce? '' : 'Once') +'() then add'+ (!isOnce? '' : 'Once') +'() the same listener without removing the relationship first.');
-                }
-            } else {
-                binding = new SignalBinding(this, listener, isOnce, listenerContext, priority);
-                this._addBinding(binding);
-            }
-
-            if(this.memorize && this._prevParams){
-                binding.execute(this._prevParams);
-            }
-
-            return binding;
-        },
-
-        /**
-         * @param {SignalBinding} binding
-         * @private
-         */
-        _addBinding : function (binding) {
-            //simplified insertion sort
-            var n = this._bindings.length;
-            do { --n; } while (this._bindings[n] && binding._priority <= this._bindings[n]._priority);
-            this._bindings.splice(n + 1, 0, binding);
-        },
-
-        /**
-         * @param {Function} listener
-         * @return {number}
-         * @private
-         */
-        _indexOfListener : function (listener, context) {
-            var n = this._bindings.length,
-                cur;
-            while (n--) {
-                cur = this._bindings[n];
-                if (cur._listener === listener && cur.context === context) {
-                    return n;
-                }
-            }
-            return -1;
-        },
-
-        /**
-         * Check if listener was attached to Signal.
-         * @param {Function} listener
-         * @param {Object} [context]
-         * @return {boolean} if Signal has the specified listener.
-         */
-        has : function (listener, context) {
-            return this._indexOfListener(listener, context) !== -1;
-        },
-
-        /**
-         * Add a listener to the signal.
-         * @param {Function} listener Signal handler function.
-         * @param {Object} [listenerContext] Context on which listener will be executed (object that should represent the `this` variable inside listener function).
-         * @param {Number} [priority] The priority level of the event listener. Listeners with higher priority will be executed before listeners with lower priority. Listeners with same priority level will be executed at the same order as they were added. (default = 0)
-         * @return {SignalBinding} An Object representing the binding between the Signal and listener.
-         */
-        add : function (listener, listenerContext, priority) {
-            validateListener(listener, 'add');
-            return this._registerListener(listener, false, listenerContext, priority);
-        },
-
-        /**
-         * Add listener to the signal that should be removed after first execution (will be executed only once).
-         * @param {Function} listener Signal handler function.
-         * @param {Object} [listenerContext] Context on which listener will be executed (object that should represent the `this` variable inside listener function).
-         * @param {Number} [priority] The priority level of the event listener. Listeners with higher priority will be executed before listeners with lower priority. Listeners with same priority level will be executed at the same order as they were added. (default = 0)
-         * @return {SignalBinding} An Object representing the binding between the Signal and listener.
-         */
-        addOnce : function (listener, listenerContext, priority) {
-            validateListener(listener, 'addOnce');
-            return this._registerListener(listener, true, listenerContext, priority);
-        },
-
-        /**
-         * Remove a single listener from the dispatch queue.
-         * @param {Function} listener Handler function that should be removed.
-         * @param {Object} [context] Execution context (since you can add the same handler multiple times if executing in a different context).
-         * @return {Function} Listener handler function.
-         */
-        remove : function (listener, context) {
-            validateListener(listener, 'remove');
-
-            var i = this._indexOfListener(listener, context);
-            if (i !== -1) {
-                this._bindings[i]._destroy(); //no reason to a SignalBinding exist if it isn't attached to a signal
-                this._bindings.splice(i, 1);
-            }
-            return listener;
-        },
-
-        /**
-         * Remove all listeners from the Signal.
-         */
-        removeAll : function () {
-            var n = this._bindings.length;
-            while (n--) {
-                this._bindings[n]._destroy();
-            }
-            this._bindings.length = 0;
-        },
-
-        /**
-         * @return {number} Number of listeners attached to the Signal.
-         */
-        getNumListeners : function () {
-            return this._bindings.length;
-        },
-
-        /**
-         * Stop propagation of the event, blocking the dispatch to next listeners on the queue.
-         * <p><strong>IMPORTANT:</strong> should be called only during signal dispatch, calling it before/after dispatch won't affect signal broadcast.</p>
-         * @see Signal.prototype.disable
-         */
-        halt : function () {
-            this._shouldPropagate = false;
-        },
-
-        /**
-         * Dispatch/Broadcast Signal to all listeners added to the queue.
-         * @param {...*} [params] Parameters that should be passed to each handler.
-         */
-        dispatch : function (params) {
-            if (! this.active) {
-                return;
-            }
-
-            var paramsArr = Array.prototype.slice.call(arguments),
-                n = this._bindings.length,
-                bindings;
-
-            if (this.memorize) {
-                this._prevParams = paramsArr;
-            }
-
-            if (! n) {
-                //should come after memorize
-                return;
-            }
-
-            bindings = this._bindings.slice(); //clone array in case add/remove items during dispatch
-            this._shouldPropagate = true; //in case `halt` was called before dispatch or during the previous dispatch.
-
-            //execute all callbacks until end of the list or until a callback returns `false` or stops propagation
-            //reverse loop since listeners with higher priority will be added at the end of the list
-            do { n--; } while (bindings[n] && this._shouldPropagate && bindings[n].execute(paramsArr) !== false);
-        },
-
-        /**
-         * Forget memorized arguments.
-         * @see Signal.memorize
-         */
-        forget : function(){
-            this._prevParams = null;
-        },
-
-        /**
-         * Remove all bindings from signal and destroy any reference to external objects (destroy Signal object).
-         * <p><strong>IMPORTANT:</strong> calling any method on the signal instance after calling dispose will throw errors.</p>
-         */
-        dispose : function () {
-            this.removeAll();
-            delete this._bindings;
-            delete this._prevParams;
-        },
-
-        /**
-         * @return {string} String representation of the object.
-         */
-        toString : function () {
-            return '[Signal active:'+ this.active +' numListeners:'+ this.getNumListeners() +']';
-        }
-
-    };
-
-
-    // Namespace -----------------------------------------------------
-    //================================================================
-
-    /**
-     * Signals namespace
-     * @namespace
-     * @name signals
-     */
-    var signals = Signal;
-
-    /**
-     * Custom event broadcaster
-     * @see Signal
-     */
-    // alias for backwards compatibility (see #gh-44)
-    signals.Signal = Signal;
-
-
-
-    //exports to multiple environments
-    if(typeof define === 'function' && define.amd){ //AMD
-        define('Signal',[],function () { return signals; });
-    } else if (typeof module !== 'undefined' && module.exports){ //node
-        module.exports = signals;
-    } else { //browser
-        //use string because of Google closure compiler ADVANCED_MODE
-        /*jslint sub:true */
-        global['signals'] = signals;
-    }
-
-}(this));
-
-
-(function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
-  define('cs!app/components/Timer',['require','Signal'],function(require) {
-    var Signals, Timer;
-    Signals = require('Signal');
-    return Timer = (function() {
-      function Timer() {
-        this.update = __bind(this.update, this);
-        this.getCurrentTime = __bind(this.getCurrentTime, this);
-        this.totalDuration = 240 * 1000;
-        this.time = [2400];
-        this.is_playing = false;
-        this.last_timeStamp = -1;
-        this.updated = new Signals.Signal();
-        window.requestAnimationFrame(this.update);
-      }
-
-      Timer.prototype.getCurrentTime = function() {
-        return this.time[0];
-      };
-
-      Timer.prototype.play = function() {
-        return this.is_playing = true;
-      };
-
-      Timer.prototype.stop = function() {
-        return this.is_playing = false;
-      };
-
-      Timer.prototype.toggle = function() {
-        return this.is_playing = !this.is_playing;
-      };
-
-      Timer.prototype.seek = function(time) {
-        return this.time = time;
-      };
-
-      Timer.prototype.update = function(timestamp) {
-        var elapsed;
-        if (this.last_timeStamp === -1) {
-          this.last_timeStamp = timestamp;
-        }
-        elapsed = timestamp - this.last_timeStamp;
-        if (this.is_playing) {
-          this.time[0] += elapsed;
-        }
-        this.updated.dispatch(this.time[0]);
-        this.last_timeStamp = timestamp;
-        return window.requestAnimationFrame(this.update);
-      };
-
-      return Timer;
-
-    })();
-  });
-
-}).call(this);
-
-
-(function() {
-  define('cs!app/elements/Camera',['require','threejs'],function(require) {
-    var Camera, THREE;
-    THREE = require('threejs');
-    return Camera = (function() {
-      Camera.properties = {
-        x: {
-          name: 'x',
-          label: 'x',
-          val: 0
-        },
-        y: {
-          name: 'y',
-          label: 'y',
-          val: 0
-        },
-        z: {
-          name: 'z',
-          label: 'z',
-          val: 700
-        },
-        target_x: {
-          name: 'target_x',
-          label: 'target x',
-          val: 0
-        },
-        target_y: {
-          name: 'target_y',
-          label: 'target y',
-          val: 0
-        },
-        target_z: {
-          name: 'target_z',
-          label: 'target z',
-          val: 0
-        },
-        fov: {
-          name: 'fov',
-          label: 'fov',
-          val: 45
-        }
-      };
-
-      function Camera(values, time) {
-        this.values = values != null ? values : {};
-        if (time == null) {
-          time = 0;
-        }
-        this.isCamera = true;
-        this.target = new THREE.Vector3(this.values.target_x, this.values.target_y, this.values.target_z);
-        this.container = new THREE.PerspectiveCamera(this.values.fov, window.innerWidth / window.innerHeight, 1, 2000);
-        this.container.position.set(this.values.x, this.values.y, this.values.z);
-      }
-
-      Camera.prototype.update = function(seconds, values, force) {
-        if (values == null) {
-          values = false;
-        }
-        if (force == null) {
-          force = false;
-        }
-        this.container.fov = values.fov;
-        this.container.position.set(values.x, values.y, values.z);
-        this.target.set(values.target_x, values.target_y, values.target_z);
-        return this.container.lookAt(this.target);
-      };
-
-      Camera.prototype.destroy = function() {
-        delete this.container;
-        return delete this.isCamera;
-      };
-
-      return Camera;
-
-    })();
-  });
-
-}).call(this);
-
 /**
  * @license
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
@@ -44893,246 +43060,451 @@ define("vendors/three.js-extras/shaders/DigitalGlitch", function(){});
   }
 }.call(this));
 
-/**
- * Seedable random number generator functions.
- * @version 1.0.0
- * @license Public Domain
- *
- * @example
- * var rng = new RNG('Example');
- * rng.random(40, 50);  // =>  42
- * rng.uniform();       // =>  0.7972798995050903
- * rng.normal();        // => -0.6698504543216376
- * rng.exponential();   // =>  1.0547367609131555
- * rng.poisson(4);      // =>  2
- * rng.gamma(4);        // =>  2.781724687386858
+/*jslint onevar:true, undef:true, newcap:true, regexp:true, bitwise:true, maxerr:50, indent:4, white:false, nomen:false, plusplus:false */
+/*global define:false, require:false, exports:false, module:false, signals:false */
+
+/** @license
+ * JS Signals <http://millermedeiros.github.com/js-signals/>
+ * Released under the MIT license
+ * Author: Miller Medeiros
+ * Version: 1.0.0 - Build: 268 (2012/11/29 05:48 PM)
  */
 
-/**
- * @param {String} seed A string to seed the generator.
- * @constructor
- */
-function RC4(seed) {
-    this.s = new Array(256);
-    this.i = 0;
-    this.j = 0;
-    for (var i = 0; i < 256; i++) {
-        this.s[i] = i;
+(function(global){
+
+    // SignalBinding -------------------------------------------------
+    //================================================================
+
+    /**
+     * Object that represents a binding between a Signal and a listener function.
+     * <br />- <strong>This is an internal constructor and shouldn't be called by regular users.</strong>
+     * <br />- inspired by Joa Ebert AS3 SignalBinding and Robert Penner's Slot classes.
+     * @author Miller Medeiros
+     * @constructor
+     * @internal
+     * @name SignalBinding
+     * @param {Signal} signal Reference to Signal object that listener is currently bound to.
+     * @param {Function} listener Handler function bound to the signal.
+     * @param {boolean} isOnce If binding should be executed just once.
+     * @param {Object} [listenerContext] Context on which listener will be executed (object that should represent the `this` variable inside listener function).
+     * @param {Number} [priority] The priority level of the event listener. (default = 0).
+     */
+    function SignalBinding(signal, listener, isOnce, listenerContext, priority) {
+
+        /**
+         * Handler function bound to the signal.
+         * @type Function
+         * @private
+         */
+        this._listener = listener;
+
+        /**
+         * If binding should be executed just once.
+         * @type boolean
+         * @private
+         */
+        this._isOnce = isOnce;
+
+        /**
+         * Context on which listener will be executed (object that should represent the `this` variable inside listener function).
+         * @memberOf SignalBinding.prototype
+         * @name context
+         * @type Object|undefined|null
+         */
+        this.context = listenerContext;
+
+        /**
+         * Reference to Signal object that listener is currently bound to.
+         * @type Signal
+         * @private
+         */
+        this._signal = signal;
+
+        /**
+         * Listener priority
+         * @type Number
+         * @private
+         */
+        this._priority = priority || 0;
     }
-    if (seed) {
-        this.mix(seed);
-    }
-}
 
-/**
- * Get the underlying bytes of a string.
- * @param {string} string
- * @returns {Array} An array of bytes
- */
-RC4.getStringBytes = function(string) {
-    var output = [];
-    for (var i = 0; i < string.length; i++) {
-        var c = string.charCodeAt(i);
-        var bytes = [];
-        do {
-            bytes.push(c & 0xFF);
-            c = c >> 8;
-        } while (c > 0);
-        output = output.concat(bytes.reverse());
-    }
-    return output;
-};
+    SignalBinding.prototype = {
 
-RC4.prototype._swap = function(i, j) {
-    var tmp = this.s[i];
-    this.s[i] = this.s[j];
-    this.s[j] = tmp;
-};
+        /**
+         * If binding is active and should be executed.
+         * @type boolean
+         */
+        active : true,
 
-/**
- * Mix additional entropy into this generator.
- * @param {String} seed
- */
-RC4.prototype.mix = function(seed) {
-    var input = RC4.getStringBytes(seed);
-    var j = 0;
-    for (var i = 0; i < this.s.length; i++) {
-        j += this.s[i] + input[i % input.length];
-        j %= 256;
-        this._swap(i, j);
-    }
-};
+        /**
+         * Default parameters passed to listener during `Signal.dispatch` and `SignalBinding.execute`. (curried parameters)
+         * @type Array|null
+         */
+        params : null,
 
-/**
- * @returns {number} The next byte of output from the generator.
- */
-RC4.prototype.next = function() {
-    this.i = (this.i + 1) % 256;
-    this.j = (this.j + this.s[this.i]) % 256;
-    this._swap(this.i, this.j);
-    return this.s[(this.s[this.i] + this.s[this.j]) % 256];
-};
+        /**
+         * Call listener passing arbitrary parameters.
+         * <p>If binding was added using `Signal.addOnce()` it will be automatically removed from signal dispatch queue, this method is used internally for the signal dispatch.</p>
+         * @param {Array} [paramsArr] Array of parameters that should be passed to the listener
+         * @return {*} Value returned by the listener.
+         */
+        execute : function (paramsArr) {
+            var handlerReturn, params;
+            if (this.active && !!this._listener) {
+                params = this.params? this.params.concat(paramsArr) : paramsArr;
+                handlerReturn = this._listener.apply(this.context, params);
+                if (this._isOnce) {
+                    this.detach();
+                }
+            }
+            return handlerReturn;
+        },
 
-/**
- * Create a new random number generator with optional seed. If the
- * provided seed is a function (i.e. Math.random) it will be used as
- * the uniform number generator.
- * @param seed An arbitrary object used to seed the generator.
- * @constructor
- */
-function RNG(seed) {
-    if (seed == null) {
-        seed = (Math.random() + Date.now()).toString();
-    } else if (typeof seed === "function") {
-        // Use it as a uniform number generator
-        this.uniform = seed;
-        this.nextByte = function() {
-            return ~~(this.uniform() * 256);
-        };
-        seed = null;
-    } else if (Object.prototype.toString.call(seed) !== "[object String]") {
-        seed = JSON.stringify(seed);
-    }
-    this._normal = null;
-    if (seed) {
-        this._state = new RC4(seed);
-    } else {
-        this._state = null;
-    }
-}
+        /**
+         * Detach binding from signal.
+         * - alias to: mySignal.remove(myBinding.getListener());
+         * @return {Function|null} Handler function bound to the signal or `null` if binding was previously detached.
+         */
+        detach : function () {
+            return this.isBound()? this._signal.remove(this._listener, this.context) : null;
+        },
 
-/**
- * @returns {number} Uniform random number between 0 and 255.
- */
-RNG.prototype.nextByte = function() {
-    return this._state.next();
-};
+        /**
+         * @return {Boolean} `true` if binding is still bound to the signal and have a listener.
+         */
+        isBound : function () {
+            return (!!this._signal && !!this._listener);
+        },
 
-/**
- * @returns {number} Uniform random number between 0 and 1.
- */
-RNG.prototype.uniform = function() {
-    var BYTES = 7; // 56 bits to make a 53-bit double
-    var output = 0;
-    for (var i = 0; i < BYTES; i++) {
-        output *= 256;
-        output += this.nextByte();
-    }
-    return output / (Math.pow(2, BYTES * 8) - 1);
-};
+        /**
+         * @return {boolean} If SignalBinding will only be executed once.
+         */
+        isOnce : function () {
+            return this._isOnce;
+        },
 
-/**
- * Produce a random integer within [n, m).
- * @param {number} [n=0]
- * @param {number} m
- *
- */
-RNG.prototype.random = function(n, m) {
-    if (n == null) {
-        return this.uniform();
-    } else if (m == null) {
-        m = n;
-        n = 0;
-    }
-    return n + Math.floor(this.uniform() * (m - n));
-};
+        /**
+         * @return {Function} Handler function bound to the signal.
+         */
+        getListener : function () {
+            return this._listener;
+        },
 
-/**
- * Generates numbers using this.uniform() with the Box-Muller transform.
- * @returns {number} Normally-distributed random number of mean 0, variance 1.
- */
-RNG.prototype.normal = function() {
-    if (this._normal !== null) {
-        var n = this._normal;
-        this._normal = null;
-        return n;
-    } else {
-        var x = this.uniform() || Math.pow(2, -53); // can't be exactly 0
-        var y = this.uniform();
-        this._normal = Math.sqrt(-2 * Math.log(x)) * Math.sin(2 * Math.PI * y);
-        return Math.sqrt(-2 * Math.log(x)) * Math.cos(2 * Math.PI * y);
-    }
-};
+        /**
+         * @return {Signal} Signal that listener is currently bound to.
+         */
+        getSignal : function () {
+            return this._signal;
+        },
 
-/**
- * Generates numbers using this.uniform().
- * @returns {number} Number from the exponential distribution, lambda = 1.
- */
-RNG.prototype.exponential = function() {
-    return -Math.log(this.uniform() || Math.pow(2, -53));
-};
+        /**
+         * Delete instance properties
+         * @private
+         */
+        _destroy : function () {
+            delete this._signal;
+            delete this._listener;
+            delete this.context;
+        },
 
-/**
- * Generates numbers using this.uniform() and Knuth's method.
- * @param {number} [mean=1]
- * @returns {number} Number from the Poisson distribution.
- */
-RNG.prototype.poisson = function(mean) {
-    var L = Math.exp(-(mean || 1));
-    var k = 0, p = 1;
-    do {
-        k++;
-        p *= this.uniform();
-    } while (p > L);
-    return k - 1;
-};
-
-/**
- * Generates numbers using this.uniform(), this.normal(),
- * this.exponential(), and the Marsaglia-Tsang method.
- * @param {number} a
- * @returns {number} Number from the gamma distribution.
- */
-RNG.prototype.gamma = function(a) {
-    var d = (a < 1 ? 1 + a : a) - 1 / 3;
-    var c = 1 / Math.sqrt(9 * d);
-    do {
-        do {
-            var x = this.normal();
-            var v = Math.pow(c * x + 1, 3);
-        } while (v <= 0);
-        var u = this.uniform();
-        var x2 = Math.pow(x, 2);
-    } while (u >= 1 - 0.0331 * x2 * x2 &&
-             Math.log(u) >= 0.5 * x2 + d * (1 - v + Math.log(v)));
-    if (a < 1) {
-        return d * v * Math.exp(this.exponential() / -a);
-    } else {
-        return d * v;
-    }
-};
-
-/**
- * Accepts a dice rolling notation string and returns a generator
- * function for that distribution. The parser is quite flexible.
- * @param {string} expr A dice-rolling, expression i.e. '2d6+10'.
- * @param {RNG} rng An optional RNG object.
- * @returns {Function}
- */
-RNG.roller = function(expr, rng) {
-    var parts = expr.split(/(\d+)?d(\d+)([+-]\d+)?/).slice(1);
-    var dice = parseFloat(parts[0]) || 1;
-    var sides = parseFloat(parts[1]);
-    var mod = parseFloat(parts[2]) || 0;
-    rng = rng || new RNG();
-    return function() {
-        var total = dice + mod;
-        for (var i = 0; i < dice; i++) {
-            total += rng.random(sides);
+        /**
+         * @return {string} String representation of the object.
+         */
+        toString : function () {
+            return '[SignalBinding isOnce:' + this._isOnce +', isBound:'+ this.isBound() +', active:' + this.active + ']';
         }
-        return total;
-    };
-};
 
-/* Provide a pre-made generator instance. */
-RNG.$ = new RNG();
-
-define("rng", (function (global) {
-    return function () {
-        var ret, fn;
-        return ret || global.RNG;
     };
-}(this)));
+
+
+/*global SignalBinding:false*/
+
+    // Signal --------------------------------------------------------
+    //================================================================
+
+    function validateListener(listener, fnName) {
+        if (typeof listener !== 'function') {
+            throw new Error( 'listener is a required param of {fn}() and should be a Function.'.replace('{fn}', fnName) );
+        }
+    }
+
+    /**
+     * Custom event broadcaster
+     * <br />- inspired by Robert Penner's AS3 Signals.
+     * @name Signal
+     * @author Miller Medeiros
+     * @constructor
+     */
+    function Signal() {
+        /**
+         * @type Array.<SignalBinding>
+         * @private
+         */
+        this._bindings = [];
+        this._prevParams = null;
+
+        // enforce dispatch to aways work on same context (#47)
+        var self = this;
+        this.dispatch = function(){
+            Signal.prototype.dispatch.apply(self, arguments);
+        };
+    }
+
+    Signal.prototype = {
+
+        /**
+         * Signals Version Number
+         * @type String
+         * @const
+         */
+        VERSION : '1.0.0',
+
+        /**
+         * If Signal should keep record of previously dispatched parameters and
+         * automatically execute listener during `add()`/`addOnce()` if Signal was
+         * already dispatched before.
+         * @type boolean
+         */
+        memorize : false,
+
+        /**
+         * @type boolean
+         * @private
+         */
+        _shouldPropagate : true,
+
+        /**
+         * If Signal is active and should broadcast events.
+         * <p><strong>IMPORTANT:</strong> Setting this property during a dispatch will only affect the next dispatch, if you want to stop the propagation of a signal use `halt()` instead.</p>
+         * @type boolean
+         */
+        active : true,
+
+        /**
+         * @param {Function} listener
+         * @param {boolean} isOnce
+         * @param {Object} [listenerContext]
+         * @param {Number} [priority]
+         * @return {SignalBinding}
+         * @private
+         */
+        _registerListener : function (listener, isOnce, listenerContext, priority) {
+
+            var prevIndex = this._indexOfListener(listener, listenerContext),
+                binding;
+
+            if (prevIndex !== -1) {
+                binding = this._bindings[prevIndex];
+                if (binding.isOnce() !== isOnce) {
+                    throw new Error('You cannot add'+ (isOnce? '' : 'Once') +'() then add'+ (!isOnce? '' : 'Once') +'() the same listener without removing the relationship first.');
+                }
+            } else {
+                binding = new SignalBinding(this, listener, isOnce, listenerContext, priority);
+                this._addBinding(binding);
+            }
+
+            if(this.memorize && this._prevParams){
+                binding.execute(this._prevParams);
+            }
+
+            return binding;
+        },
+
+        /**
+         * @param {SignalBinding} binding
+         * @private
+         */
+        _addBinding : function (binding) {
+            //simplified insertion sort
+            var n = this._bindings.length;
+            do { --n; } while (this._bindings[n] && binding._priority <= this._bindings[n]._priority);
+            this._bindings.splice(n + 1, 0, binding);
+        },
+
+        /**
+         * @param {Function} listener
+         * @return {number}
+         * @private
+         */
+        _indexOfListener : function (listener, context) {
+            var n = this._bindings.length,
+                cur;
+            while (n--) {
+                cur = this._bindings[n];
+                if (cur._listener === listener && cur.context === context) {
+                    return n;
+                }
+            }
+            return -1;
+        },
+
+        /**
+         * Check if listener was attached to Signal.
+         * @param {Function} listener
+         * @param {Object} [context]
+         * @return {boolean} if Signal has the specified listener.
+         */
+        has : function (listener, context) {
+            return this._indexOfListener(listener, context) !== -1;
+        },
+
+        /**
+         * Add a listener to the signal.
+         * @param {Function} listener Signal handler function.
+         * @param {Object} [listenerContext] Context on which listener will be executed (object that should represent the `this` variable inside listener function).
+         * @param {Number} [priority] The priority level of the event listener. Listeners with higher priority will be executed before listeners with lower priority. Listeners with same priority level will be executed at the same order as they were added. (default = 0)
+         * @return {SignalBinding} An Object representing the binding between the Signal and listener.
+         */
+        add : function (listener, listenerContext, priority) {
+            validateListener(listener, 'add');
+            return this._registerListener(listener, false, listenerContext, priority);
+        },
+
+        /**
+         * Add listener to the signal that should be removed after first execution (will be executed only once).
+         * @param {Function} listener Signal handler function.
+         * @param {Object} [listenerContext] Context on which listener will be executed (object that should represent the `this` variable inside listener function).
+         * @param {Number} [priority] The priority level of the event listener. Listeners with higher priority will be executed before listeners with lower priority. Listeners with same priority level will be executed at the same order as they were added. (default = 0)
+         * @return {SignalBinding} An Object representing the binding between the Signal and listener.
+         */
+        addOnce : function (listener, listenerContext, priority) {
+            validateListener(listener, 'addOnce');
+            return this._registerListener(listener, true, listenerContext, priority);
+        },
+
+        /**
+         * Remove a single listener from the dispatch queue.
+         * @param {Function} listener Handler function that should be removed.
+         * @param {Object} [context] Execution context (since you can add the same handler multiple times if executing in a different context).
+         * @return {Function} Listener handler function.
+         */
+        remove : function (listener, context) {
+            validateListener(listener, 'remove');
+
+            var i = this._indexOfListener(listener, context);
+            if (i !== -1) {
+                this._bindings[i]._destroy(); //no reason to a SignalBinding exist if it isn't attached to a signal
+                this._bindings.splice(i, 1);
+            }
+            return listener;
+        },
+
+        /**
+         * Remove all listeners from the Signal.
+         */
+        removeAll : function () {
+            var n = this._bindings.length;
+            while (n--) {
+                this._bindings[n]._destroy();
+            }
+            this._bindings.length = 0;
+        },
+
+        /**
+         * @return {number} Number of listeners attached to the Signal.
+         */
+        getNumListeners : function () {
+            return this._bindings.length;
+        },
+
+        /**
+         * Stop propagation of the event, blocking the dispatch to next listeners on the queue.
+         * <p><strong>IMPORTANT:</strong> should be called only during signal dispatch, calling it before/after dispatch won't affect signal broadcast.</p>
+         * @see Signal.prototype.disable
+         */
+        halt : function () {
+            this._shouldPropagate = false;
+        },
+
+        /**
+         * Dispatch/Broadcast Signal to all listeners added to the queue.
+         * @param {...*} [params] Parameters that should be passed to each handler.
+         */
+        dispatch : function (params) {
+            if (! this.active) {
+                return;
+            }
+
+            var paramsArr = Array.prototype.slice.call(arguments),
+                n = this._bindings.length,
+                bindings;
+
+            if (this.memorize) {
+                this._prevParams = paramsArr;
+            }
+
+            if (! n) {
+                //should come after memorize
+                return;
+            }
+
+            bindings = this._bindings.slice(); //clone array in case add/remove items during dispatch
+            this._shouldPropagate = true; //in case `halt` was called before dispatch or during the previous dispatch.
+
+            //execute all callbacks until end of the list or until a callback returns `false` or stops propagation
+            //reverse loop since listeners with higher priority will be added at the end of the list
+            do { n--; } while (bindings[n] && this._shouldPropagate && bindings[n].execute(paramsArr) !== false);
+        },
+
+        /**
+         * Forget memorized arguments.
+         * @see Signal.memorize
+         */
+        forget : function(){
+            this._prevParams = null;
+        },
+
+        /**
+         * Remove all bindings from signal and destroy any reference to external objects (destroy Signal object).
+         * <p><strong>IMPORTANT:</strong> calling any method on the signal instance after calling dispose will throw errors.</p>
+         */
+        dispose : function () {
+            this.removeAll();
+            delete this._bindings;
+            delete this._prevParams;
+        },
+
+        /**
+         * @return {string} String representation of the object.
+         */
+        toString : function () {
+            return '[Signal active:'+ this.active +' numListeners:'+ this.getNumListeners() +']';
+        }
+
+    };
+
+
+    // Namespace -----------------------------------------------------
+    //================================================================
+
+    /**
+     * Signals namespace
+     * @namespace
+     * @name signals
+     */
+    var signals = Signal;
+
+    /**
+     * Custom event broadcaster
+     * @see Signal
+     */
+    // alias for backwards compatibility (see #gh-44)
+    signals.Signal = Signal;
+
+
+
+    //exports to multiple environments
+    if(typeof define === 'function' && define.amd){ //AMD
+        define('signals',[],function () { return signals; });
+    } else if (typeof module !== 'undefined' && module.exports){ //node
+        module.exports = signals;
+    } else { //browser
+        //use string because of Google closure compiler ADVANCED_MODE
+        /*jslint sub:true */
+        global['signals'] = signals;
+    }
+
+}(this));
 
 /*!
  * VERSION: 1.12.1
@@ -51945,1098 +50317,1952 @@ define("rng", (function (global) {
 		_tickerActive = false; //ensures that the first official animation forces a ticker.tick() to update the time when it is instantiated
 
 })(window);
-define("TweenMax", function(){});
-
-/*!
- * VERSION: 1.12.1
- * DATE: 2014-06-26
- * UPDATES AND DOCS AT: http://www.greensock.com
- *
- * @license Copyright (c) 2008-2014, GreenSock. All rights reserved.
- * This work is subject to the terms at http://www.greensock.com/terms_of_use.html or for
- * Club GreenSock members, the software agreement that was issued with your membership.
- * 
- * @author: Jack Doyle, jack@greensock.com
- */
-	
-(window._gsQueue || (window._gsQueue = [])).push( function() {
-
-	
-
-	window._gsDefine("TimelineMax", ["TimelineLite","TweenLite","easing.Ease"], function(TimelineLite, TweenLite, Ease) {
-		
-		var TimelineMax = function(vars) {
-				TimelineLite.call(this, vars);
-				this._repeat = this.vars.repeat || 0;
-				this._repeatDelay = this.vars.repeatDelay || 0;
-				this._cycle = 0;
-				this._yoyo = (this.vars.yoyo === true);
-				this._dirty = true;
-			},
-			_tinyNum = 0.0000000001,
-			_blankArray = [],
-			_easeNone = new Ease(null, null, 1, 0),
-			p = TimelineMax.prototype = new TimelineLite();
-			
-		p.constructor = TimelineMax;
-		p.kill()._gc = false;
-		TimelineMax.version = "1.12.1";
-		
-		p.invalidate = function() {
-			this._yoyo = (this.vars.yoyo === true);
-			this._repeat = this.vars.repeat || 0;
-			this._repeatDelay = this.vars.repeatDelay || 0;
-			this._uncache(true);
-			return TimelineLite.prototype.invalidate.call(this);
-		};
-		
-		p.addCallback = function(callback, position, params, scope) {
-			return this.add( TweenLite.delayedCall(0, callback, params, scope), position);
-		};
-		
-		p.removeCallback = function(callback, position) {
-			if (callback) {
-				if (position == null) {
-					this._kill(null, callback);
-				} else {
-					var a = this.getTweensOf(callback, false),
-						i = a.length,
-						time = this._parseTimeOrLabel(position);
-					while (--i > -1) {
-						if (a[i]._startTime === time) {
-							a[i]._enabled(false, false);
-						}
-					}
-				}
-			}
-			return this;
-		};
-		
-		p.tweenTo = function(position, vars) {
-			vars = vars || {};
-			var copy = {ease:_easeNone, overwrite:(vars.delay ? 2 : 1), useFrames:this.usesFrames(), immediateRender:false},//note: set overwrite to 1 (true/all) by default unless there's a delay so that we avoid a racing situation that could happen if, for example, an onmousemove creates the same tweenTo() over and over again.
-				duration, p, t;
-			for (p in vars) {
-				copy[p] = vars[p];
-			}
-			copy.time = this._parseTimeOrLabel(position);
-			duration = (Math.abs(Number(copy.time) - this._time) / this._timeScale) || 0.001;
-			t = new TweenLite(this, duration, copy);
-			copy.onStart = function() {
-				t.target.paused(true);
-				if (t.vars.time !== t.target.time() && duration === t.duration()) { //don't make the duration zero - if it's supposed to be zero, don't worry because it's already initting the tween and will complete immediately, effectively making the duration zero anyway. If we make duration zero, the tween won't run at all.
-					t.duration( Math.abs( t.vars.time - t.target.time()) / t.target._timeScale );
-				}
-				if (vars.onStart) { //in case the user had an onStart in the vars - we don't want to overwrite it.
-					vars.onStart.apply(vars.onStartScope || t, vars.onStartParams || _blankArray);
-				}
-			};
-			return t;
-		};
-		
-		p.tweenFromTo = function(fromPosition, toPosition, vars) {
-			vars = vars || {};
-			fromPosition = this._parseTimeOrLabel(fromPosition);
-			vars.startAt = {onComplete:this.seek, onCompleteParams:[fromPosition], onCompleteScope:this};
-			vars.immediateRender = (vars.immediateRender !== false);
-			var t = this.tweenTo(toPosition, vars);
-			return t.duration((Math.abs( t.vars.time - fromPosition) / this._timeScale) || 0.001);
-		};
-		
-		p.render = function(time, suppressEvents, force) {
-			if (this._gc) {
-				this._enabled(true, false);
-			}
-			var totalDur = (!this._dirty) ? this._totalDuration : this.totalDuration(),
-				dur = this._duration,
-				prevTime = this._time, 
-				prevTotalTime = this._totalTime, 
-				prevStart = this._startTime, 
-				prevTimeScale = this._timeScale, 
-				prevRawPrevTime = this._rawPrevTime,
-				prevPaused = this._paused, 
-				prevCycle = this._cycle, 
-				tween, isComplete, next, callback, internalForce, cycleDuration;
-			if (time >= totalDur) {
-				if (!this._locked) {
-					this._totalTime = totalDur;
-					this._cycle = this._repeat;
-				}
-				if (!this._reversed) if (!this._hasPausedChild()) {
-					isComplete = true;
-					callback = "onComplete";
-					if (this._duration === 0) if (time === 0 || prevRawPrevTime < 0 || prevRawPrevTime === _tinyNum) if (prevRawPrevTime !== time && this._first) {
-						internalForce = true;
-						if (prevRawPrevTime > _tinyNum) {
-							callback = "onReverseComplete";
-						}
-					}
-				}
-				this._rawPrevTime = (this._duration || !suppressEvents || time || this._rawPrevTime === time) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
-				if (this._yoyo && (this._cycle & 1) !== 0) {
-					this._time = time = 0;
-				} else {
-					this._time = dur;
-					time = dur + 0.0001; //to avoid occasional floating point rounding errors - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when _time - tween._startTime is performed, floating point errors would return a value that was SLIGHTLY off). Try (999999999999.7 - 999999999999) * 1 = 0.699951171875 instead of 0.7. We cannot do less then 0.0001 because the same issue can occur when the duration is extremely large like 999999999999 in which case adding 0.00000001, for example, causes it to act like nothing was added.
-				}
-				
-			} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0.
-				if (!this._locked) {
-					this._totalTime = this._cycle = 0;
-				}
-				this._time = 0;
-				if (prevTime !== 0 || (dur === 0 && prevRawPrevTime !== _tinyNum && (prevRawPrevTime > 0 || (time < 0 && prevRawPrevTime >= 0)) && !this._locked)) { //edge case for checking time < 0 && prevRawPrevTime >= 0: a zero-duration fromTo() tween inside a zero-duration timeline (yeah, very rare)
-					callback = "onReverseComplete";
-					isComplete = this._reversed;
-				}
-				if (time < 0) {
-					this._active = false;
-					if (dur === 0) if (prevRawPrevTime >= 0 && this._first) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
-						internalForce = true;
-					}
-					this._rawPrevTime = time;
-				} else {
-					this._rawPrevTime = (dur || !suppressEvents || time || this._rawPrevTime === time) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
-					time = 0; //to avoid occasional floating point rounding errors (could cause problems especially with zero-duration tweens at the very beginning of the timeline)
-					if (!this._initted) {
-						internalForce = true;
-					}
-				}
-				
-			} else {
-				if (dur === 0 && prevRawPrevTime < 0) { //without this, zero-duration repeating timelines (like with a simple callback nested at the very beginning and a repeatDelay) wouldn't render the first time through.
-					internalForce = true;
-				}
-				this._time = this._rawPrevTime = time;
-				if (!this._locked) {
-					this._totalTime = time;
-					if (this._repeat !== 0) {
-						cycleDuration = dur + this._repeatDelay;
-						this._cycle = (this._totalTime / cycleDuration) >> 0; //originally _totalTime % cycleDuration but floating point errors caused problems, so I normalized it. (4 % 0.8 should be 0 but it gets reported as 0.79999999!)
-						if (this._cycle !== 0) if (this._cycle === this._totalTime / cycleDuration) {
-							this._cycle--; //otherwise when rendered exactly at the end time, it will act as though it is repeating (at the beginning)
-						}
-						this._time = this._totalTime - (this._cycle * cycleDuration);
-						if (this._yoyo) if ((this._cycle & 1) !== 0) {
-							this._time = dur - this._time;
-						}
-						if (this._time > dur) {
-							this._time = dur;
-							time = dur + 0.0001; //to avoid occasional floating point rounding error
-						} else if (this._time < 0) {
-							this._time = time = 0;
-						} else {
-							time = this._time;
-						}
-					}
-				}
-			}
-			
-			if (this._cycle !== prevCycle) if (!this._locked) {
-				/*
-				make sure children at the end/beginning of the timeline are rendered properly. If, for example, 
-				a 3-second long timeline rendered at 2.9 seconds previously, and now renders at 3.2 seconds (which
-				would get transated to 2.8 seconds if the timeline yoyos or 0.2 seconds if it just repeats), there
-				could be a callback or a short tween that's at 2.95 or 3 seconds in which wouldn't render. So 
-				we need to push the timeline to the end (and/or beginning depending on its yoyo value). Also we must
-				ensure that zero-duration tweens at the very beginning or end of the TimelineMax work. 
-				*/
-				var backwards = (this._yoyo && (prevCycle & 1) !== 0),
-					wrap = (backwards === (this._yoyo && (this._cycle & 1) !== 0)),
-					recTotalTime = this._totalTime,
-					recCycle = this._cycle,
-					recRawPrevTime = this._rawPrevTime,
-					recTime = this._time;
-				
-				this._totalTime = prevCycle * dur;
-				if (this._cycle < prevCycle) {
-					backwards = !backwards;
-				} else {
-					this._totalTime += dur;
-				}
-				this._time = prevTime; //temporarily revert _time so that render() renders the children in the correct order. Without this, tweens won't rewind correctly. We could arhictect things in a "cleaner" way by splitting out the rendering queue into a separate method but for performance reasons, we kept it all inside this method.
-				
-				this._rawPrevTime = (dur === 0) ? prevRawPrevTime - 0.0001 : prevRawPrevTime;
-				this._cycle = prevCycle;
-				this._locked = true; //prevents changes to totalTime and skips repeat/yoyo behavior when we recursively call render()
-				prevTime = (backwards) ? 0 : dur;
-				this.render(prevTime, suppressEvents, (dur === 0));
-				if (!suppressEvents) if (!this._gc) {
-					if (this.vars.onRepeat) {
-						this.vars.onRepeat.apply(this.vars.onRepeatScope || this, this.vars.onRepeatParams || _blankArray);
-					}
-				}
-				if (wrap) {
-					prevTime = (backwards) ? dur + 0.0001 : -0.0001;
-					this.render(prevTime, true, false);
-				}
-				this._locked = false;
-				if (this._paused && !prevPaused) { //if the render() triggered callback that paused this timeline, we should abort (very rare, but possible)
-					return;
-				}
-				this._time = recTime;
-				this._totalTime = recTotalTime;
-				this._cycle = recCycle;
-				this._rawPrevTime = recRawPrevTime;
-			}
-
-			if ((this._time === prevTime || !this._first) && !force && !internalForce) {
-				if (prevTotalTime !== this._totalTime) if (this._onUpdate) if (!suppressEvents) { //so that onUpdate fires even during the repeatDelay - as long as the totalTime changed, we should trigger onUpdate.
-					this._onUpdate.apply(this.vars.onUpdateScope || this, this.vars.onUpdateParams || _blankArray);
-				}
-				return;
-			} else if (!this._initted) {
-				this._initted = true;
-			}
-
-			if (!this._active) if (!this._paused && this._totalTime !== prevTotalTime && time > 0) {
-				this._active = true;  //so that if the user renders the timeline (as opposed to the parent timeline rendering it), it is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the timeline already finished but the user manually re-renders it as halfway done, for example.
-			}
-			
-			if (prevTotalTime === 0) if (this.vars.onStart) if (this._totalTime !== 0) if (!suppressEvents) {
-				this.vars.onStart.apply(this.vars.onStartScope || this, this.vars.onStartParams || _blankArray);
-			}
-
-			if (this._time >= prevTime) {
-				tween = this._first;
-				while (tween) {
-					next = tween._next; //record it here because the value could change after rendering...
-					if (this._paused && !prevPaused) { //in case a tween pauses the timeline when rendering
-						break;
-					} else if (tween._active || (tween._startTime <= this._time && !tween._paused && !tween._gc)) {
-						if (!tween._reversed) {
-							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, force);
-						} else {
-							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, force);
-						}
-						
-					}
-					tween = next;
-				}
-			} else {
-				tween = this._last;
-				while (tween) {
-					next = tween._prev; //record it here because the value could change after rendering...
-					if (this._paused && !prevPaused) { //in case a tween pauses the timeline when rendering
-						break;
-					} else if (tween._active || (tween._startTime <= prevTime && !tween._paused && !tween._gc)) {
-						if (!tween._reversed) {
-							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, force);
-						} else {
-							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, force);
-						}
-					}
-					tween = next;
-				}
-			}
-			
-			if (this._onUpdate) if (!suppressEvents) {
-				this._onUpdate.apply(this.vars.onUpdateScope || this, this.vars.onUpdateParams || _blankArray);
-			}
-			if (callback) if (!this._locked) if (!this._gc) if (prevStart === this._startTime || prevTimeScale !== this._timeScale) if (this._time === 0 || totalDur >= this.totalDuration()) { //if one of the tweens that was rendered altered this timeline's startTime (like if an onComplete reversed the timeline), it probably isn't complete. If it is, don't worry, because whatever call altered the startTime would complete if it was necessary at the new time. The only exception is the timeScale property. Also check _gc because there's a chance that kill() could be called in an onUpdate
-				if (isComplete) {
-					if (this._timeline.autoRemoveChildren) {
-						this._enabled(false, false);
-					}
-					this._active = false;
-				}
-				if (!suppressEvents && this.vars[callback]) {
-					this.vars[callback].apply(this.vars[callback + "Scope"] || this, this.vars[callback + "Params"] || _blankArray);
-				}
-			}
-		};
-		
-		p.getActive = function(nested, tweens, timelines) {
-			if (nested == null) {
-				nested = true;
-			}
-			if (tweens == null) {
-				tweens = true;
-			}
-			if (timelines == null) {
-				timelines = false;
-			}
-			var a = [], 
-				all = this.getChildren(nested, tweens, timelines), 
-				cnt = 0, 
-				l = all.length,
-				i, tween;
-			for (i = 0; i < l; i++) {
-				tween = all[i];
-				if (tween.isActive()) {
-					a[cnt++] = tween;
-				}
-			}
-			return a;
-		};
-		
-		
-		p.getLabelAfter = function(time) {
-			if (!time) if (time !== 0) { //faster than isNan()
-				time = this._time;
-			}
-			var labels = this.getLabelsArray(),
-				l = labels.length,
-				i;
-			for (i = 0; i < l; i++) {
-				if (labels[i].time > time) {
-					return labels[i].name;
-				}
-			}
-			return null;
-		};
-		
-		p.getLabelBefore = function(time) {
-			if (time == null) {
-				time = this._time;
-			}
-			var labels = this.getLabelsArray(),
-				i = labels.length;
-			while (--i > -1) {
-				if (labels[i].time < time) {
-					return labels[i].name;
-				}
-			}
-			return null;
-		};
-		
-		p.getLabelsArray = function() {
-			var a = [],
-				cnt = 0,
-				p;
-			for (p in this._labels) {
-				a[cnt++] = {time:this._labels[p], name:p};
-			}
-			a.sort(function(a,b) {
-				return a.time - b.time;
-			});
-			return a;
-		};
-		
-		
-//---- GETTERS / SETTERS -------------------------------------------------------------------------------------------------------
-		
-		p.progress = function(value) {
-			return (!arguments.length) ? this._time / this.duration() : this.totalTime( this.duration() * ((this._yoyo && (this._cycle & 1) !== 0) ? 1 - value : value) + (this._cycle * (this._duration + this._repeatDelay)), false);
-		};
-		
-		p.totalProgress = function(value) {
-			return (!arguments.length) ? this._totalTime / this.totalDuration() : this.totalTime( this.totalDuration() * value, false);
-		};
-
-		p.totalDuration = function(value) {
-			if (!arguments.length) {
-				if (this._dirty) {
-					TimelineLite.prototype.totalDuration.call(this); //just forces refresh
-					//Instead of Infinity, we use 999999999999 so that we can accommodate reverses.
-					this._totalDuration = (this._repeat === -1) ? 999999999999 : this._duration * (this._repeat + 1) + (this._repeatDelay * this._repeat);
-				}
-				return this._totalDuration;
-			}
-			return (this._repeat === -1) ? this : this.duration( (value - (this._repeat * this._repeatDelay)) / (this._repeat + 1) );
-		};
-		
-		p.time = function(value, suppressEvents) {
-			if (!arguments.length) {
-				return this._time;
-			}
-			if (this._dirty) {
-				this.totalDuration();
-			}
-			if (value > this._duration) {
-				value = this._duration;
-			}
-			if (this._yoyo && (this._cycle & 1) !== 0) {
-				value = (this._duration - value) + (this._cycle * (this._duration + this._repeatDelay));
-			} else if (this._repeat !== 0) {
-				value += this._cycle * (this._duration + this._repeatDelay);
-			}
-			return this.totalTime(value, suppressEvents);
-		};
-		
-		p.repeat = function(value) {
-			if (!arguments.length) {
-				return this._repeat;
-			}
-			this._repeat = value;
-			return this._uncache(true);
-		};
-		
-		p.repeatDelay = function(value) {
-			if (!arguments.length) {
-				return this._repeatDelay;
-			}
-			this._repeatDelay = value;
-			return this._uncache(true);
-		};
-		
-		p.yoyo = function(value) {
-			if (!arguments.length) {
-				return this._yoyo;
-			}
-			this._yoyo = value;
-			return this;
-		};
-		
-		p.currentLabel = function(value) {
-			if (!arguments.length) {
-				return this.getLabelBefore(this._time + 0.00000001);
-			}
-			return this.seek(value, true);
-		};
-		
-		return TimelineMax;
-		
-	}, true);
-
-
-
-
-
-
-
-/*
- * ----------------------------------------------------------------
- * TimelineLite
- * ----------------------------------------------------------------
- */
-
-	window._gsDefine("TimelineLite", ["core.Animation","core.SimpleTimeline","TweenLite"], function(Animation, SimpleTimeline, TweenLite) {
-
-		var TimelineLite = function(vars) {
-				SimpleTimeline.call(this, vars);
-				this._labels = {};
-				this.autoRemoveChildren = (this.vars.autoRemoveChildren === true);
-				this.smoothChildTiming = (this.vars.smoothChildTiming === true);
-				this._sortChildren = true;
-				this._onUpdate = this.vars.onUpdate;
-				var v = this.vars,
-					val, p;
-				for (p in v) {
-					val = v[p];
-					if (_isArray(val)) if (val.join("").indexOf("{self}") !== -1) {
-						v[p] = this._swapSelfInParams(val);
-					}
-				}
-				if (_isArray(v.tweens)) {
-					this.add(v.tweens, 0, v.align, v.stagger);
-				}
-			},
-			_tinyNum = 0.0000000001,
-			_isSelector = TweenLite._internals.isSelector,
-			_isArray = TweenLite._internals.isArray,
-			_blankArray = [],
-			_globals = window._gsDefine.globals,
-			_copy = function(vars) {
-				var copy = {}, p;
-				for (p in vars) {
-					copy[p] = vars[p];
-				}
-				return copy;
-			},
-			_pauseCallback = function(tween, callback, params, scope) {
-				tween._timeline.pause(tween._startTime);
-				if (callback) {
-					callback.apply(scope || tween._timeline, params || _blankArray);
-				}
-			},
-			_slice = _blankArray.slice,
-			p = TimelineLite.prototype = new SimpleTimeline();
-
-		TimelineLite.version = "1.12.1";
-		p.constructor = TimelineLite;
-		p.kill()._gc = false;
-
-		p.to = function(target, duration, vars, position) {
-			var Engine = (vars.repeat && _globals.TweenMax) || TweenLite;
-			return duration ? this.add( new Engine(target, duration, vars), position) : this.set(target, vars, position);
-		};
-
-		p.from = function(target, duration, vars, position) {
-			return this.add( ((vars.repeat && _globals.TweenMax) || TweenLite).from(target, duration, vars), position);
-		};
-
-		p.fromTo = function(target, duration, fromVars, toVars, position) {
-			var Engine = (toVars.repeat && _globals.TweenMax) || TweenLite;
-			return duration ? this.add( Engine.fromTo(target, duration, fromVars, toVars), position) : this.set(target, toVars, position);
-		};
-
-		p.staggerTo = function(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope) {
-			var tl = new TimelineLite({onComplete:onCompleteAll, onCompleteParams:onCompleteAllParams, onCompleteScope:onCompleteAllScope, smoothChildTiming:this.smoothChildTiming}),
-				i;
-			if (typeof(targets) === "string") {
-				targets = TweenLite.selector(targets) || targets;
-			}
-			if (_isSelector(targets)) { //senses if the targets object is a selector. If it is, we should translate it into an array.
-				targets = _slice.call(targets, 0);
-			}
-			stagger = stagger || 0;
-			for (i = 0; i < targets.length; i++) {
-				if (vars.startAt) {
-					vars.startAt = _copy(vars.startAt);
-				}
-				tl.to(targets[i], duration, _copy(vars), i * stagger);
-			}
-			return this.add(tl, position);
-		};
-
-		p.staggerFrom = function(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope) {
-			vars.immediateRender = (vars.immediateRender != false);
-			vars.runBackwards = true;
-			return this.staggerTo(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope);
-		};
-
-		p.staggerFromTo = function(targets, duration, fromVars, toVars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope) {
-			toVars.startAt = fromVars;
-			toVars.immediateRender = (toVars.immediateRender != false && fromVars.immediateRender != false);
-			return this.staggerTo(targets, duration, toVars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope);
-		};
-
-		p.call = function(callback, params, scope, position) {
-			return this.add( TweenLite.delayedCall(0, callback, params, scope), position);
-		};
-
-		p.set = function(target, vars, position) {
-			position = this._parseTimeOrLabel(position, 0, true);
-			if (vars.immediateRender == null) {
-				vars.immediateRender = (position === this._time && !this._paused);
-			}
-			return this.add( new TweenLite(target, 0, vars), position);
-		};
-
-		TimelineLite.exportRoot = function(vars, ignoreDelayedCalls) {
-			vars = vars || {};
-			if (vars.smoothChildTiming == null) {
-				vars.smoothChildTiming = true;
-			}
-			var tl = new TimelineLite(vars),
-				root = tl._timeline,
-				tween, next;
-			if (ignoreDelayedCalls == null) {
-				ignoreDelayedCalls = true;
-			}
-			root._remove(tl, true);
-			tl._startTime = 0;
-			tl._rawPrevTime = tl._time = tl._totalTime = root._time;
-			tween = root._first;
-			while (tween) {
-				next = tween._next;
-				if (!ignoreDelayedCalls || !(tween instanceof TweenLite && tween.target === tween.vars.onComplete)) {
-					tl.add(tween, tween._startTime - tween._delay);
-				}
-				tween = next;
-			}
-			root.add(tl, 0);
-			return tl;
-		};
-
-		p.add = function(value, position, align, stagger) {
-			var curTime, l, i, child, tl, beforeRawTime;
-			if (typeof(position) !== "number") {
-				position = this._parseTimeOrLabel(position, 0, true, value);
-			}
-			if (!(value instanceof Animation)) {
-				if ((value instanceof Array) || (value && value.push && _isArray(value))) {
-					align = align || "normal";
-					stagger = stagger || 0;
-					curTime = position;
-					l = value.length;
-					for (i = 0; i < l; i++) {
-						if (_isArray(child = value[i])) {
-							child = new TimelineLite({tweens:child});
-						}
-						this.add(child, curTime);
-						if (typeof(child) !== "string" && typeof(child) !== "function") {
-							if (align === "sequence") {
-								curTime = child._startTime + (child.totalDuration() / child._timeScale);
-							} else if (align === "start") {
-								child._startTime -= child.delay();
-							}
-						}
-						curTime += stagger;
-					}
-					return this._uncache(true);
-				} else if (typeof(value) === "string") {
-					return this.addLabel(value, position);
-				} else if (typeof(value) === "function") {
-					value = TweenLite.delayedCall(0, value);
-				} else {
-					throw("Cannot add " + value + " into the timeline; it is not a tween, timeline, function, or string.");
-				}
-			}
-
-			SimpleTimeline.prototype.add.call(this, value, position);
-
-			//if the timeline has already ended but the inserted tween/timeline extends the duration, we should enable this timeline again so that it renders properly. We should also align the playhead with the parent timeline's when appropriate.
-			if (this._gc || this._time === this._duration) if (!this._paused) if (this._duration < this.duration()) {
-				//in case any of the ancestors had completed but should now be enabled...
-				tl = this;
-				beforeRawTime = (tl.rawTime() > value._startTime); //if the tween is placed on the timeline so that it starts BEFORE the current rawTime, we should align the playhead (move the timeline). This is because sometimes users will create a timeline, let it finish, and much later append a tween and expect it to run instead of jumping to its end state. While technically one could argue that it should jump to its end state, that's not what users intuitively expect.
-				while (tl._timeline) {
-					if (beforeRawTime && tl._timeline.smoothChildTiming) {
-						tl.totalTime(tl._totalTime, true); //moves the timeline (shifts its startTime) if necessary, and also enables it.
-					} else if (tl._gc) {
-						tl._enabled(true, false);
-					}
-					tl = tl._timeline;
-				}
-			}
-
-			return this;
-		};
-
-		p.remove = function(value) {
-			if (value instanceof Animation) {
-				return this._remove(value, false);
-			} else if (value instanceof Array || (value && value.push && _isArray(value))) {
-				var i = value.length;
-				while (--i > -1) {
-					this.remove(value[i]);
-				}
-				return this;
-			} else if (typeof(value) === "string") {
-				return this.removeLabel(value);
-			}
-			return this.kill(null, value);
-		};
-
-		p._remove = function(tween, skipDisable) {
-			SimpleTimeline.prototype._remove.call(this, tween, skipDisable);
-			var last = this._last;
-			if (!last) {
-				this._time = this._totalTime = this._duration = this._totalDuration = 0;
-			} else if (this._time > last._startTime + last._totalDuration / last._timeScale) {
-				this._time = this.duration();
-				this._totalTime = this._totalDuration;
-			}
-			return this;
-		};
-
-		p.append = function(value, offsetOrLabel) {
-			return this.add(value, this._parseTimeOrLabel(null, offsetOrLabel, true, value));
-		};
-
-		p.insert = p.insertMultiple = function(value, position, align, stagger) {
-			return this.add(value, position || 0, align, stagger);
-		};
-
-		p.appendMultiple = function(tweens, offsetOrLabel, align, stagger) {
-			return this.add(tweens, this._parseTimeOrLabel(null, offsetOrLabel, true, tweens), align, stagger);
-		};
-
-		p.addLabel = function(label, position) {
-			this._labels[label] = this._parseTimeOrLabel(position);
-			return this;
-		};
-
-		p.addPause = function(position, callback, params, scope) {
-			return this.call(_pauseCallback, ["{self}", callback, params, scope], this, position);
-		};
-
-		p.removeLabel = function(label) {
-			delete this._labels[label];
-			return this;
-		};
-
-		p.getLabelTime = function(label) {
-			return (this._labels[label] != null) ? this._labels[label] : -1;
-		};
-
-		p._parseTimeOrLabel = function(timeOrLabel, offsetOrLabel, appendIfAbsent, ignore) {
-			var i;
-			//if we're about to add a tween/timeline (or an array of them) that's already a child of this timeline, we should remove it first so that it doesn't contaminate the duration().
-			if (ignore instanceof Animation && ignore.timeline === this) {
-				this.remove(ignore);
-			} else if (ignore && ((ignore instanceof Array) || (ignore.push && _isArray(ignore)))) {
-				i = ignore.length;
-				while (--i > -1) {
-					if (ignore[i] instanceof Animation && ignore[i].timeline === this) {
-						this.remove(ignore[i]);
-					}
-				}
-			}
-			if (typeof(offsetOrLabel) === "string") {
-				return this._parseTimeOrLabel(offsetOrLabel, (appendIfAbsent && typeof(timeOrLabel) === "number" && this._labels[offsetOrLabel] == null) ? timeOrLabel - this.duration() : 0, appendIfAbsent);
-			}
-			offsetOrLabel = offsetOrLabel || 0;
-			if (typeof(timeOrLabel) === "string" && (isNaN(timeOrLabel) || this._labels[timeOrLabel] != null)) { //if the string is a number like "1", check to see if there's a label with that name, otherwise interpret it as a number (absolute value).
-				i = timeOrLabel.indexOf("=");
-				if (i === -1) {
-					if (this._labels[timeOrLabel] == null) {
-						return appendIfAbsent ? (this._labels[timeOrLabel] = this.duration() + offsetOrLabel) : offsetOrLabel;
-					}
-					return this._labels[timeOrLabel] + offsetOrLabel;
-				}
-				offsetOrLabel = parseInt(timeOrLabel.charAt(i-1) + "1", 10) * Number(timeOrLabel.substr(i+1));
-				timeOrLabel = (i > 1) ? this._parseTimeOrLabel(timeOrLabel.substr(0, i-1), 0, appendIfAbsent) : this.duration();
-			} else if (timeOrLabel == null) {
-				timeOrLabel = this.duration();
-			}
-			return Number(timeOrLabel) + offsetOrLabel;
-		};
-
-		p.seek = function(position, suppressEvents) {
-			return this.totalTime((typeof(position) === "number") ? position : this._parseTimeOrLabel(position), (suppressEvents !== false));
-		};
-
-		p.stop = function() {
-			return this.paused(true);
-		};
-
-		p.gotoAndPlay = function(position, suppressEvents) {
-			return this.play(position, suppressEvents);
-		};
-
-		p.gotoAndStop = function(position, suppressEvents) {
-			return this.pause(position, suppressEvents);
-		};
-
-		p.render = function(time, suppressEvents, force) {
-			if (this._gc) {
-				this._enabled(true, false);
-			}
-			var totalDur = (!this._dirty) ? this._totalDuration : this.totalDuration(),
-				prevTime = this._time,
-				prevStart = this._startTime,
-				prevTimeScale = this._timeScale,
-				prevPaused = this._paused,
-				tween, isComplete, next, callback, internalForce;
-			if (time >= totalDur) {
-				this._totalTime = this._time = totalDur;
-				if (!this._reversed) if (!this._hasPausedChild()) {
-					isComplete = true;
-					callback = "onComplete";
-					if (this._duration === 0) if (time === 0 || this._rawPrevTime < 0 || this._rawPrevTime === _tinyNum) if (this._rawPrevTime !== time && this._first) {
-						internalForce = true;
-						if (this._rawPrevTime > _tinyNum) {
-							callback = "onReverseComplete";
-						}
-					}
-				}
-				this._rawPrevTime = (this._duration || !suppressEvents || time || this._rawPrevTime === time) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
-				time = totalDur + 0.0001; //to avoid occasional floating point rounding errors - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when _time - tween._startTime is performed, floating point errors would return a value that was SLIGHTLY off). Try (999999999999.7 - 999999999999) * 1 = 0.699951171875 instead of 0.7.
-
-			} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0.
-				this._totalTime = this._time = 0;
-				if (prevTime !== 0 || (this._duration === 0 && this._rawPrevTime !== _tinyNum && (this._rawPrevTime > 0 || (time < 0 && this._rawPrevTime >= 0)))) {
-					callback = "onReverseComplete";
-					isComplete = this._reversed;
-				}
-				if (time < 0) {
-					this._active = false;
-					if (this._duration === 0) if (this._rawPrevTime >= 0 && this._first) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
-						internalForce = true;
-					}
-					this._rawPrevTime = time;
-				} else {
-					this._rawPrevTime = (this._duration || !suppressEvents || time || this._rawPrevTime === time) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
-
-					time = 0; //to avoid occasional floating point rounding errors (could cause problems especially with zero-duration tweens at the very beginning of the timeline)
-					if (!this._initted) {
-						internalForce = true;
-					}
-				}
-
-			} else {
-				this._totalTime = this._time = this._rawPrevTime = time;
-			}
-			if ((this._time === prevTime || !this._first) && !force && !internalForce) {
-				return;
-			} else if (!this._initted) {
-				this._initted = true;
-			}
-
-			if (!this._active) if (!this._paused && this._time !== prevTime && time > 0) {
-				this._active = true;  //so that if the user renders the timeline (as opposed to the parent timeline rendering it), it is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the timeline already finished but the user manually re-renders it as halfway done, for example.
-			}
-
-			if (prevTime === 0) if (this.vars.onStart) if (this._time !== 0) if (!suppressEvents) {
-				this.vars.onStart.apply(this.vars.onStartScope || this, this.vars.onStartParams || _blankArray);
-			}
-
-			if (this._time >= prevTime) {
-				tween = this._first;
-				while (tween) {
-					next = tween._next; //record it here because the value could change after rendering...
-					if (this._paused && !prevPaused) { //in case a tween pauses the timeline when rendering
-						break;
-					} else if (tween._active || (tween._startTime <= this._time && !tween._paused && !tween._gc)) {
-						if (!tween._reversed) {
-							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, force);
-						} else {
-							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, force);
-						}
-					}
-					tween = next;
-				}
-			} else {
-				tween = this._last;
-				while (tween) {
-					next = tween._prev; //record it here because the value could change after rendering...
-					if (this._paused && !prevPaused) { //in case a tween pauses the timeline when rendering
-						break;
-					} else if (tween._active || (tween._startTime <= prevTime && !tween._paused && !tween._gc)) {
-						if (!tween._reversed) {
-							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, force);
-						} else {
-							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, force);
-						}
-					}
-					tween = next;
-				}
-			}
-
-			if (this._onUpdate) if (!suppressEvents) {
-				this._onUpdate.apply(this.vars.onUpdateScope || this, this.vars.onUpdateParams || _blankArray);
-			}
-
-			if (callback) if (!this._gc) if (prevStart === this._startTime || prevTimeScale !== this._timeScale) if (this._time === 0 || totalDur >= this.totalDuration()) { //if one of the tweens that was rendered altered this timeline's startTime (like if an onComplete reversed the timeline), it probably isn't complete. If it is, don't worry, because whatever call altered the startTime would complete if it was necessary at the new time. The only exception is the timeScale property. Also check _gc because there's a chance that kill() could be called in an onUpdate
-				if (isComplete) {
-					if (this._timeline.autoRemoveChildren) {
-						this._enabled(false, false);
-					}
-					this._active = false;
-				}
-				if (!suppressEvents && this.vars[callback]) {
-					this.vars[callback].apply(this.vars[callback + "Scope"] || this, this.vars[callback + "Params"] || _blankArray);
-				}
-			}
-		};
-
-		p._hasPausedChild = function() {
-			var tween = this._first;
-			while (tween) {
-				if (tween._paused || ((tween instanceof TimelineLite) && tween._hasPausedChild())) {
-					return true;
-				}
-				tween = tween._next;
-			}
-			return false;
-		};
-
-		p.getChildren = function(nested, tweens, timelines, ignoreBeforeTime) {
-			ignoreBeforeTime = ignoreBeforeTime || -9999999999;
-			var a = [],
-				tween = this._first,
-				cnt = 0;
-			while (tween) {
-				if (tween._startTime < ignoreBeforeTime) {
-					//do nothing
-				} else if (tween instanceof TweenLite) {
-					if (tweens !== false) {
-						a[cnt++] = tween;
-					}
-				} else {
-					if (timelines !== false) {
-						a[cnt++] = tween;
-					}
-					if (nested !== false) {
-						a = a.concat(tween.getChildren(true, tweens, timelines));
-						cnt = a.length;
-					}
-				}
-				tween = tween._next;
-			}
-			return a;
-		};
-
-		p.getTweensOf = function(target, nested) {
-			var disabled = this._gc,
-				a = [],
-				cnt = 0,
-				tweens, i;
-			if (disabled) {
-				this._enabled(true, true); //getTweensOf() filters out disabled tweens, and we have to mark them as _gc = true when the timeline completes in order to allow clean garbage collection, so temporarily re-enable the timeline here.
-			}
-			tweens = TweenLite.getTweensOf(target);
-			i = tweens.length;
-			while (--i > -1) {
-				if (tweens[i].timeline === this || (nested && this._contains(tweens[i]))) {
-					a[cnt++] = tweens[i];
-				}
-			}
-			if (disabled) {
-				this._enabled(false, true);
-			}
-			return a;
-		};
-
-		p._contains = function(tween) {
-			var tl = tween.timeline;
-			while (tl) {
-				if (tl === this) {
-					return true;
-				}
-				tl = tl.timeline;
-			}
-			return false;
-		};
-
-		p.shiftChildren = function(amount, adjustLabels, ignoreBeforeTime) {
-			ignoreBeforeTime = ignoreBeforeTime || 0;
-			var tween = this._first,
-				labels = this._labels,
-				p;
-			while (tween) {
-				if (tween._startTime >= ignoreBeforeTime) {
-					tween._startTime += amount;
-				}
-				tween = tween._next;
-			}
-			if (adjustLabels) {
-				for (p in labels) {
-					if (labels[p] >= ignoreBeforeTime) {
-						labels[p] += amount;
-					}
-				}
-			}
-			return this._uncache(true);
-		};
-
-		p._kill = function(vars, target) {
-			if (!vars && !target) {
-				return this._enabled(false, false);
-			}
-			var tweens = (!target) ? this.getChildren(true, true, false) : this.getTweensOf(target),
-				i = tweens.length,
-				changed = false;
-			while (--i > -1) {
-				if (tweens[i]._kill(vars, target)) {
-					changed = true;
-				}
-			}
-			return changed;
-		};
-
-		p.clear = function(labels) {
-			var tweens = this.getChildren(false, true, true),
-				i = tweens.length;
-			this._time = this._totalTime = 0;
-			while (--i > -1) {
-				tweens[i]._enabled(false, false);
-			}
-			if (labels !== false) {
-				this._labels = {};
-			}
-			return this._uncache(true);
-		};
-
-		p.invalidate = function() {
-			var tween = this._first;
-			while (tween) {
-				tween.invalidate();
-				tween = tween._next;
-			}
-			return this;
-		};
-
-		p._enabled = function(enabled, ignoreTimeline) {
-			if (enabled === this._gc) {
-				var tween = this._first;
-				while (tween) {
-					tween._enabled(enabled, true);
-					tween = tween._next;
-				}
-			}
-			return SimpleTimeline.prototype._enabled.call(this, enabled, ignoreTimeline);
-		};
-
-		p.duration = function(value) {
-			if (!arguments.length) {
-				if (this._dirty) {
-					this.totalDuration(); //just triggers recalculation
-				}
-				return this._duration;
-			}
-			if (this.duration() !== 0 && value !== 0) {
-				this.timeScale(this._duration / value);
-			}
-			return this;
-		};
-
-		p.totalDuration = function(value) {
-			if (!arguments.length) {
-				if (this._dirty) {
-					var max = 0,
-						tween = this._last,
-						prevStart = 999999999999,
-						prev, end;
-					while (tween) {
-						prev = tween._prev; //record it here in case the tween changes position in the sequence...
-						if (tween._dirty) {
-							tween.totalDuration(); //could change the tween._startTime, so make sure the tween's cache is clean before analyzing it.
-						}
-						if (tween._startTime > prevStart && this._sortChildren && !tween._paused) { //in case one of the tweens shifted out of order, it needs to be re-inserted into the correct position in the sequence
-							this.add(tween, tween._startTime - tween._delay);
-						} else {
-							prevStart = tween._startTime;
-						}
-						if (tween._startTime < 0 && !tween._paused) { //children aren't allowed to have negative startTimes unless smoothChildTiming is true, so adjust here if one is found.
-							max -= tween._startTime;
-							if (this._timeline.smoothChildTiming) {
-								this._startTime += tween._startTime / this._timeScale;
-							}
-							this.shiftChildren(-tween._startTime, false, -9999999999);
-							prevStart = 0;
-						}
-						end = tween._startTime + (tween._totalDuration / tween._timeScale);
-						if (end > max) {
-							max = end;
-						}
-						tween = prev;
-					}
-					this._duration = this._totalDuration = max;
-					this._dirty = false;
-				}
-				return this._totalDuration;
-			}
-			if (this.totalDuration() !== 0) if (value !== 0) {
-				this.timeScale(this._totalDuration / value);
-			}
-			return this;
-		};
-
-		p.usesFrames = function() {
-			var tl = this._timeline;
-			while (tl._timeline) {
-				tl = tl._timeline;
-			}
-			return (tl === Animation._rootFramesTimeline);
-		};
-
-		p.rawTime = function() {
-			return this._paused ? this._totalTime : (this._timeline.rawTime() - this._startTime) * this._timeScale;
-		};
-
-		return TimelineLite;
-
-	}, true);
-
-}); if (window._gsDefine) { window._gsQueue.pop()(); };
-define("TimelineMax", ["TweenMax"], (function (global) {
+define("TweenMax", (function (global) {
     return function () {
         var ret, fn;
-        return ret || global.TimelineLite;
+        return ret || global.TweenMax;
     };
 }(this)));
 
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory(require("lodash"), require(undefined), require("TweenMax"));
+	else if(typeof define === 'function' && define.amd)
+		define('TweenTime',["lodash", "signals", "TweenMax"], factory);
+	else if(typeof exports === 'object')
+		exports["Core"] = factory(require("lodash"), require("./signals"), require("TweenMax"));
+	else
+		root["TweenTime"] = root["TweenTime"] || {}, root["TweenTime"]["Core"] = factory(root["_"], root["signals"], root["TweenMax"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_12__, __WEBPACK_EXTERNAL_MODULE_13__) {
+return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+/******/
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	
+	var _ = __webpack_require__(1);
+	
+	var Utils = __webpack_require__(2)["default"];
+	var Timer = __webpack_require__(3)["default"];
+	var Orchestrator = __webpack_require__(4)["default"];
+	var Core = (function () {
+	  var Core = function Core(data, options) {
+	    if (options === undefined) options = {};
+	    this.data = data;
+	    this.timer = new Timer(options);
+	    this.orchestrator = new Orchestrator(this.timer, this.data);
+	  };
+	
+	  Core.prototype.getItem = function (item_id) {
+	    // In case we passed the item object directly return it.
+	    if (item_id != null && typeof item_id == "object") {
+	      return item_id;
+	    }
+	
+	    return _.find(this.data, function (item) {
+	      return item.id == item_id;
+	    });
+	  };
+	
+	  Core.prototype.getProperty = function (prop_name, item_id_or_obj) {
+	    // If we passed the item name get the object from it.
+	    item_id_or_obj = this.getItem(item_id_or_obj);
+	
+	    // Return false if we have no item
+	    if (!item_id_or_obj) {
+	      return false;
+	    }
+	
+	    return _.find(item_id_or_obj.properties, function (property) {
+	      return property.name == prop_name;
+	    });
+	  };
+	
+	  Core.prototype.getValues = function (item_id_or_obj) {
+	    // If we passed the item name get the object from it.
+	    item_id_or_obj = this.getItem(item_id_or_obj);
+	
+	    // Return false if we have no item
+	    if (!item_id_or_obj) {
+	      return undefined;
+	    }
+	
+	    return item_id_or_obj.values;
+	  };
+	
+	  Core.prototype.getValue = function (prop_name, item_id_or_obj) {
+	    // If we passed the item name get the object from it.
+	    var values = this.getValues(item_id_or_obj);
+	
+	    // Return false if we have no item
+	    if (!values) {
+	      return undefined;
+	    }
+	
+	    if (values[prop_name] != null) {
+	      return values[prop_name];
+	    } else {
+	      return undefined;
+	    }
+	  };
+	
+	  Core.prototype.getKeyAt = function (property, time_in_seconds) {
+	    return _.find(property.keys, function (key) {
+	      return key.time == time_in_seconds;
+	    });
+	  };
+	
+	  Core.prototype.setValue = function (property, new_val, time_in_seconds) {
+	    if (time_in_seconds === undefined) time_in_seconds = false;
+	    if (time_in_seconds === false) {
+	      time_in_seconds = this.timer.getCurrentTime() / 1000;
+	    }
+	    var key = this.getKeyAt(property, time_in_seconds);
+	
+	    if (key) {
+	      // If we found a key, simply update the value.
+	      key.val = new_val;
+	    } else {
+	      // If no key, create it and add it to the array.
+	      key = { val: new_val, time: time_in_seconds };
+	      property.keys.push(key);
+	      // Also sort the keys.
+	      property.keys = Utils.sortKeys(property.keys);
+	    }
+	  };
+	
+	  Core.prototype.getTotalDuration = function () {
+	    return this.orchestrator.getTotalDuration();
+	  };
+	
+	  return Core;
+	})();
+	
+	exports["default"] = Core;
+	
+	
+	module.exports = Core;
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	
+	var Utils = (function () {
+	  var Utils = function Utils() {};
+	
+	  Utils.formatMinutes = function (d) {
+	    // convert milliseconds to seconds
+	    d = d / 1000;
+	    var hours = Math.floor(d / 3600);
+	    var minutes = Math.floor((d - (hours * 3600)) / 60);
+	    var seconds = d - (minutes * 60);
+	    var output = seconds + "s";
+	    if (minutes) {
+	      output = minutes + "m " + output;
+	    }
+	    if (hours) {
+	      output = hours + "h " + output;
+	    }
+	    return output;
+	  };
+	
+	  Utils.getClosestTime = function (data, time, objectId, property_name, timer, tolerance) {
+	    if (objectId === undefined) objectId = false;
+	    if (property_name === undefined) property_name = false;
+	    if (timer === undefined) timer = false;
+	    if (tolerance === undefined) tolerance = 0.1;
+	    if (timer) {
+	      var timer_time = timer.getCurrentTime() / 1000;
+	      if (Math.abs(timer_time - time) <= tolerance) {
+	        return timer_time;
+	      }
+	    }
+	
+	    if (objectId || property_name) {
+	      for (var i = 0; i < data.length; i++) {
+	        var item = data[i];
+	        // Don't match item with itself, but allow property to match item start/end.
+	        if (item.id != objectId || property_name) {
+	          // First check start & end.
+	          if (Math.abs(item.start - time) <= tolerance) {
+	            return item.start;
+	          }
+	
+	          if (Math.abs(item.end - time) <= tolerance) {
+	            return item.end;
+	          }
+	        }
+	
+	        // Test properties keys
+	        for (var j = 0; j < item.properties.length; j++) {
+	          var prop = item.properties[j];
+	          // Don't match property with itself.
+	          if (prop.keys && (item.id != objectId || prop.name != property_name)) {
+	            for (var k = 0; k < prop.keys; k++) {
+	              var key = prop.keys[k];
+	              if (Math.abs(key.time - time) <= tolerance) {
+	                return key.time;
+	              }
+	            }
+	          }
+	        }
+	      }
+	    }
+	    return false;
+	  };
+	
+	  Utils.getPreviousKey = function (keys, time) {
+	    var prevKey = false;
+	    for (var i = 0; i < keys.length; i++) {
+	      var key = keys[i];
+	      if (key.time < time) {
+	        prevKey = key;
+	      } else {
+	        return prevKey;
+	      }
+	    }
+	    return prevKey;
+	  };
+	
+	  Utils.sortKeys = function (keys) {
+	    var compare = function (a, b) {
+	      if (a.time < b.time) {
+	        return -1;
+	      }
+	      if (a.time > b.time) {
+	        return 1;
+	      }
+	      return 0;
+	    };
+	    return keys.sort(compare);
+	  };
+	
+	  Utils.guid = function () {
+	    var s4 = function () {
+	      return Math.floor((1 + Math.random()) * 65536).toString(16).substring(1);
+	    };
+	    return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
+	  };
+	
+	  return Utils;
+	})();
+	
+	exports["default"] = Utils;
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	
+	var Signals = __webpack_require__(12);
+	
+	var Timer = (function () {
+	  var Timer = function Timer(options) {
+	    var _this = this;
+	    if (options === undefined) options = {};
+	    // in millisecond
+	    this.totalDuration = options.totalDuration || 240 * 1000;
+	    // Use an array for the time for easier d3.js integration (used as data for timeseeker).
+	    this.time = [0];
+	    this.is_playing = false;
+	    this.last_timeStamp = -1;
+	    this.last_time = -1;
+	    this.updated = new Signals.Signal();
+	    this.statusChanged = new Signals.Signal();
+	    this.durationChanged = new Signals.Signal();
+	    this.seeked = new Signals.Signal();
+	    window.requestAnimationFrame(function (timestamp) {
+	      return _this.update(timestamp);
+	    });
+	  };
+	
+	  Timer.prototype.getCurrentTime = function () {
+	    return this.time[0];
+	  };
+	
+	  Timer.prototype.getDuration = function () {
+	    return this.totalDuration / 1000;
+	  };
+	
+	  Timer.prototype.setDuration = function (seconds) {
+	    this.totalDuration = seconds * 1000;
+	    this.durationChanged.dispatch(seconds);
+	  };
+	
+	  Timer.prototype.play = function () {
+	    this.is_playing = true;
+	    this.statusChanged.dispatch(this.is_playing);
+	  };
+	
+	  Timer.prototype.stop = function () {
+	    this.is_playing = false;
+	    this.statusChanged.dispatch(this.is_playing);
+	  };
+	
+	  Timer.prototype.toggle = function () {
+	    this.is_playing = !this.is_playing;
+	    this.statusChanged.dispatch(this.is_playing);
+	  };
+	
+	  Timer.prototype.seek = function (time) {
+	    this.time[0] = time[0];
+	    this.seeked.dispatch(this.time[0]);
+	  };
+	
+	  Timer.prototype.update = function (timestamp) {
+	    var _this2 = this;
+	    // Init timestamp
+	    if (this.last_timeStamp == -1) {
+	      this.last_timeStamp = timestamp;
+	    }
+	    var elapsed = timestamp - this.last_timeStamp;
+	
+	    if (this.is_playing) {
+	      this.time[0] += elapsed;
+	    }
+	
+	    if (this.time[0] >= this.totalDuration) {
+	      // Stop timer when reaching the end.
+	      this.time[0] = this.totalDuration;
+	      this.stop();
+	    }
+	
+	    this.updated.dispatch(this.time[0]);
+	
+	    this.last_timeStamp = timestamp;
+	    this.last_time = this.time[0];
+	    window.requestAnimationFrame(function (timestamp) {
+	      return _this2.update(timestamp);
+	    });
+	  };
+	
+	  return Timer;
+	})();
+	
+	exports["default"] = Timer;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	
+	var Signals = __webpack_require__(12);
+	var TweenMax = __webpack_require__(13);
+	
+	var Orchestrator = (function () {
+	  var Orchestrator = function Orchestrator(timer, data) {
+	    this.update = this.update.bind(this);
+	    this.timer = timer;
+	    this.data = data;
+	    this.mainTimeline = new TimelineMax({ paused: true });
+	    this.onUpdate = new Signals.Signal();
+	    this.timer.updated.add(this.update);
+	    this.update(0);
+	  };
+	
+	  Orchestrator.prototype.getTotalDuration = function () {
+	    return this.mainTimeline.totalDuration();
+	  };
+	
+	  Orchestrator.prototype.getEasing = function (key) {
+	    if (key === undefined) key = false;
+	    if (key && key.ease) {
+	      var ease_index = key.ease.split(".");
+	      if (ease_index.length == 2 && window[ease_index[0]] && window[ease_index[0]][ease_index[1]]) {
+	        return window[ease_index[0]][ease_index[1]];
+	      }
+	    }
+	    return Quad.easeOut;
+	  };
+	
+	  Orchestrator.prototype.initSpecialProperties = function (item) {
+	    // Add a dom element for color tweening and other css properties.
+	    item._domHelper = document.createElement("div");
+	    for (var property_key = 0; property_key < item.properties.length; property_key++) {
+	      var property = item.properties[property_key];
+	      // Setup special properties
+	      if (property.type && property.type == "color") {
+	        // If the property is a color mark it as css
+	        property.css = true;
+	      }
+	
+	      if (property.css) {
+	        // If property is a css or a color value apply it to the domHelper element.
+	        item._domHelper.style[property.name] = property.val;
+	      }
+	    }
+	  };
+	
+	  Orchestrator.prototype.initItemValues = function (item) {
+	    item.values = {};
+	    //item._isDirty = true
+	    for (var property_key = 0; property_key < item.properties.length; property_key++) {
+	      var property = item.properties[property_key];
+	      if (property.keys.length) {
+	        // Take the value of the first key as initial value.
+	        // this.todo: update this when the value of the first key change. (when rebuilding the timeline, simply delete item.values before item._timeline)
+	        property.val = property.keys[0].val;
+	      }
+	      item.values[property.name] = property.val;
+	    }
+	  };
+	
+	  Orchestrator.prototype.update = function (timestamp) {
+	    var seconds = timestamp / 1000;
+	    var has_dirty_items = false;
+	
+	    for (var i = 0; i < this.data.length; i++) {
+	      var item = this.data[i];
+	      if (!item._domHelper) {
+	        this.initSpecialProperties(item);
+	      }
+	
+	      // create the values object to contain all properties
+	      if (!item.values) {
+	        this.initItemValues(item);
+	      }
+	
+	      // Create the timeline if needed
+	      if (!item._timeline) {
+	        item._timeline = new TimelineMax();
+	        this.mainTimeline.add(item._timeline, 0);
+	        item._isDirty = true;
+	      }
+	
+	      if (item._isDirty) {
+	        has_dirty_items = true;
+	      }
+	
+	      if (item._timeline && item._isDirty && item.properties) {
+	        item._isDirty = false;
+	        //item._timeline.clear();
+	
+	        for (var property_key = 0; property_key < item.properties.length; property_key++) {
+	          var property = item.properties[property_key];
+	          if (property._timeline) {
+	            property._timeline.clear();
+	          } else {
+	            property._timeline = new TimelineMax();
+	            item._timeline.add(property._timeline, 0);
+	          }
+	
+	          var propertyTimeline = property._timeline;
+	          var propName = property.name;
+	
+	          // If there is no key stop there and set value to default.
+	          if (!property.keys.length) {
+	            item.values[property.name] = property.val;
+	            continue;
+	          }
+	
+	          // Set the data values target object.
+	          var data_target = item.values;
+	          // Add a inital key, even if there is no animation to set the value from time 0.
+	          var first_key = property.keys[0];
+	
+	          var tween_time = 0;
+	          if (first_key) {
+	            tween_time = Math.min(-1, first_key.time - 0.1);
+	          }
+	
+	          var tween_duration = 0;
+	          var val = {};
+	          var easing = this.getEasing();
+	          val.ease = easing;
+	
+	          if (property.css) {
+	            data_target = item._domHelper;
+	            val.css = {};
+	            val.css[propName] = first_key ? first_key.val : property.val;
+	          } else {
+	            val[propName] = first_key ? first_key.val : property.val;
+	          }
+	
+	          var tween = TweenMax.to(data_target, tween_duration, val);
+	          propertyTimeline.add(tween, tween_time);
+	
+	          for (var key_index = 0; key_index < property.keys.length; key_index++) {
+	            var key = property.keys[key_index];
+	
+	            if (key_index < property.keys.length - 1) {
+	              var next_key = property.keys[key_index + 1];
+	              tween_duration = next_key.time - key.time;
+	
+	              val = {};
+	              easing = this.getEasing(next_key);
+	              val.ease = easing;
+	              if (property.css) {
+	                val.css = {};
+	                val.css[propName] = next_key.val;
+	              } else {
+	                val[propName] = next_key.val;
+	              }
+	
+	              tween = TweenMax.to(data_target, tween_duration, val);
+	              propertyTimeline.add(tween, key.time);
+	            }
+	          }
+	
+	          // Directly seek the property timeline to update the value.
+	          propertyTimeline.seek(seconds);
+	        }
+	        // Force main timeline to refresh but never try to go to < 0
+	        // to prevent glitches when current time is 0.
+	        if (seconds > 0) {
+	          seconds = seconds - 1e-7;
+	        } else {
+	          seconds = seconds + 1e-7;
+	        }
+	      }
+	    }
+	
+	    // Finally update the main timeline.
+	    this.mainTimeline.seek(seconds);
+	
+	    // update the css properties.
+	    for (var i = 0; i < this.data.length; i++) {
+	      var item = this.data[i];
+	      for (var property_key = 0; property_key < item.properties.length; property_key++) {
+	        var property = item.properties[property_key];
+	        if (property.css && property.keys.length) {
+	          // Only css values.
+	          item.values[property.name] = item._domHelper.style[property.name];
+	        }
+	      }
+	    }
+	
+	    if (has_dirty_items) {
+	      this.onUpdate.dispatch();
+	    }
+	  };
+	
+	  return Orchestrator;
+	})();
+	
+	exports["default"] = Orchestrator;
+
+/***/ },
+/* 5 */,
+/* 6 */,
+/* 7 */,
+/* 8 */,
+/* 9 */,
+/* 10 */,
+/* 11 */,
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_12__;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_13__;
+
+/***/ }
+/******/ ])
+});
+
+//# sourceMappingURL=TweenTime.Core.js.map;
 
 (function() {
-  define('cs!app/components/Colors',['require','threejs'],function(require) {
-    var Colors, THREE, items, items2, length;
+  define('cs!app/components/Background',['require','threejs'],function(require) {
+    var Background, THREE;
     THREE = require('threejs');
-    items = [new THREE.Color(0xffffff), new THREE.Color(0x86d1b8), new THREE.Color(0x65c282)];
-    items2 = [new THREE.Color(0xffffff), new THREE.Color(0x023750), new THREE.Color(0x028A9E), new THREE.Color(0x0EBFA9), new THREE.Color(0xF2C01D), new THREE.Color(0xD93024)];
-    length = items.length;
-    return Colors = (function() {
-      function Colors() {}
+    return Background = (function() {
+      function Background(scene) {
+        var bg, bgMat, texture;
+        this.scene = scene;
+        texture = THREE.ImageUtils.loadTexture('src/images/background.jpg');
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(2, 2);
+        bgMat = new THREE.MeshBasicMaterial({
+          map: texture
+        });
+        bg = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600, 4, 4), bgMat);
+        bg.material.depthTest = false;
+        bg.material.depthWrite = false;
+        bg.position.set(0, 0, -10);
+        this.scene.add(bg);
+      }
 
-      Colors.get = function(index) {
-        index = Math.abs(parseInt(index, 10));
-        return items[index % length];
+      return Background;
+
+    })();
+  });
+
+}).call(this);
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+
+THREE.EffectComposer = function ( renderer, renderTarget ) {
+
+	this.renderer = renderer;
+
+	if ( renderTarget === undefined ) {
+
+		var width = window.innerWidth || 1;
+		var height = window.innerHeight || 1;
+		var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+
+		renderTarget = new THREE.WebGLRenderTarget( width, height, parameters );
+
+	}
+
+	this.renderTarget1 = renderTarget;
+	this.renderTarget2 = renderTarget.clone();
+
+	this.writeBuffer = this.renderTarget1;
+	this.readBuffer = this.renderTarget2;
+
+	this.passes = [];
+
+	if ( THREE.CopyShader === undefined )
+		console.error( "THREE.EffectComposer relies on THREE.CopyShader" );
+
+	this.copyPass = new THREE.ShaderPass( THREE.CopyShader );
+
+};
+
+THREE.EffectComposer.prototype = {
+
+	swapBuffers: function() {
+
+		var tmp = this.readBuffer;
+		this.readBuffer = this.writeBuffer;
+		this.writeBuffer = tmp;
+
+	},
+
+	addPass: function ( pass ) {
+
+		this.passes.push( pass );
+
+	},
+
+	insertPass: function ( pass, index ) {
+
+		this.passes.splice( index, 0, pass );
+
+	},
+
+	render: function ( delta ) {
+
+		this.writeBuffer = this.renderTarget1;
+		this.readBuffer = this.renderTarget2;
+
+		var maskActive = false;
+
+		var pass, i, il = this.passes.length;
+
+		for ( i = 0; i < il; i ++ ) {
+
+			pass = this.passes[ i ];
+
+			if ( !pass.enabled ) continue;
+
+			pass.render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
+
+			if ( pass.needsSwap ) {
+
+				if ( maskActive ) {
+
+					var context = this.renderer.context;
+
+					context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
+
+					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, delta );
+
+					context.stencilFunc( context.EQUAL, 1, 0xffffffff );
+
+				}
+
+				this.swapBuffers();
+
+			}
+
+			if ( pass instanceof THREE.MaskPass ) {
+
+				maskActive = true;
+
+			} else if ( pass instanceof THREE.ClearMaskPass ) {
+
+				maskActive = false;
+
+			}
+
+		}
+
+	},
+
+	reset: function ( renderTarget ) {
+
+		if ( renderTarget === undefined ) {
+
+			renderTarget = this.renderTarget1.clone();
+
+			renderTarget.width = window.innerWidth;
+			renderTarget.height = window.innerHeight;
+
+		}
+
+		this.renderTarget1 = renderTarget;
+		this.renderTarget2 = renderTarget.clone();
+
+		this.writeBuffer = this.renderTarget1;
+		this.readBuffer = this.renderTarget2;
+
+	},
+
+	setSize: function ( width, height ) {
+
+		var renderTarget = this.renderTarget1.clone();
+
+		renderTarget.width = width;
+		renderTarget.height = height;
+
+		this.reset( renderTarget );
+
+	}
+
+};
+
+define("vendors/three.js-extras/postprocessing/EffectComposer", function(){});
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+
+THREE.MaskPass = function ( scene, camera ) {
+
+	this.scene = scene;
+	this.camera = camera;
+
+	this.enabled = true;
+	this.clear = true;
+	this.needsSwap = false;
+
+	this.inverse = false;
+
+};
+
+THREE.MaskPass.prototype = {
+
+	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+
+		var context = renderer.context;
+
+		// don't update color or depth
+
+		context.colorMask( false, false, false, false );
+		context.depthMask( false );
+
+		// set up stencil
+
+		var writeValue, clearValue;
+
+		if ( this.inverse ) {
+
+			writeValue = 0;
+			clearValue = 1;
+
+		} else {
+
+			writeValue = 1;
+			clearValue = 0;
+
+		}
+
+		context.enable( context.STENCIL_TEST );
+		context.stencilOp( context.REPLACE, context.REPLACE, context.REPLACE );
+		context.stencilFunc( context.ALWAYS, writeValue, 0xffffffff );
+		context.clearStencil( clearValue );
+
+		// draw into the stencil buffer
+
+		renderer.render( this.scene, this.camera, readBuffer, this.clear );
+		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+
+		// re-enable update of color and depth
+
+		context.colorMask( true, true, true, true );
+		context.depthMask( true );
+
+		// only render where stencil is set to 1
+
+		context.stencilFunc( context.EQUAL, 1, 0xffffffff );  // draw if == 1
+		context.stencilOp( context.KEEP, context.KEEP, context.KEEP );
+
+	}
+
+};
+
+
+THREE.ClearMaskPass = function () {
+
+	this.enabled = true;
+
+};
+
+THREE.ClearMaskPass.prototype = {
+
+	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+
+		var context = renderer.context;
+
+		context.disable( context.STENCIL_TEST );
+
+	}
+
+};
+
+define("vendors/three.js-extras/postprocessing/MaskPass", function(){});
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+
+THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
+
+	strength = ( strength !== undefined ) ? strength : 1;
+	kernelSize = ( kernelSize !== undefined ) ? kernelSize : 25;
+	sigma = ( sigma !== undefined ) ? sigma : 4.0;
+	resolution = ( resolution !== undefined ) ? resolution : 256;
+
+	// render targets
+
+	var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
+
+	this.renderTargetX = new THREE.WebGLRenderTarget( resolution, resolution, pars );
+	this.renderTargetY = new THREE.WebGLRenderTarget( resolution, resolution, pars );
+
+	// copy material
+
+	if ( THREE.CopyShader === undefined )
+		console.error( "THREE.BloomPass relies on THREE.CopyShader" );
+
+	var copyShader = THREE.CopyShader;
+
+	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
+
+	this.copyUniforms[ "opacity" ].value = strength;
+
+	this.materialCopy = new THREE.ShaderMaterial( {
+
+		uniforms: this.copyUniforms,
+		vertexShader: copyShader.vertexShader,
+		fragmentShader: copyShader.fragmentShader,
+		blending: THREE.AdditiveBlending,
+		transparent: true
+
+	} );
+
+	// convolution material
+
+	if ( THREE.ConvolutionShader === undefined )
+		console.error( "THREE.BloomPass relies on THREE.ConvolutionShader" );
+
+	var convolutionShader = THREE.ConvolutionShader;
+
+	this.convolutionUniforms = THREE.UniformsUtils.clone( convolutionShader.uniforms );
+
+	this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurx;
+	this.convolutionUniforms[ "cKernel" ].value = THREE.ConvolutionShader.buildKernel( sigma );
+
+	this.materialConvolution = new THREE.ShaderMaterial( {
+
+		uniforms: this.convolutionUniforms,
+		vertexShader:  convolutionShader.vertexShader,
+		fragmentShader: convolutionShader.fragmentShader,
+		defines: {
+			"KERNEL_SIZE_FLOAT": kernelSize.toFixed( 1 ),
+			"KERNEL_SIZE_INT": kernelSize.toFixed( 0 )
+		}
+
+	} );
+
+	this.enabled = true;
+	this.needsSwap = false;
+	this.clear = false;
+
+
+	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+	this.scene  = new THREE.Scene();
+
+	this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
+	this.scene.add( this.quad );
+
+};
+
+THREE.BloomPass.prototype = {
+
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+
+		if ( maskActive ) renderer.context.disable( renderer.context.STENCIL_TEST );
+
+		// Render quad with blured scene into texture (convolution pass 1)
+
+		this.quad.material = this.materialConvolution;
+
+		this.convolutionUniforms[ "tDiffuse" ].value = readBuffer;
+		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurX;
+
+		renderer.render( this.scene, this.camera, this.renderTargetX, true );
+
+
+		// Render quad with blured scene into texture (convolution pass 2)
+
+		this.convolutionUniforms[ "tDiffuse" ].value = this.renderTargetX;
+		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurY;
+
+		renderer.render( this.scene, this.camera, this.renderTargetY, true );
+
+		// Render original scene with superimposed blur to texture
+
+		this.quad.material = this.materialCopy;
+
+		this.copyUniforms[ "tDiffuse" ].value = this.renderTargetY;
+
+		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
+
+		renderer.render( this.scene, this.camera, readBuffer, this.clear );
+
+	}
+
+};
+
+THREE.BloomPass.blurX = new THREE.Vector2( 0.001953125, 0.0 );
+THREE.BloomPass.blurY = new THREE.Vector2( 0.0, 0.001953125 );
+
+define("vendors/three.js-extras/postprocessing/BloomPass", function(){});
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+
+THREE.ShaderPass = function ( shader, textureID ) {
+
+	this.textureID = ( textureID !== undefined ) ? textureID : "tDiffuse";
+
+	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+
+	this.material = new THREE.ShaderMaterial( {
+
+		uniforms: this.uniforms,
+		vertexShader: shader.vertexShader,
+		fragmentShader: shader.fragmentShader
+
+	} );
+
+	this.renderToScreen = false;
+
+	this.enabled = true;
+	this.needsSwap = true;
+	this.clear = false;
+
+
+	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+	this.scene  = new THREE.Scene();
+
+	this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
+	this.scene.add( this.quad );
+
+};
+
+THREE.ShaderPass.prototype = {
+
+	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+
+		if ( this.uniforms[ this.textureID ] ) {
+
+			this.uniforms[ this.textureID ].value = readBuffer;
+
+		}
+
+		this.quad.material = this.material;
+
+		if ( this.renderToScreen ) {
+
+			renderer.render( this.scene, this.camera );
+
+		} else {
+
+			renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+
+		}
+
+	}
+
+};
+
+define("vendors/three.js-extras/postprocessing/ShaderPass", function(){});
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+
+THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
+
+	this.scene = scene;
+	this.camera = camera;
+
+	this.overrideMaterial = overrideMaterial;
+
+	this.clearColor = clearColor;
+	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 1;
+
+	this.oldClearColor = new THREE.Color();
+	this.oldClearAlpha = 1;
+
+	this.enabled = true;
+	this.clear = true;
+	this.needsSwap = false;
+
+};
+
+THREE.RenderPass.prototype = {
+
+	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+
+		this.scene.overrideMaterial = this.overrideMaterial;
+
+		if ( this.clearColor ) {
+
+			this.oldClearColor.copy( renderer.getClearColor() );
+			this.oldClearAlpha = renderer.getClearAlpha();
+
+			renderer.setClearColor( this.clearColor, this.clearAlpha );
+
+		}
+
+		renderer.render( this.scene, this.camera, readBuffer, this.clear );
+
+		if ( this.clearColor ) {
+
+			renderer.setClearColor( this.oldClearColor, this.oldClearAlpha );
+
+		}
+
+		this.scene.overrideMaterial = null;
+
+	}
+
+};
+
+define("vendors/three.js-extras/postprocessing/RenderPass", function(){});
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+
+THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale ) {
+
+	if ( THREE.FilmShader === undefined )
+		console.error( "THREE.FilmPass relies on THREE.FilmShader" );
+
+	var shader = THREE.FilmShader;
+
+	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+
+	this.material = new THREE.ShaderMaterial( {
+
+		uniforms: this.uniforms,
+		vertexShader: shader.vertexShader,
+		fragmentShader: shader.fragmentShader
+
+	} );
+
+	if ( grayscale !== undefined )	this.uniforms.grayscale.value = grayscale;
+	if ( noiseIntensity !== undefined ) this.uniforms.nIntensity.value = noiseIntensity;
+	if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlinesIntensity;
+	if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
+
+	this.enabled = true;
+	this.renderToScreen = false;
+	this.needsSwap = true;
+
+
+	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+	this.scene  = new THREE.Scene();
+
+	this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
+	this.scene.add( this.quad );
+
+};
+
+THREE.FilmPass.prototype = {
+
+	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+
+		this.uniforms[ "tDiffuse" ].value = readBuffer;
+		this.uniforms[ "time" ].value += delta;
+
+		this.quad.material = this.material;
+
+		if ( this.renderToScreen ) {
+
+			renderer.render( this.scene, this.camera );
+
+		} else {
+
+			renderer.render( this.scene, this.camera, writeBuffer, false );
+
+		}
+
+	}
+
+};
+
+define("vendors/three.js-extras/postprocessing/FilmPass", function(){});
+
+THREE.GlitchPass2 = function ( dt_size ) {
+
+  if ( THREE.DigitalGlitch2 === undefined ) console.error( "THREE.GlitchPass relies on THREE.DigitalGlitch" );
+
+  var shader = THREE.DigitalGlitch2;
+  this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+
+  if(dt_size==undefined) dt_size=64;
+
+  this.intensity = 1;
+  this.uniforms["tDisp"].value=this.generateHeightmap(dt_size);
+
+
+  this.material = new THREE.ShaderMaterial({
+    uniforms: this.uniforms,
+    vertexShader: shader.vertexShader,
+    fragmentShader: shader.fragmentShader
+  });
+
+  this.enabled = true;
+  this.renderToScreen = false;
+  this.needsSwap = true;
+
+  this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+  this.scene  = new THREE.Scene();
+
+  this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
+  this.scene.add( this.quad );
+
+  this.goWild=false;
+  this.curF=0;
+  this.generateTrigger();
+
+};
+
+THREE.GlitchPass2.prototype = {
+
+  render: function ( renderer, writeBuffer, readBuffer, delta )
+  {
+    this.uniforms[ "tDiffuse" ].value = readBuffer;
+    this.uniforms[ 'seed' ].value=Math.random();//default seeding
+    //this.uniforms[ 'byp' ].value=0;
+
+    this.uniforms[ 'amount' ].value = (Math.random()/420) * this.intensity;
+    this.uniforms[ 'angle' ].value=THREE.Math.randFloat(-Math.PI,Math.PI);
+    this.uniforms[ 'seed_x' ].value=THREE.Math.randFloat(-1,1);
+    this.uniforms[ 'seed_y' ].value=THREE.Math.randFloat(-1,1);
+    this.uniforms[ 'seed_x' ].value *= 0.001;
+    this.uniforms[ 'seed_y' ].value *= 0.001;
+    this.uniforms[ 'distortion_x' ].value=THREE.Math.randFloat(0,0.001);
+    this.uniforms[ 'distortion_y' ].value=THREE.Math.randFloat(0,0.001);
+    //this.curF=0;
+    this.generateTrigger();
+
+    this.uniforms[ 'byp' ].value=0;
+    this.curF++;
+
+    this.quad.material = this.material;
+    if ( this.renderToScreen )
+    {
+      renderer.render( this.scene, this.camera );
+    }
+    else
+    {
+      renderer.render( this.scene, this.camera, writeBuffer, false );
+    }
+  },
+  generateTrigger:function()
+  {
+    this.randX=THREE.Math.randInt(120,240);
+  },
+  generateHeightmap:function(dt_size)
+  {
+    var data_arr = new Float32Array( dt_size*dt_size * 3 );
+    var length=dt_size*dt_size;
+
+    for ( var i = 0; i < length; i++)
+    {
+      var val=THREE.Math.randFloat(0,1);
+      data_arr[ i*3 + 0 ] = val;
+      data_arr[ i*3 + 1 ] = val;
+      data_arr[ i*3 + 2 ] = val;
+    }
+
+    var texture = new THREE.DataTexture( data_arr, dt_size, dt_size, THREE.RGBFormat, THREE.FloatType );
+    texture.minFilter = THREE.NearestFilter;
+    texture.magFilter = THREE.NearestFilter;
+    texture.needsUpdate = true;
+    texture.flipY = false;
+    return texture;
+  }
+};
+
+
+define("app/postprocessing/GlitchPass2", function(){});
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ *
+ * Full-screen textured quad shader
+ */
+
+THREE.CopyShader = {
+
+	uniforms: {
+
+		"tDiffuse": { type: "t", value: null },
+		"opacity":  { type: "f", value: 1.0 }
+
+	},
+
+	vertexShader: [
+
+		"varying vec2 vUv;",
+
+		"void main() {",
+
+			"vUv = uv;",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+		"}"
+
+	].join("\n"),
+
+	fragmentShader: [
+
+		"uniform float opacity;",
+
+		"uniform sampler2D tDiffuse;",
+
+		"varying vec2 vUv;",
+
+		"void main() {",
+
+			"vec4 texel = texture2D( tDiffuse, vUv );",
+			"gl_FragColor = opacity * texel;",
+
+		"}"
+
+	].join("\n")
+
+};
+
+define("vendors/three.js-extras/shaders/CopyShader", function(){});
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ * @author davidedc / http://www.sketchpatch.net/
+ *
+ * NVIDIA FXAA by Timothy Lottes
+ * http://timothylottes.blogspot.com/2011/06/fxaa3-source-released.html
+ * - WebGL port by @supereggbert
+ * http://www.glge.org/demos/fxaa/
+ */
+
+THREE.FXAAShader = {
+
+	uniforms: {
+
+		"tDiffuse":   { type: "t", value: null },
+		"resolution": { type: "v2", value: new THREE.Vector2( 1 / 1024, 1 / 512 )  }
+
+	},
+
+	vertexShader: [
+
+		"varying vec2 vUv;",
+
+		"void main() {",
+
+			"vUv = uv;",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+		"}"
+
+	].join("\n"),
+
+	fragmentShader: [
+
+		"uniform sampler2D tDiffuse;",
+		"uniform vec2 resolution;",
+
+		"varying vec2 vUv;",
+
+		"#define FXAA_REDUCE_MIN   (1.0/128.0)",
+		"#define FXAA_REDUCE_MUL   (1.0/8.0)",
+		"#define FXAA_SPAN_MAX     8.0",
+
+		"void main() {",
+
+			"vec3 rgbNW = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( -1.0, -1.0 ) ) * resolution ).xyz;",
+			"vec3 rgbNE = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( 1.0, -1.0 ) ) * resolution ).xyz;",
+			"vec3 rgbSW = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( -1.0, 1.0 ) ) * resolution ).xyz;",
+			"vec3 rgbSE = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( 1.0, 1.0 ) ) * resolution ).xyz;",
+			"vec4 rgbaM  = texture2D( tDiffuse,  gl_FragCoord.xy  * resolution );",
+			"vec3 rgbM  = rgbaM.xyz;",
+			"float opacity  = rgbaM.w;",
+
+			"vec3 luma = vec3( 0.299, 0.587, 0.114 );",
+
+			"float lumaNW = dot( rgbNW, luma );",
+			"float lumaNE = dot( rgbNE, luma );",
+			"float lumaSW = dot( rgbSW, luma );",
+			"float lumaSE = dot( rgbSE, luma );",
+			"float lumaM  = dot( rgbM,  luma );",
+			"float lumaMin = min( lumaM, min( min( lumaNW, lumaNE ), min( lumaSW, lumaSE ) ) );",
+			"float lumaMax = max( lumaM, max( max( lumaNW, lumaNE) , max( lumaSW, lumaSE ) ) );",
+
+			"vec2 dir;",
+			"dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));",
+			"dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));",
+
+			"float dirReduce = max( ( lumaNW + lumaNE + lumaSW + lumaSE ) * ( 0.25 * FXAA_REDUCE_MUL ), FXAA_REDUCE_MIN );",
+
+			"float rcpDirMin = 1.0 / ( min( abs( dir.x ), abs( dir.y ) ) + dirReduce );",
+			"dir = min( vec2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),",
+				  "max( vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),",
+						"dir * rcpDirMin)) * resolution;",
+
+			"vec3 rgbA = texture2D( tDiffuse, gl_FragCoord.xy  * resolution + dir * ( 1.0 / 3.0 - 0.5 ) ).xyz;",
+			"rgbA += texture2D( tDiffuse, gl_FragCoord.xy  * resolution + dir * ( 2.0 / 3.0 - 0.5 ) ).xyz;",
+			"rgbA *= 0.5;",
+
+			"vec3 rgbB = texture2D( tDiffuse, gl_FragCoord.xy  * resolution + dir * -0.5 ).xyz;",
+			"rgbB += texture2D( tDiffuse, gl_FragCoord.xy  * resolution + dir * 0.5 ).xyz;",
+			"rgbB *= 0.25;",
+			"rgbB += rgbA * 0.5;",
+
+			"float lumaB = dot( rgbB, luma );",
+
+			"if ( ( lumaB < lumaMin ) || ( lumaB > lumaMax ) ) {",
+
+				"gl_FragColor = vec4( rgbA, opacity );",
+
+			"} else {",
+
+				"gl_FragColor = vec4( rgbB, opacity );",
+
+			"}",
+
+		"}"
+
+	].join("\n")
+
+};
+
+define("vendors/three.js-extras/shaders/FXAAShader", function(){});
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ *
+ * Film grain & scanlines shader
+ *
+ * - ported from HLSL to WebGL / GLSL
+ * http://www.truevision3d.com/forums/showcase/staticnoise_colorblackwhite_scanline_shaders-t18698.0.html
+ *
+ * Screen Space Static Postprocessor
+ *
+ * Produces an analogue noise overlay similar to a film grain / TV static
+ *
+ * Original implementation and noise algorithm
+ * Pat 'Hawthorne' Shearon
+ *
+ * Optimized scanlines + noise version with intensity scaling
+ * Georg 'Leviathan' Steinrohder
+ *
+ * This version is provided under a Creative Commons Attribution 3.0 License
+ * http://creativecommons.org/licenses/by/3.0/
+ */
+
+THREE.FilmShader = {
+
+	uniforms: {
+
+		"tDiffuse":   { type: "t", value: null },
+		"time":       { type: "f", value: 0.0 },
+		"nIntensity": { type: "f", value: 0.5 },
+		"sIntensity": { type: "f", value: 0.05 },
+		"sCount":     { type: "f", value: 4096 },
+		"grayscale":  { type: "i", value: 1 }
+
+	},
+
+	vertexShader: [
+
+		"varying vec2 vUv;",
+
+		"void main() {",
+
+			"vUv = uv;",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+		"}"
+
+	].join("\n"),
+
+	fragmentShader: [
+
+		// control parameter
+		"uniform float time;",
+
+		"uniform bool grayscale;",
+
+		// noise effect intensity value (0 = no effect, 1 = full effect)
+		"uniform float nIntensity;",
+
+		// scanlines effect intensity value (0 = no effect, 1 = full effect)
+		"uniform float sIntensity;",
+
+		// scanlines effect count value (0 = no effect, 4096 = full effect)
+		"uniform float sCount;",
+
+		"uniform sampler2D tDiffuse;",
+
+		"varying vec2 vUv;",
+
+		"void main() {",
+
+			// sample the source
+			"vec4 cTextureScreen = texture2D( tDiffuse, vUv );",
+
+			// make some noise
+			"float x = vUv.x * vUv.y * time *  1000.0;",
+			"x = mod( x, 13.0 ) * mod( x, 123.0 );",
+			"float dx = mod( x, 0.01 );",
+
+			// add noise
+			"vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx * 100.0, 0.0, 1.0 );",
+
+			// get us a sine and cosine
+			"vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );",
+
+			// add scanlines
+			"cResult += cTextureScreen.rgb * vec3( sc.x, sc.y, sc.x ) * sIntensity;",
+
+			// interpolate between source and result by intensity
+			"cResult = cTextureScreen.rgb + clamp( nIntensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );",
+
+			// convert to grayscale if desired
+			"if( grayscale ) {",
+
+				"cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );",
+
+			"}",
+
+			"gl_FragColor =  vec4( cResult, cTextureScreen.a );",
+
+		"}"
+
+	].join("\n")
+
+};
+
+define("vendors/three.js-extras/shaders/FilmShader", function(){});
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ *
+ * Convolution shader
+ * ported from o3d sample to WebGL / GLSL
+ * http://o3d.googlecode.com/svn/trunk/samples/convolution.html
+ */
+
+THREE.ConvolutionShader = {
+
+	defines: {
+
+		"KERNEL_SIZE_FLOAT": "25.0",
+		"KERNEL_SIZE_INT": "25",
+
+	},
+
+	uniforms: {
+
+		"tDiffuse":        { type: "t", value: null },
+		"uImageIncrement": { type: "v2", value: new THREE.Vector2( 0.001953125, 0.0 ) },
+		"cKernel":         { type: "fv1", value: [] }
+
+	},
+
+	vertexShader: [
+
+		"uniform vec2 uImageIncrement;",
+
+		"varying vec2 vUv;",
+
+		"void main() {",
+
+			"vUv = uv - ( ( KERNEL_SIZE_FLOAT - 1.0 ) / 2.0 ) * uImageIncrement;",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+		"}"
+
+	].join("\n"),
+
+	fragmentShader: [
+
+		"uniform float cKernel[ KERNEL_SIZE_INT ];",
+
+		"uniform sampler2D tDiffuse;",
+		"uniform vec2 uImageIncrement;",
+
+		"varying vec2 vUv;",
+
+		"void main() {",
+
+			"vec2 imageCoord = vUv;",
+			"vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );",
+
+			"for( int i = 0; i < KERNEL_SIZE_INT; i ++ ) {",
+
+				"sum += texture2D( tDiffuse, imageCoord ) * cKernel[ i ];",
+				"imageCoord += uImageIncrement;",
+
+			"}",
+
+			"gl_FragColor = sum;",
+
+		"}"
+
+
+	].join("\n"),
+
+	buildKernel: function ( sigma ) {
+
+		// We lop off the sqrt(2 * pi) * sigma term, since we're going to normalize anyway.
+
+		function gauss( x, sigma ) {
+
+			return Math.exp( - ( x * x ) / ( 2.0 * sigma * sigma ) );
+
+		}
+
+		var i, values, sum, halfWidth, kMaxKernelSize = 25, kernelSize = 2 * Math.ceil( sigma * 3.0 ) + 1;
+
+		if ( kernelSize > kMaxKernelSize ) kernelSize = kMaxKernelSize;
+		halfWidth = ( kernelSize - 1 ) * 0.5;
+
+		values = new Array( kernelSize );
+		sum = 0.0;
+		for ( i = 0; i < kernelSize; ++i ) {
+
+			values[ i ] = gauss( i - halfWidth, sigma );
+			sum += values[ i ];
+
+		}
+
+		// normalize the kernel
+
+		for ( i = 0; i < kernelSize; ++i ) values[ i ] /= sum;
+
+		return values;
+
+	}
+
+};
+
+define("vendors/three.js-extras/shaders/ConvolutionShader", function(){});
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ *
+ * Vignette shader
+ * based on PaintEffect postprocess from ro.me
+ * http://code.google.com/p/3-dreams-of-black/source/browse/deploy/js/effects/PaintEffect.js
+ */
+
+THREE.VignetteShader = {
+
+  uniforms: {
+
+    "tDiffuse": { type: "t", value: null },
+    "offset":   { type: "f", value: 1.0 },
+    "darkness": { type: "f", value: 1.0 }
+
+  },
+
+  vertexShader: [
+
+    "varying vec2 vUv;",
+
+    "void main() {",
+
+      "vUv = uv;",
+      "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+    "}"
+
+  ].join("\n"),
+
+  fragmentShader: [
+
+    "uniform float offset;",
+    "uniform float darkness;",
+
+    "uniform sampler2D tDiffuse;",
+
+    "varying vec2 vUv;",
+
+    "void main() {",
+
+      // Eskil's vignette
+
+      "vec4 texel = texture2D( tDiffuse, vUv );",
+      "vec2 uv = ( vUv - vec2( 0.5 ) ) * vec2( offset );",
+      "gl_FragColor = vec4( mix( texel.rgb, vec3( 1.0 - darkness ), dot( uv, uv ) ), texel.a );",
+
+      /*
+      // alternative version from glfx.js
+      // this one makes more "dusty" look (as opposed to "burned")
+
+      "vec4 color = texture2D( tDiffuse, vUv );",
+      "float dist = distance( vUv, vec2( 0.5 ) );",
+      "color.rgb *= smoothstep( 0.8, offset * 0.799, dist *( darkness + offset ) );",
+      "gl_FragColor = color;",
+      */
+
+    "}"
+
+  ].join("\n")
+
+};
+
+
+define("vendors/three.js-extras/shaders/VignetteShader", function(){});
+
+/**
+ * @author felixturner / http://airtight.cc/
+ *
+ * RGB Shift Shader
+ * Shifts red and blue channels from center in opposite directions
+ * Ported from http://kriss.cx/tom/2009/05/rgb-shift/
+ * by Tom Butterworth / http://kriss.cx/tom/
+ *
+ * amount: shift distance (1 is width of input)
+ * angle: shift angle in radians
+ */
+
+THREE.DigitalGlitch2 = {
+
+  uniforms: {
+
+    "tDiffuse":   { type: "t", value: null },//diffuse texture
+    "tDisp":    { type: "t", value: null },//displacement texture for digital glitch squares
+    "tScratch":   { type: "t", value: null },//scratch texture
+    "byp":      { type: "i", value: 0 },//apply the glitch ?
+    "amount":   { type: "f", value: 0.08 },
+    "angle":    { type: "f", value: 0.02 },
+    "seed":     { type: "f", value: 0.02 },
+    "seed_x":   { type: "f", value: 0.02 },//-1,1
+    "seed_y":   { type: "f", value: 0.02 },//-1,1
+    "distortion_x": { type: "f", value: 0.5 },
+    "distortion_y": { type: "f", value: 0.6 },
+    "col_s":    { type: "f", value: 0.05 }
+  },
+
+  vertexShader: [
+
+    "varying vec2 vUv;",
+    "void main() {",
+      "vUv = uv;",
+      "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+    "}"
+  ].join("\n"),
+
+  fragmentShader: [
+    "uniform int byp;",//should we apply the glitch ?
+
+    "uniform sampler2D tDiffuse;",
+    "uniform sampler2D tDisp;",
+    "uniform sampler2D tScratch;",
+
+    "uniform float amount;",
+    "uniform float angle;",
+    "uniform float seed;",
+    "uniform float seed_x;",
+    "uniform float seed_y;",
+    "uniform float distortion_x;",
+    "uniform float distortion_y;",
+    "uniform float col_s;",
+
+    "varying vec2 vUv;",
+
+
+    "float rand(vec2 co){",
+      "return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);",
+    "}",
+
+    "float luma(vec3 color) {",
+      "return dot(color, vec3(0.299, 0.587, 0.114));",
+    "}",
+
+    "float luma(vec4 color) {",
+      "return dot(color.rgb, vec3(0.299, 0.587, 0.114));",
+    "}",
+
+    "void main() {",
+      // ref for dust/scratch: https://gist.github.com/mattdesl/253aece2d3eaac505823
+      "vec2 p = vUv;",
+      "vec4 scratches = texture2D(tScratch, p);",
+
+
+      // https://github.com/mattdesl/lwjgl-basics/wiki/ShaderLesson3
+      "if(byp<1) {",
+        "float xs = floor(gl_FragCoord.x / 0.5);",
+        "float ys = floor(gl_FragCoord.y / 0.5);",
+        //based on staffantans glitch shader for unity https://github.com/staffantan/unityglitch
+        "vec4 normal = texture2D (tDisp, p*seed*seed);",
+        "if(p.y<distortion_x+col_s && p.y>distortion_x-col_s*seed) {",
+          "if(seed_x>0.){",
+            "p.y = 1. - (p.y + distortion_y);",
+          "}",
+          "else {",
+            "p.y = distortion_y;",
+          "}",
+        "}",
+        "if(p.x<distortion_y+col_s && p.x>distortion_y-col_s*seed) {",
+          "if(seed_y>0.){",
+            "p.x=distortion_x;",
+          "}",
+          "else {",
+            "p.x = 1. - (p.x + distortion_x);",
+          "}",
+        "}",
+        "p.x+=normal.x*seed_x*(seed/5.);",
+        "p.y+=normal.y*seed_y*(seed/5.);",
+        //base from RGB shift shader
+        "vec2 offset = amount * vec2( cos(angle), sin(angle));",
+        "vec4 cr = texture2D(tDiffuse, p + offset);",
+        "vec4 cga = texture2D(tDiffuse, p);",
+        "vec4 cb = texture2D(tDiffuse, p - offset);",
+
+        "gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);",
+        //add noise
+        "vec4 snow = 200.*amount*vec4(rand(vec2(xs * seed,ys * seed*50.))*0.2);",
+        "gl_FragColor = gl_FragColor+ snow;",
+      "}",
+      "else {",
+        "gl_FragColor=texture2D (tDiffuse, vUv);",
+      "}",
+
+      "vec3 scratchBlend = gl_FragColor.rgb + scratches.rgb;",
+      // vignette scratch so that it affect only edges.
+      "float center = smoothstep(0.0, 0.5, length(vUv-0.5));",
+      "float luminance = luma(gl_FragColor.rgb);",
+      "float brightnessMap = smoothstep(0.1, 0.4, luminance * center );",
+      "gl_FragColor.rgb = mix(gl_FragColor.rgb, scratchBlend, brightnessMap);",
+    "}"
+
+  ].join("\n")
+
+};
+
+
+define("app/shaders/DigitalGlitch2", function(){});
+
+
+(function() {
+  define('cs!app/components/PostFX',['require','threejs','vendors/three.js-extras/postprocessing/EffectComposer','vendors/three.js-extras/postprocessing/MaskPass','vendors/three.js-extras/postprocessing/BloomPass','vendors/three.js-extras/postprocessing/ShaderPass','vendors/three.js-extras/postprocessing/RenderPass','vendors/three.js-extras/postprocessing/FilmPass','app/postprocessing/GlitchPass2','vendors/three.js-extras/shaders/CopyShader','vendors/three.js-extras/shaders/FXAAShader','vendors/three.js-extras/shaders/FilmShader','vendors/three.js-extras/shaders/ConvolutionShader','vendors/three.js-extras/shaders/VignetteShader','app/shaders/DigitalGlitch2'],function(require) {
+    var PostFX, THREE;
+    THREE = require('threejs');
+    require('vendors/three.js-extras/postprocessing/EffectComposer');
+    require('vendors/three.js-extras/postprocessing/MaskPass');
+    require('vendors/three.js-extras/postprocessing/BloomPass');
+    require('vendors/three.js-extras/postprocessing/ShaderPass');
+    require('vendors/three.js-extras/postprocessing/RenderPass');
+    require('vendors/three.js-extras/postprocessing/FilmPass');
+    require('app/postprocessing/GlitchPass2');
+    require('vendors/three.js-extras/shaders/CopyShader');
+    require('vendors/three.js-extras/shaders/FXAAShader');
+    require('vendors/three.js-extras/shaders/FilmShader');
+    require('vendors/three.js-extras/shaders/ConvolutionShader');
+    require('vendors/three.js-extras/shaders/VignetteShader');
+    require('app/shaders/DigitalGlitch2');
+    return PostFX = (function() {
+      function PostFX(scene, camera, renderer, size) {
+        var dpr, renderModel;
+        this.scene = scene;
+        this.camera = camera;
+        this.renderer = renderer;
+        this.renderer.autoClear = false;
+        renderModel = new THREE.RenderPass(this.scene, this.camera);
+        window.renderModel = renderModel;
+        dpr = window.devicePixelRatio != null ? window.devicePixelRatio : 1;
+        this.renderTargetParameters = {
+          minFilter: THREE.LinearFilter,
+          magFilter: THREE.LinearFilter,
+          format: THREE.RGBFormat,
+          stencilBufer: false
+        };
+        this.renderTarget = new THREE.WebGLRenderTarget(size.width * dpr, size.height * dpr, this.renderTargetParameters);
+        this.effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
+        this.effectFXAA.uniforms['resolution'].value.set(1 / (size.width * dpr), 1 / (size.height * dpr));
+        this.bloom = new THREE.BloomPass(0.6, 25, 4);
+        this.glitchPass = new THREE.GlitchPass2();
+        this.glitchPass.intensity = 0.3;
+        this.glitchPass.uniforms.tScratch.value = THREE.ImageUtils.loadTexture("src/images/lensflare_dirt.jpg");
+        this.vignettePass = new THREE.ShaderPass(THREE.VignetteShader);
+        this.vignettePass.uniforms['darkness'].value = 2;
+        this.filmShader = new THREE.FilmPass(0.34, 0.01, 648, false);
+        this.filmShader.renderToScreen = true;
+        this.composer = new THREE.EffectComposer(this.renderer, this.renderTarget);
+        this.composer.setSize(size.width * dpr, size.height * dpr);
+        this.composer.addPass(renderModel);
+        this.composer.addPass(this.bloom);
+        this.composer.addPass(this.vignettePass);
+        this.composer.addPass(this.filmShader);
+      }
+
+      PostFX.prototype.resize = function(SCREEN_WIDTH, SCREEN_HEIGHT) {
+        var dpr;
+        dpr = window.devicePixelRatio != null ? window.devicePixelRatio : 1;
+        this.renderTarget = new THREE.WebGLRenderTarget(SCREEN_WIDTH * dpr, SCREEN_HEIGHT * dpr, this.renderTargetParameters);
+        this.composer.reset(this.renderTarget);
+        return this.effectFXAA.uniforms['resolution'].value.set(1 / (SCREEN_WIDTH * dpr), 1 / (SCREEN_HEIGHT * dpr));
       };
 
-      return Colors;
+      PostFX.prototype.render = function(delta) {
+        this.renderer.clear();
+        return this.composer.render(delta);
+      };
+
+      return PostFX;
+
+    })();
+  });
+
+}).call(this);
+
+
+(function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  define('cs!app/components/SceneManager',['require','lodash','signals'],function(require) {
+    var SceneManager, Signals, _;
+    _ = require('lodash');
+    Signals = require('signals');
+    return SceneManager = (function() {
+      function SceneManager(tweenTime, data, scene, defaultCamera, factory) {
+        this.tweenTime = tweenTime;
+        this.data = data;
+        this.scene = scene;
+        this.defaultCamera = defaultCamera;
+        this.factory = factory;
+        this.update = __bind(this.update, this);
+        this.timer = this.tweenTime.timer;
+        this.timer.updated.add(this.update);
+        this.update(0);
+      }
+
+      SceneManager.prototype.update = function(timestamp) {
+        var activeCamera, el, item, seconds, should_exist, type, _i, _len, _ref;
+        activeCamera = this.defaultCamera;
+        seconds = timestamp / 1000;
+        _ref = this.data;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          item = _ref[_i];
+          should_exist = seconds >= item.start && seconds <= item.end ? true : false;
+          if ((item.object && should_exist === false) || item.isDirtyObject) {
+            item.isDirtyObject = false;
+            if (item.object) {
+              this.scene.remove(item.object.container);
+              item.object.destroy();
+              delete item.object;
+            }
+          }
+          if (!item.classObject) {
+            item.classObject = this.factory.getTypeClass(item.type);
+          }
+          if (should_exist === false) {
+            continue;
+          }
+          if (should_exist && !item.object) {
+            type = item.type;
+            el = this.factory.create(type, item.values, seconds - item.start);
+            this.scene.add(el.container);
+            item.object = el;
+          }
+          if (item.object && item.object.isCamera) {
+            activeCamera = item.object.container;
+            window.updateCameraAspect(activeCamera);
+          }
+          if (item.object) {
+            item.object.update(seconds - item.start, item.values);
+          }
+        }
+        window.activeCamera = activeCamera;
+        if (window.renderModel) {
+          return window.renderModel.camera = activeCamera;
+        }
+      };
+
+      return SceneManager;
 
     })();
   });
@@ -53054,7 +52280,7 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       Audio.instance = false;
 
       function Audio(mp3Url, onLoadedCallback) {
-        var gain2, parameters, volume;
+        var gain2, muted, parameters;
         this.onLoadedCallback = onLoadedCallback;
         this.rms = __bind(this.rms, this);
         this.play = __bind(this.play, this);
@@ -53063,6 +52289,8 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         this.load = __bind(this.load, this);
         this.seek = __bind(this.seek, this);
         this.update = __bind(this.update, this);
+        window.audio = this;
+        muted = true;
         this.fftSize = 512;
         this.filters = {};
         this.playing = false;
@@ -53133,9 +52361,8 @@ define("TimelineMax", ["TweenMax"], (function (global) {
         this.delay.delayTime.value = this.fftSize * 2 / this.context.sampleRate;
         this.source.connect(this.analyser);
         this.analyser.connect(this.delay);
-        volume = false;
-        if (volume) {
-          gain2 = this.context.createGainNode();
+        if (muted) {
+          gain2 = this.context.createGain();
           this.delay.connect(gain2);
           gain2.gain.value = 0.00;
           gain2.connect(this.context.destination);
@@ -53267,6 +52494,352 @@ define("TimelineMax", ["TweenMax"], (function (global) {
       };
 
       return Audio;
+
+    })();
+  });
+
+}).call(this);
+
+
+(function() {
+  define('cs!app/elements/Camera',['require','threejs'],function(require) {
+    var Camera, THREE;
+    THREE = require('threejs');
+    return Camera = (function() {
+      Camera.properties = {
+        x: {
+          name: 'x',
+          label: 'x',
+          val: 0
+        },
+        y: {
+          name: 'y',
+          label: 'y',
+          val: 0
+        },
+        z: {
+          name: 'z',
+          label: 'z',
+          val: 700
+        },
+        target_x: {
+          name: 'target_x',
+          label: 'target x',
+          val: 0
+        },
+        target_y: {
+          name: 'target_y',
+          label: 'target y',
+          val: 0
+        },
+        target_z: {
+          name: 'target_z',
+          label: 'target z',
+          val: 0
+        },
+        fov: {
+          name: 'fov',
+          label: 'fov',
+          val: 45
+        }
+      };
+
+      function Camera(values, time) {
+        this.values = values != null ? values : {};
+        if (time == null) {
+          time = 0;
+        }
+        this.isCamera = true;
+        this.target = new THREE.Vector3(this.values.target_x, this.values.target_y, this.values.target_z);
+        this.container = new THREE.PerspectiveCamera(this.values.fov, window.innerWidth / window.innerHeight, 1, 2000);
+        this.container.position.set(this.values.x, this.values.y, this.values.z);
+      }
+
+      Camera.prototype.update = function(seconds, values, force) {
+        if (values == null) {
+          values = false;
+        }
+        if (force == null) {
+          force = false;
+        }
+        if (values.fov != null) {
+          this.container.fov = values.fov;
+        }
+        this.container.position.set(values.x, values.y, values.z);
+        this.target.set(values.target_x, values.target_y, values.target_z);
+        return this.container.lookAt(this.target);
+      };
+
+      Camera.prototype.destroy = function() {
+        delete this.container;
+        return delete this.isCamera;
+      };
+
+      return Camera;
+
+    })();
+  });
+
+}).call(this);
+
+/**
+ * Seedable random number generator functions.
+ * @version 1.0.0
+ * @license Public Domain
+ *
+ * @example
+ * var rng = new RNG('Example');
+ * rng.random(40, 50);  // =>  42
+ * rng.uniform();       // =>  0.7972798995050903
+ * rng.normal();        // => -0.6698504543216376
+ * rng.exponential();   // =>  1.0547367609131555
+ * rng.poisson(4);      // =>  2
+ * rng.gamma(4);        // =>  2.781724687386858
+ */
+
+/**
+ * @param {String} seed A string to seed the generator.
+ * @constructor
+ */
+function RC4(seed) {
+    this.s = new Array(256);
+    this.i = 0;
+    this.j = 0;
+    for (var i = 0; i < 256; i++) {
+        this.s[i] = i;
+    }
+    if (seed) {
+        this.mix(seed);
+    }
+}
+
+/**
+ * Get the underlying bytes of a string.
+ * @param {string} string
+ * @returns {Array} An array of bytes
+ */
+RC4.getStringBytes = function(string) {
+    var output = [];
+    for (var i = 0; i < string.length; i++) {
+        var c = string.charCodeAt(i);
+        var bytes = [];
+        do {
+            bytes.push(c & 0xFF);
+            c = c >> 8;
+        } while (c > 0);
+        output = output.concat(bytes.reverse());
+    }
+    return output;
+};
+
+RC4.prototype._swap = function(i, j) {
+    var tmp = this.s[i];
+    this.s[i] = this.s[j];
+    this.s[j] = tmp;
+};
+
+/**
+ * Mix additional entropy into this generator.
+ * @param {String} seed
+ */
+RC4.prototype.mix = function(seed) {
+    var input = RC4.getStringBytes(seed);
+    var j = 0;
+    for (var i = 0; i < this.s.length; i++) {
+        j += this.s[i] + input[i % input.length];
+        j %= 256;
+        this._swap(i, j);
+    }
+};
+
+/**
+ * @returns {number} The next byte of output from the generator.
+ */
+RC4.prototype.next = function() {
+    this.i = (this.i + 1) % 256;
+    this.j = (this.j + this.s[this.i]) % 256;
+    this._swap(this.i, this.j);
+    return this.s[(this.s[this.i] + this.s[this.j]) % 256];
+};
+
+/**
+ * Create a new random number generator with optional seed. If the
+ * provided seed is a function (i.e. Math.random) it will be used as
+ * the uniform number generator.
+ * @param seed An arbitrary object used to seed the generator.
+ * @constructor
+ */
+function RNG(seed) {
+    if (seed == null) {
+        seed = (Math.random() + Date.now()).toString();
+    } else if (typeof seed === "function") {
+        // Use it as a uniform number generator
+        this.uniform = seed;
+        this.nextByte = function() {
+            return ~~(this.uniform() * 256);
+        };
+        seed = null;
+    } else if (Object.prototype.toString.call(seed) !== "[object String]") {
+        seed = JSON.stringify(seed);
+    }
+    this._normal = null;
+    if (seed) {
+        this._state = new RC4(seed);
+    } else {
+        this._state = null;
+    }
+}
+
+/**
+ * @returns {number} Uniform random number between 0 and 255.
+ */
+RNG.prototype.nextByte = function() {
+    return this._state.next();
+};
+
+/**
+ * @returns {number} Uniform random number between 0 and 1.
+ */
+RNG.prototype.uniform = function() {
+    var BYTES = 7; // 56 bits to make a 53-bit double
+    var output = 0;
+    for (var i = 0; i < BYTES; i++) {
+        output *= 256;
+        output += this.nextByte();
+    }
+    return output / (Math.pow(2, BYTES * 8) - 1);
+};
+
+/**
+ * Produce a random integer within [n, m).
+ * @param {number} [n=0]
+ * @param {number} m
+ *
+ */
+RNG.prototype.random = function(n, m) {
+    if (n == null) {
+        return this.uniform();
+    } else if (m == null) {
+        m = n;
+        n = 0;
+    }
+    return n + Math.floor(this.uniform() * (m - n));
+};
+
+/**
+ * Generates numbers using this.uniform() with the Box-Muller transform.
+ * @returns {number} Normally-distributed random number of mean 0, variance 1.
+ */
+RNG.prototype.normal = function() {
+    if (this._normal !== null) {
+        var n = this._normal;
+        this._normal = null;
+        return n;
+    } else {
+        var x = this.uniform() || Math.pow(2, -53); // can't be exactly 0
+        var y = this.uniform();
+        this._normal = Math.sqrt(-2 * Math.log(x)) * Math.sin(2 * Math.PI * y);
+        return Math.sqrt(-2 * Math.log(x)) * Math.cos(2 * Math.PI * y);
+    }
+};
+
+/**
+ * Generates numbers using this.uniform().
+ * @returns {number} Number from the exponential distribution, lambda = 1.
+ */
+RNG.prototype.exponential = function() {
+    return -Math.log(this.uniform() || Math.pow(2, -53));
+};
+
+/**
+ * Generates numbers using this.uniform() and Knuth's method.
+ * @param {number} [mean=1]
+ * @returns {number} Number from the Poisson distribution.
+ */
+RNG.prototype.poisson = function(mean) {
+    var L = Math.exp(-(mean || 1));
+    var k = 0, p = 1;
+    do {
+        k++;
+        p *= this.uniform();
+    } while (p > L);
+    return k - 1;
+};
+
+/**
+ * Generates numbers using this.uniform(), this.normal(),
+ * this.exponential(), and the Marsaglia-Tsang method.
+ * @param {number} a
+ * @returns {number} Number from the gamma distribution.
+ */
+RNG.prototype.gamma = function(a) {
+    var d = (a < 1 ? 1 + a : a) - 1 / 3;
+    var c = 1 / Math.sqrt(9 * d);
+    do {
+        do {
+            var x = this.normal();
+            var v = Math.pow(c * x + 1, 3);
+        } while (v <= 0);
+        var u = this.uniform();
+        var x2 = Math.pow(x, 2);
+    } while (u >= 1 - 0.0331 * x2 * x2 &&
+             Math.log(u) >= 0.5 * x2 + d * (1 - v + Math.log(v)));
+    if (a < 1) {
+        return d * v * Math.exp(this.exponential() / -a);
+    } else {
+        return d * v;
+    }
+};
+
+/**
+ * Accepts a dice rolling notation string and returns a generator
+ * function for that distribution. The parser is quite flexible.
+ * @param {string} expr A dice-rolling, expression i.e. '2d6+10'.
+ * @param {RNG} rng An optional RNG object.
+ * @returns {Function}
+ */
+RNG.roller = function(expr, rng) {
+    var parts = expr.split(/(\d+)?d(\d+)([+-]\d+)?/).slice(1);
+    var dice = parseFloat(parts[0]) || 1;
+    var sides = parseFloat(parts[1]);
+    var mod = parseFloat(parts[2]) || 0;
+    rng = rng || new RNG();
+    return function() {
+        var total = dice + mod;
+        for (var i = 0; i < dice; i++) {
+            total += rng.random(sides);
+        }
+        return total;
+    };
+};
+
+/* Provide a pre-made generator instance. */
+RNG.$ = new RNG();
+
+define("rng", (function (global) {
+    return function () {
+        var ret, fn;
+        return ret || global.RNG;
+    };
+}(this)));
+
+
+(function() {
+  define('cs!app/components/Colors',['require','threejs'],function(require) {
+    var Colors, THREE, items, items2, length;
+    THREE = require('threejs');
+    items = [new THREE.Color(0xffffff), new THREE.Color(0x86d1b8), new THREE.Color(0x65c282)];
+    items2 = [new THREE.Color(0xffffff), new THREE.Color(0x023750), new THREE.Color(0x028A9E), new THREE.Color(0x0EBFA9), new THREE.Color(0xF2C01D), new THREE.Color(0xD93024)];
+    length = items.length;
+    return Colors = (function() {
+      function Colors() {}
+
+      Colors.get = function(index) {
+        index = Math.abs(parseInt(index, 10));
+        return items[index % length];
+      };
+
+      return Colors;
 
     })();
   });
@@ -53665,7 +53238,7 @@ define('text',['module'], function (module) {
 });
 
 
-define('text!app/shaders/BasicNoise.vert',[],function () { return 'varying vec2 vUv;\nvarying float noise;\nuniform float time;\n\n//\n// GLSL textureless classic 3D noise "cnoise",\n// with an RSL-style periodic variant "pnoise".\n// Author:  Stefan Gustavson (stefan.gustavson@liu.se)\n// Version: 2011-10-11\n//\n// Many thanks to Ian McEwan of Ashima Arts for the\n// ideas for permutation and gradient selection.\n//\n// Copyright (c) 2011 Stefan Gustavson. All rights reserved.\n// Distributed under the MIT license. See LICENSE file.\n// https://github.com/ashima/webgl-noise\n//\n\nvec3 mod289(vec3 x)\n{\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 mod289(vec4 x)\n{\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 permute(vec4 x)\n{\n  return mod289(((x*34.0)+1.0)*x);\n}\n\nvec4 taylorInvSqrt(vec4 r)\n{\n  return 1.79284291400159 - 0.85373472095314 * r;\n}\n\nvec3 fade(vec3 t) {\n  return t*t*t*(t*(t*6.0-15.0)+10.0);\n}\n\n// Classic Perlin noise\nfloat cnoise(vec3 P)\n{\n  vec3 Pi0 = floor(P); // Integer part for indexing\n  vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1\n  Pi0 = mod289(Pi0);\n  Pi1 = mod289(Pi1);\n  vec3 Pf0 = fract(P); // Fractional part for interpolation\n  vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0\n  vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);\n  vec4 iy = vec4(Pi0.yy, Pi1.yy);\n  vec4 iz0 = Pi0.zzzz;\n  vec4 iz1 = Pi1.zzzz;\n\n  vec4 ixy = permute(permute(ix) + iy);\n  vec4 ixy0 = permute(ixy + iz0);\n  vec4 ixy1 = permute(ixy + iz1);\n\n  vec4 gx0 = ixy0 * (1.0 / 7.0);\n  vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;\n  gx0 = fract(gx0);\n  vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);\n  vec4 sz0 = step(gz0, vec4(0.0));\n  gx0 -= sz0 * (step(0.0, gx0) - 0.5);\n  gy0 -= sz0 * (step(0.0, gy0) - 0.5);\n\n  vec4 gx1 = ixy1 * (1.0 / 7.0);\n  vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;\n  gx1 = fract(gx1);\n  vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);\n  vec4 sz1 = step(gz1, vec4(0.0));\n  gx1 -= sz1 * (step(0.0, gx1) - 0.5);\n  gy1 -= sz1 * (step(0.0, gy1) - 0.5);\n\n  vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);\n  vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);\n  vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);\n  vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);\n  vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);\n  vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);\n  vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);\n  vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);\n\n  vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));\n  g000 *= norm0.x;\n  g010 *= norm0.y;\n  g100 *= norm0.z;\n  g110 *= norm0.w;\n  vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));\n  g001 *= norm1.x;\n  g011 *= norm1.y;\n  g101 *= norm1.z;\n  g111 *= norm1.w;\n\n  float n000 = dot(g000, Pf0);\n  float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));\n  float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));\n  float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));\n  float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));\n  float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));\n  float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));\n  float n111 = dot(g111, Pf1);\n\n  vec3 fade_xyz = fade(Pf0);\n  vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);\n  vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);\n  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);\n  return 2.2 * n_xyz;\n}\n\n// Classic Perlin noise, periodic variant\nfloat pnoise(vec3 P, vec3 rep)\n{\n  vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period\n  vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period\n  Pi0 = mod289(Pi0);\n  Pi1 = mod289(Pi1);\n  vec3 Pf0 = fract(P); // Fractional part for interpolation\n  vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0\n  vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);\n  vec4 iy = vec4(Pi0.yy, Pi1.yy);\n  vec4 iz0 = Pi0.zzzz;\n  vec4 iz1 = Pi1.zzzz;\n\n  vec4 ixy = permute(permute(ix) + iy);\n  vec4 ixy0 = permute(ixy + iz0);\n  vec4 ixy1 = permute(ixy + iz1);\n\n  vec4 gx0 = ixy0 * (1.0 / 7.0);\n  vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;\n  gx0 = fract(gx0);\n  vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);\n  vec4 sz0 = step(gz0, vec4(0.0));\n  gx0 -= sz0 * (step(0.0, gx0) - 0.5);\n  gy0 -= sz0 * (step(0.0, gy0) - 0.5);\n\n  vec4 gx1 = ixy1 * (1.0 / 7.0);\n  vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;\n  gx1 = fract(gx1);\n  vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);\n  vec4 sz1 = step(gz1, vec4(0.0));\n  gx1 -= sz1 * (step(0.0, gx1) - 0.5);\n  gy1 -= sz1 * (step(0.0, gy1) - 0.5);\n\n  vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);\n  vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);\n  vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);\n  vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);\n  vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);\n  vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);\n  vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);\n  vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);\n\n  vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));\n  g000 *= norm0.x;\n  g010 *= norm0.y;\n  g100 *= norm0.z;\n  g110 *= norm0.w;\n  vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));\n  g001 *= norm1.x;\n  g011 *= norm1.y;\n  g101 *= norm1.z;\n  g111 *= norm1.w;\n\n  float n000 = dot(g000, Pf0);\n  float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));\n  float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));\n  float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));\n  float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));\n  float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));\n  float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));\n  float n111 = dot(g111, Pf1);\n\n  vec3 fade_xyz = fade(Pf0);\n  vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);\n  vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);\n  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);\n  return 2.2 * n_xyz;\n}\n\n\n\n\n\n\n\n\nfloat turbulence( vec3 p ) {\n    float w = 100.0;\n    float t = -.5;\n    for (float f = 1.0 ; f <= 10.0 ; f++ ){\n        float power = pow( 2.0, f );\n        t += abs( pnoise( vec3( power * p ), vec3( 10.0, 10.0, 10.0 ) ) / power );\n    }\n    return t;\n}\n\nvoid main() {\n\n    vUv = uv;\n\n    // add time to the noise parameters so it\'s animated\n    noise = 10.0 *  -.10 * turbulence( 0.5 * normal + time );\n    float b = 5.0 * pnoise( 0.2 * position + vec3( 2.0 * time ), vec3( 100.0 ) );\n    float displacement = - noise + b;\n\n    vec3 newPosition = position + normal * displacement;\n    gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );\n\n}\n';});
+define('text!app/shaders/BasicNoise.vert',[],function () { return 'varying vec2 vUv;\nvarying float noise;\nuniform float time;\nuniform float strength;\n\n//\n// GLSL textureless classic 3D noise "cnoise",\n// with an RSL-style periodic variant "pnoise".\n// Author:  Stefan Gustavson (stefan.gustavson@liu.se)\n// Version: 2011-10-11\n//\n// Many thanks to Ian McEwan of Ashima Arts for the\n// ideas for permutation and gradient selection.\n//\n// Copyright (c) 2011 Stefan Gustavson. All rights reserved.\n// Distributed under the MIT license. See LICENSE file.\n// https://github.com/ashima/webgl-noise\n//\n\nvec3 mod289(vec3 x)\n{\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 mod289(vec4 x)\n{\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 permute(vec4 x)\n{\n  return mod289(((x*34.0)+1.0)*x);\n}\n\nvec4 taylorInvSqrt(vec4 r)\n{\n  return 1.79284291400159 - 0.85373472095314 * r;\n}\n\nvec3 fade(vec3 t) {\n  return t*t*t*(t*(t*6.0-15.0)+10.0);\n}\n\n// Classic Perlin noise\nfloat cnoise(vec3 P)\n{\n  vec3 Pi0 = floor(P); // Integer part for indexing\n  vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1\n  Pi0 = mod289(Pi0);\n  Pi1 = mod289(Pi1);\n  vec3 Pf0 = fract(P); // Fractional part for interpolation\n  vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0\n  vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);\n  vec4 iy = vec4(Pi0.yy, Pi1.yy);\n  vec4 iz0 = Pi0.zzzz;\n  vec4 iz1 = Pi1.zzzz;\n\n  vec4 ixy = permute(permute(ix) + iy);\n  vec4 ixy0 = permute(ixy + iz0);\n  vec4 ixy1 = permute(ixy + iz1);\n\n  vec4 gx0 = ixy0 * (1.0 / 7.0);\n  vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;\n  gx0 = fract(gx0);\n  vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);\n  vec4 sz0 = step(gz0, vec4(0.0));\n  gx0 -= sz0 * (step(0.0, gx0) - 0.5);\n  gy0 -= sz0 * (step(0.0, gy0) - 0.5);\n\n  vec4 gx1 = ixy1 * (1.0 / 7.0);\n  vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;\n  gx1 = fract(gx1);\n  vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);\n  vec4 sz1 = step(gz1, vec4(0.0));\n  gx1 -= sz1 * (step(0.0, gx1) - 0.5);\n  gy1 -= sz1 * (step(0.0, gy1) - 0.5);\n\n  vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);\n  vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);\n  vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);\n  vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);\n  vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);\n  vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);\n  vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);\n  vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);\n\n  vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));\n  g000 *= norm0.x;\n  g010 *= norm0.y;\n  g100 *= norm0.z;\n  g110 *= norm0.w;\n  vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));\n  g001 *= norm1.x;\n  g011 *= norm1.y;\n  g101 *= norm1.z;\n  g111 *= norm1.w;\n\n  float n000 = dot(g000, Pf0);\n  float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));\n  float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));\n  float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));\n  float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));\n  float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));\n  float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));\n  float n111 = dot(g111, Pf1);\n\n  vec3 fade_xyz = fade(Pf0);\n  vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);\n  vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);\n  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);\n  return 2.2 * n_xyz;\n}\n\n// Classic Perlin noise, periodic variant\nfloat pnoise(vec3 P, vec3 rep)\n{\n  vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period\n  vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period\n  Pi0 = mod289(Pi0);\n  Pi1 = mod289(Pi1);\n  vec3 Pf0 = fract(P); // Fractional part for interpolation\n  vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0\n  vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);\n  vec4 iy = vec4(Pi0.yy, Pi1.yy);\n  vec4 iz0 = Pi0.zzzz;\n  vec4 iz1 = Pi1.zzzz;\n\n  vec4 ixy = permute(permute(ix) + iy);\n  vec4 ixy0 = permute(ixy + iz0);\n  vec4 ixy1 = permute(ixy + iz1);\n\n  vec4 gx0 = ixy0 * (1.0 / 7.0);\n  vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;\n  gx0 = fract(gx0);\n  vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);\n  vec4 sz0 = step(gz0, vec4(0.0));\n  gx0 -= sz0 * (step(0.0, gx0) - 0.5);\n  gy0 -= sz0 * (step(0.0, gy0) - 0.5);\n\n  vec4 gx1 = ixy1 * (1.0 / 7.0);\n  vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;\n  gx1 = fract(gx1);\n  vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);\n  vec4 sz1 = step(gz1, vec4(0.0));\n  gx1 -= sz1 * (step(0.0, gx1) - 0.5);\n  gy1 -= sz1 * (step(0.0, gy1) - 0.5);\n\n  vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);\n  vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);\n  vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);\n  vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);\n  vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);\n  vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);\n  vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);\n  vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);\n\n  vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));\n  g000 *= norm0.x;\n  g010 *= norm0.y;\n  g100 *= norm0.z;\n  g110 *= norm0.w;\n  vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));\n  g001 *= norm1.x;\n  g011 *= norm1.y;\n  g101 *= norm1.z;\n  g111 *= norm1.w;\n\n  float n000 = dot(g000, Pf0);\n  float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));\n  float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));\n  float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));\n  float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));\n  float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));\n  float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));\n  float n111 = dot(g111, Pf1);\n\n  vec3 fade_xyz = fade(Pf0);\n  vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);\n  vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);\n  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);\n  return 2.2 * n_xyz;\n}\n\n\n\n\n\n\n\n\nfloat turbulence( vec3 p ) {\n    float w = 100.0;\n    float t = -.5;\n    for (float f = 1.0 ; f <= 10.0 ; f++ ){\n        float power = pow( 2.0, f );\n        t += abs( pnoise( vec3( power * p ), vec3( 10.0, 10.0, 10.0 ) ) / power );\n    }\n    return t;\n}\n\nvoid main() {\n\n    vUv = uv;\n\n    // add time to the noise parameters so it\'s animated\n    noise = 10.0 *  -.10 * turbulence( 0.5 * normal + time );\n    float b = 5.0 * pnoise( 0.2 * position + vec3( 2.0 * time ), vec3( 100.0 ) );\n    float displacement = - noise + b;\n\n    vec3 newPosition = position + normal * displacement * strength;\n    gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );\n\n}\n';});
 
 
 define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 vUv;\nuniform vec3 color;\n\nvoid main() {\n  //vec3 k = vec3(1.0, 1.0, 1.0);\n  //gl_FragColor = vec4( vec3( vUv, 0. ), 1. );\n  gl_FragColor = vec4( color, 1.0 );\n}\n';});
@@ -53674,25 +53247,24 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/elements/AnimatedCircle',['require','lodash','threejs','rng','TweenMax','TimelineMax','cs!app/components/Colors','cs!app/components/Audio','text!app/shaders/BasicNoise.vert','text!app/shaders/BasicNoise.frag'],function(require) {
-    var AnimatedCircle, Audio, Colors, RNG, ShaderFragement, ShaderVertex, THREE, TimelineMax, TweenMax, _;
+  define('cs!app/elements/AnimatedObject',['require','lodash','threejs','rng','TweenMax','cs!app/components/Colors','cs!app/components/Audio','text!app/shaders/BasicNoise.vert','text!app/shaders/BasicNoise.frag'],function(require) {
+    var AnimatedObject, Audio, Colors, RNG, ShaderFragement, ShaderVertex, THREE, TweenMax, _;
     _ = require('lodash');
     THREE = require('threejs');
     RNG = require('rng');
     TweenMax = require('TweenMax');
-    TimelineMax = require('TimelineMax');
     Colors = require('cs!app/components/Colors');
     Audio = require('cs!app/components/Audio');
     ShaderVertex = require('text!app/shaders/BasicNoise.vert');
     ShaderFragement = require('text!app/shaders/BasicNoise.frag');
-    return AnimatedCircle = (function() {
-      AnimatedCircle.circleGeom = new THREE.CircleGeometry(10, 30, 0, Math.PI * 2);
+    return AnimatedObject = (function() {
+      AnimatedObject.circleGeom = new THREE.CircleGeometry(10, 30, 0, Math.PI * 2);
 
-      AnimatedCircle.ringGeom = new THREE.RingGeometry(10 - 1, 10 + 1, 30, 1, 0, Math.PI * 2);
+      AnimatedObject.ringGeom = new THREE.RingGeometry(10 - 1, 10 + 1, 30, 1, 0, Math.PI * 2);
 
-      AnimatedCircle.ringGeom2 = new THREE.RingGeometry(10 - 1, 10, 30, 1, 0, Math.PI * 2);
+      AnimatedObject.ringGeom2 = new THREE.RingGeometry(10 - 1, 10, 30, 1, 0, Math.PI * 2);
 
-      AnimatedCircle.properties = {
+      AnimatedObject.properties = {
         size: {
           name: 'size',
           label: 'size',
@@ -53747,10 +53319,25 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
           name: 'z',
           label: 'z',
           val: 0
+        },
+        randRotZ: {
+          name: 'randRotZ',
+          label: 'random rotation z',
+          val: 0
+        },
+        randScaleX: {
+          name: 'randScaleX',
+          label: 'random scale x',
+          val: 0
+        },
+        randScaleY: {
+          name: 'randScaleY',
+          label: 'random scale y',
+          val: 0
         }
       };
 
-      function AnimatedCircle(values, time) {
+      function AnimatedObject(values, time) {
         var key, prop, tween, _ref;
         this.values = values != null ? values : {};
         if (time == null) {
@@ -53758,7 +53345,7 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
         }
         this.renderOutline = __bind(this.renderOutline, this);
         this.renderCircle = __bind(this.renderCircle, this);
-        _ref = AnimatedCircle.properties;
+        _ref = AnimatedObject.properties;
         for (key in _ref) {
           prop = _ref[key];
           if (this.values[key] == null) {
@@ -53768,6 +53355,7 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
         this.container = new THREE.Object3D();
         this.container.scale.set(0.001, 0.001, 0.001);
         this.container.position.set(this.values.x, this.values.y, this.values.z);
+        this.container.rotation.set(0, 0, this.values.randRotZ);
         this.materials = [];
         this.start = Date.now();
         this.offset = new THREE.Vector3();
@@ -53808,7 +53396,18 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
         }
       }
 
-      AnimatedCircle.prototype.destroy = function() {
+      AnimatedObject.prototype.getGeometry = function() {
+        return AnimatedObject.circleGeom;
+      };
+
+      AnimatedObject.prototype.getGeometryOutline = function(outlineWidth) {
+        if (outlineWidth < 1) {
+          return AnimatedObject.ringGeom;
+        }
+        return AnimatedObject.ringGeom2;
+      };
+
+      AnimatedObject.prototype.destroy = function() {
         var child, _i, _len, _ref;
         this.timeline.clear();
         _ref = this.container.children;
@@ -53819,12 +53418,16 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
         return this.container = null;
       };
 
-      AnimatedCircle.prototype.getMaterial = function(color) {
+      AnimatedObject.prototype.getMaterial = function(color) {
         var material, uniforms;
         uniforms = {
           time: {
             type: 'f',
             value: 0.0
+          },
+          strength: {
+            type: 'f',
+            value: 0.2
           },
           color: {
             type: 'c',
@@ -53843,7 +53446,7 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
         return material;
       };
 
-      AnimatedCircle.prototype.update = function(seconds, progression) {
+      AnimatedObject.prototype.update = function(seconds, progression) {
         var material, scale, timeDiff, _i, _len, _ref;
         this.container.position.add(this.velocity);
         this.velocity = this.velocity.multiplyScalar(0.94);
@@ -53852,33 +53455,30 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           material = _ref[_i];
           material.uniforms['time'].value = 0.00025 * timeDiff;
+          material.uniforms['strength'].value = window.audio.mid;
         }
         scale = this.animatedProperties.scale * this.values.size * 0.1;
-        return this.container.scale.set(scale, scale, scale);
+        return this.container.scale.set(scale * (1 + this.values.randScaleX), scale * (1 + this.values.randScaleY), scale);
       };
 
-      AnimatedCircle.prototype.renderCircle = function(size, color) {
-        var material, numSegments, object;
+      AnimatedObject.prototype.renderCircle = function(size, color) {
+        var material, object;
         material = this.getMaterial(color);
         this.materials.push(material);
-        numSegments = parseInt(size / 1.5, 10) + 4;
-        object = new THREE.Mesh(AnimatedCircle.circleGeom, material);
+        object = new THREE.Mesh(this.getGeometry(), material);
         return this.container.add(object);
       };
 
-      AnimatedCircle.prototype.renderOutline = function(size, color, outlineWidth) {
+      AnimatedObject.prototype.renderOutline = function(size, color, outlineWidth) {
         var geom, material, object;
-        geom = AnimatedCircle.ringGeom;
-        if (outlineWidth > 1) {
-          geom = AnimatedCircle.ringGeom2;
-        }
+        geom = this.getGeometryOutline(outlineWidth);
         material = this.getMaterial(color);
         this.materials.push(material);
         object = new THREE.Mesh(geom, material);
         return this.container.add(object);
       };
 
-      return AnimatedCircle;
+      return AnimatedObject;
 
     })();
   });
@@ -53887,20 +53487,61 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
 
 
 (function() {
-  define('cs!app/elements/Circles',['require','lodash','threejs','rng','TimelineMax','cs!app/components/Colors','cs!app/elements/AnimatedCircle'],function(require) {
-    var AnimatedCircle, Circles, Colors, RNG, THREE, TimelineMax, _;
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  define('cs!app/elements/AnimatedCircle',['require','lodash','threejs','cs!app/elements/AnimatedObject'],function(require) {
+    var AnimatedCircle, AnimatedObject, THREE, _;
+    _ = require('lodash');
+    THREE = require('threejs');
+    AnimatedObject = require('cs!app/elements/AnimatedObject');
+    return AnimatedCircle = (function(_super) {
+      __extends(AnimatedCircle, _super);
+
+      AnimatedCircle.circleGeom = new THREE.CircleGeometry(10, 30, 0, Math.PI * 2);
+
+      AnimatedCircle.ringGeom = new THREE.RingGeometry(10 - 1, 10 + 1, 30, 1, 0, Math.PI * 2);
+
+      AnimatedCircle.ringGeom2 = new THREE.RingGeometry(10 - 1, 10, 30, 1, 0, Math.PI * 2);
+
+      function AnimatedCircle() {
+        AnimatedCircle.__super__.constructor.apply(this, arguments);
+      }
+
+      AnimatedCircle.prototype.getGeometry = function() {
+        return AnimatedCircle.circleGeom;
+      };
+
+      AnimatedCircle.prototype.getGeometryOutline = function(outlineWidth) {
+        if (outlineWidth < 1) {
+          return AnimatedCircle.ringGeom;
+        }
+        return AnimatedCircle.ringGeom2;
+      };
+
+      return AnimatedCircle;
+
+    })(AnimatedObject);
+  });
+
+}).call(this);
+
+
+(function() {
+  define('cs!app/elements/SpreadedObjects',['require','lodash','threejs','rng','TweenMax','cs!app/components/Colors'],function(require) {
+    var Colors, RNG, SpreadedObjects, THREE, TweenMax, _;
     _ = require('lodash');
     THREE = require('threejs');
     RNG = require('rng');
-    TimelineMax = require('TimelineMax');
+    TweenMax = require('TweenMax');
     Colors = require('cs!app/components/Colors');
-    AnimatedCircle = require('cs!app/elements/AnimatedCircle');
-    return Circles = (function() {
-      Circles.properties = {
+    return SpreadedObjects = (function() {
+      SpreadedObjects.properties = {
         numItems: {
           name: 'numItems',
           label: 'num items',
-          val: 20
+          val: 20,
+          triggerRebuild: true
         },
         seed: {
           name: 'seed',
@@ -53908,10 +53549,41 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
           val: 12002,
           triggerRebuild: true
         },
-        radius: {
-          name: 'radius',
-          label: 'radius',
-          val: 80
+        randX: {
+          name: 'randX',
+          label: 'random x',
+          val: 80,
+          triggerRebuild: true
+        },
+        randY: {
+          name: 'randY',
+          label: 'random y',
+          val: 80,
+          triggerRebuild: true
+        },
+        randZ: {
+          name: 'randZ',
+          label: 'random z',
+          val: 0,
+          triggerRebuild: true
+        },
+        randRotZ: {
+          name: 'randRotZ',
+          label: 'random rotation z',
+          val: 0,
+          triggerRebuild: true
+        },
+        randScaleX: {
+          name: 'randScaleX',
+          label: 'random scale x',
+          val: 0,
+          triggerRebuild: true
+        },
+        randScaleY: {
+          name: 'randScaleY',
+          label: 'random scale y',
+          val: 0,
+          triggerRebuild: true
         },
         circleRadius: {
           name: 'circleRadius',
@@ -53926,7 +53598,9 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
         progression: {
           name: 'progression',
           label: 'progression',
-          val: 1
+          val: 1,
+          min: 0,
+          max: 2
         },
         depth: {
           name: 'depth',
@@ -53953,13 +53627,36 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
           name: 'z',
           label: 'z',
           val: 0
+        },
+        rotX: {
+          name: 'rotX',
+          label: 'rotation x',
+          val: 0
+        },
+        rotY: {
+          name: 'rotY',
+          label: 'rotation y',
+          val: 0
+        },
+        rotZ: {
+          name: 'rotZ',
+          label: 'rotation z',
+          val: 0
         }
       };
 
-      function Circles(values, time) {
+      function SpreadedObjects(values, time) {
+        var key, prop, _ref;
         this.values = values != null ? values : {};
         if (time == null) {
           time = 0;
+        }
+        _ref = SpreadedObjects.properties;
+        for (key in _ref) {
+          prop = _ref[key];
+          if (this.values[key] == null) {
+            this.values[key] = prop.val;
+          }
         }
         this.timeline = new TimelineMax();
         this.container = new THREE.Object3D();
@@ -53970,7 +53667,11 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
         this.build(time);
       }
 
-      Circles.prototype.buildCache = function() {
+      SpreadedObjects.prototype.getItemClass = function() {
+        return AnimatedCircle;
+      };
+
+      SpreadedObjects.prototype.buildCache = function() {
         var cache, key, prop, _ref;
         cache = {};
         _ref = this.values;
@@ -53981,17 +53682,18 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
         return cache;
       };
 
-      Circles.prototype.rebuild = function(time) {
+      SpreadedObjects.prototype.rebuild = function(time) {
         this.empty();
         return this.build(time);
       };
 
-      Circles.prototype.empty = function() {
+      SpreadedObjects.prototype.empty = function() {
         var item, _i, _len, _ref;
         if (!this.items || !this.items.length) {
           return;
         }
         this.timeline.clear();
+        this.items_position = [];
         _ref = this.items;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           item = _ref[_i];
@@ -54001,8 +53703,8 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
         return this.items = [];
       };
 
-      Circles.prototype.build = function(time) {
-        var border_radius, color, delay, draw_circle, draw_outline, duration, fillColor, i, item, pos, rndtype, size, x, y, z, _i, _ref;
+      SpreadedObjects.prototype.build = function(time) {
+        var border_radius, color, delay, draw_circle, draw_outline, duration, fillColor, i, item, itemClass, pos, randRotZ, randScaleX, randScaleY, rndtype, size, x, y, z, _i, _ref;
         if (time == null) {
           time = 0;
         }
@@ -54010,16 +53712,29 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
         this.rngAnimation = new RNG(this.values.seed + "lorem");
         this.rngOutline = new RNG(this.values.seed);
         for (i = _i = 0, _ref = this.values.numItems - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+          itemClass = this.getItemClass();
+          rndtype = this.rng.random(0, 1000) / 1000;
+          draw_outline = rndtype < 0.8 ? true : false;
+          draw_circle = rndtype > 0.5 ? true : false;
+          if (itemClass.noOutline) {
+            draw_outline = false;
+            draw_circle = true;
+          }
           color = Colors.get(this.rng.random(0, 1000));
           if (this.rng.random(0, 1000) > this.values.percent_color * 1000) {
             color = Colors.get(0);
           }
-          fillColor = color.clone().multiplyScalar(this.rng.random(0.1, 0.5));
-          rndtype = this.rng.random(0, 1000) / 1000;
+          fillColor = color.clone();
+          if (draw_outline) {
+            fillColor.multiplyScalar(this.rng.random(0.1, 0.5));
+          }
           size = this.rng.random(this.values.circleRadius, this.values.circleRadiusMax);
-          x = this.getRandomPosition();
-          y = this.getRandomPosition();
-          z = this.getRandomPosition();
+          x = this.getRandomPosition(this.values.randX);
+          y = this.getRandomPosition(this.values.randY);
+          z = this.getRandomPosition(this.values.randZ);
+          randRotZ = this.rng.random(0, 1000) / 1000 * Math.PI * this.values.randRotZ;
+          randScaleX = this.rng.random(0, 1000) / 1000 * this.values.randScaleX;
+          randScaleY = this.rng.random(0, 1000) / 1000 * this.values.randScaleY;
           pos = {
             x: x,
             y: y,
@@ -54029,12 +53744,10 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
           duration = this.rngAnimation.random(600, 800) / 1000;
           duration *= 4;
           border_radius = this.rngOutline.random(1, 400) / 100;
-          draw_outline = rndtype < 0.8 ? true : false;
-          draw_circle = rndtype > 0.5 ? true : false;
           if (draw_outline === false) {
             fillColor.multiplyScalar(3);
           }
-          item = new AnimatedCircle({
+          item = new itemClass({
             size: size,
             outlineWidth: border_radius,
             drawOutline: draw_outline,
@@ -54046,7 +53759,10 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
             depth: this.values.depth,
             x: pos.x,
             y: pos.y,
-            z: pos.z
+            z: pos.z,
+            randRotZ: randRotZ,
+            randScaleX: randScaleX,
+            randScaleY: randScaleY
           });
           this.container.add(item.container);
           this.timeline.add(item.timeline, 0);
@@ -54057,7 +53773,7 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
         return this.update(time, this.values, true);
       };
 
-      Circles.prototype.valueChanged = function(key, values) {
+      SpreadedObjects.prototype.valueChanged = function(key, values) {
         var has_changed, new_val;
         if (values[key] == null) {
           return false;
@@ -54071,7 +53787,11 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
         return has_changed;
       };
 
-      Circles.prototype.update = function(seconds, values, force) {
+      SpreadedObjects.prototype.degreeToRadian = function(degree) {
+        return Math.PI * degree / 180;
+      };
+
+      SpreadedObjects.prototype.update = function(seconds, values, force) {
         var item, key, needs_rebuild, pos, progression, prop, _i, _j, _len, _len1, _ref, _ref1, _ref2;
         if (values == null) {
           values = false;
@@ -54083,7 +53803,7 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
           values = this.values;
         }
         needs_rebuild = false;
-        _ref = Circles.properties;
+        _ref = SpreadedObjects.properties;
         for (key in _ref) {
           prop = _ref[key];
           if (prop.triggerRebuild && this.valueChanged(key, values)) {
@@ -54092,6 +53812,9 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
         }
         if (force || this.valueChanged("x", values) || this.valueChanged("y", values) || this.valueChanged("z", values)) {
           this.container.position.set(values.x, values.y, values.z);
+        }
+        if (force || this.valueChanged("rotX", values) || this.valueChanged("rotY", values) || this.valueChanged("rotZ", values)) {
+          this.container.rotation.set(this.degreeToRadian(values.rotX), this.degreeToRadian(values.rotY), this.degreeToRadian(values.rotZ));
         }
         progression = values.progression / 2;
         this.timeline.seek(this.totalDuration * progression);
@@ -54110,16 +53833,20 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
             item.container.position.set(pos.x, pos.y, pos.z * values.depth);
           }
         }
+        this.values = _.merge(this.values, values);
         if (needs_rebuild === true) {
           return this.rebuild(seconds);
         }
       };
 
-      Circles.prototype.getRandomPosition = function() {
-        return this.rng.random(-this.values.radius, this.values.radius);
+      SpreadedObjects.prototype.getRandomPosition = function(scale) {
+        if (scale == null) {
+          scale = 1;
+        }
+        return this.rng.random(-scale, scale);
       };
 
-      Circles.prototype.destroy = function() {
+      SpreadedObjects.prototype.destroy = function() {
         if (this.container) {
           if (this.container.parent) {
             this.container.parent.remove(this.container);
@@ -54131,7 +53858,7 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
         return delete this.cache;
       };
 
-      return Circles;
+      return SpreadedObjects;
 
     })();
   });
@@ -54140,17 +53867,199 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
 
 
 (function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  define('cs!app/elements/Circles',['require','cs!app/elements/AnimatedCircle','cs!app/elements/SpreadedObjects'],function(require) {
+    var AnimatedCircle, Circles, SpreadedObjects;
+    AnimatedCircle = require('cs!app/elements/AnimatedCircle');
+    SpreadedObjects = require('cs!app/elements/SpreadedObjects');
+    return Circles = (function(_super) {
+      __extends(Circles, _super);
+
+      function Circles() {
+        return Circles.__super__.constructor.apply(this, arguments);
+      }
+
+      Circles.prototype.getItemClass = function() {
+        return AnimatedCircle;
+      };
+
+      return Circles;
+
+    })(SpreadedObjects);
+  });
+
+}).call(this);
+
+
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  define('cs!app/elements/AnimatedBox',['require','lodash','threejs','cs!app/elements/AnimatedObject'],function(require) {
+    var AnimatedBox, AnimatedObject, THREE, _;
+    _ = require('lodash');
+    THREE = require('threejs');
+    AnimatedObject = require('cs!app/elements/AnimatedObject');
+    return AnimatedBox = (function(_super) {
+      __extends(AnimatedBox, _super);
+
+      AnimatedBox.circleGeom = new THREE.CircleGeometry(10, 4, 0, Math.PI * 2);
+
+      AnimatedBox.ringGeom = new THREE.RingGeometry(10 - 1, 10 + 1, 4, 1, 0, Math.PI * 2);
+
+      AnimatedBox.ringGeom2 = new THREE.RingGeometry(10 - 1, 10, 4, 1, 0, Math.PI * 2);
+
+      function AnimatedBox() {
+        AnimatedBox.__super__.constructor.apply(this, arguments);
+      }
+
+      AnimatedBox.prototype.getGeometry = function() {
+        return AnimatedBox.circleGeom;
+      };
+
+      AnimatedBox.prototype.getGeometryOutline = function(outlineWidth) {
+        if (outlineWidth < 1) {
+          return AnimatedBox.ringGeom;
+        }
+        return AnimatedBox.ringGeom2;
+      };
+
+      return AnimatedBox;
+
+    })(AnimatedObject);
+  });
+
+}).call(this);
+
+
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  define('cs!app/elements/Boxes',['require','cs!app/elements/AnimatedBox','cs!app/elements/SpreadedObjects'],function(require) {
+    var AnimatedBox, Boxes, SpreadedObjects;
+    AnimatedBox = require('cs!app/elements/AnimatedBox');
+    SpreadedObjects = require('cs!app/elements/SpreadedObjects');
+    return Boxes = (function(_super) {
+      __extends(Boxes, _super);
+
+      function Boxes() {
+        return Boxes.__super__.constructor.apply(this, arguments);
+      }
+
+      Boxes.prototype.getItemClass = function() {
+        return AnimatedBox;
+      };
+
+      return Boxes;
+
+    })(SpreadedObjects);
+  });
+
+}).call(this);
+
+
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  define('cs!app/elements/AnimatedLine',['require','lodash','threejs','cs!app/elements/AnimatedObject'],function(require) {
+    var AnimatedLine, AnimatedObject, THREE, _;
+    _ = require('lodash');
+    THREE = require('threejs');
+    AnimatedObject = require('cs!app/elements/AnimatedObject');
+    return AnimatedLine = (function(_super) {
+      __extends(AnimatedLine, _super);
+
+      AnimatedLine.circleGeom = new THREE.PlaneGeometry(100, 1);
+
+      AnimatedLine.ringGeom = false;
+
+      AnimatedLine.ringGeom2 = false;
+
+      AnimatedLine.noOutline = true;
+
+      function AnimatedLine() {
+        AnimatedLine.__super__.constructor.apply(this, arguments);
+      }
+
+      AnimatedLine.prototype.getGeometry = function() {
+        return AnimatedLine.circleGeom;
+      };
+
+      AnimatedLine.prototype.getGeometryOutline = function(outlineWidth) {
+        return false;
+      };
+
+      AnimatedLine.prototype.update = function(seconds, progression) {
+        var material, scale, timeDiff, _i, _len, _ref;
+        this.container.position.add(this.velocity);
+        this.velocity = this.velocity.multiplyScalar(0.94);
+        timeDiff = Date.now() - this.start;
+        _ref = this.materials;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          material = _ref[_i];
+          material.uniforms['time'].value = 0.00025 * timeDiff;
+        }
+        scale = this.animatedProperties.scale * this.values.size * 0.1;
+        return this.container.scale.set(1, scale, 1);
+      };
+
+      return AnimatedLine;
+
+    })(AnimatedObject);
+  });
+
+}).call(this);
+
+
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  define('cs!app/elements/Lines',['require','cs!app/elements/AnimatedLine','cs!app/elements/SpreadedObjects'],function(require) {
+    var AnimatedLine, Lines, SpreadedObjects;
+    AnimatedLine = require('cs!app/elements/AnimatedLine');
+    SpreadedObjects = require('cs!app/elements/SpreadedObjects');
+    return Lines = (function(_super) {
+      __extends(Lines, _super);
+
+      function Lines() {
+        return Lines.__super__.constructor.apply(this, arguments);
+      }
+
+      Lines.prototype.getItemClass = function() {
+        return AnimatedLine;
+      };
+
+      return Lines;
+
+    })(SpreadedObjects);
+  });
+
+}).call(this);
+
+
+(function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/components/ElementFactory',['require','cs!app/elements/Camera','cs!app/elements/Circles'],function(require) {
-    var Camera, Circles, ElementFactory, extend;
+  define('cs!app/components/ElementFactory',['require','cs!app/elements/Camera','cs!app/elements/Circles','cs!app/elements/Boxes','cs!app/elements/Lines'],function(require) {
+    var Boxes, Camera, Circles, ElementFactory, Lines, extend;
     Camera = require('cs!app/elements/Camera');
     Circles = require('cs!app/elements/Circles');
+    Boxes = require('cs!app/elements/Boxes');
+    Lines = require('cs!app/elements/Lines');
     extend = function(object, properties) {
       var key, val;
       for (key in properties) {
         val = properties[key];
-        object[key] = val;
+        if (typeof object[key] === 'object' && object[key] !== null) {
+          object[key] = extend({}, val);
+        } else {
+          object[key] = val;
+        }
       }
       return object;
     };
@@ -54161,25 +54070,41 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
 
       ElementFactory.elements = {
         Circles: {
-          classObject: Circles,
-          create: function(values, time) {
-            var item;
-            item = new Circles(values);
-            return item;
-          }
+          classObject: Circles
+        },
+        Boxes: {
+          classObject: Boxes
+        },
+        Lines: {
+          classObject: Lines
         },
         Camera: {
-          classObject: Camera,
-          create: function(values, time) {
-            var item;
-            item = new Camera(values);
-            return item;
-          }
+          classObject: Camera
         }
       };
 
       ElementFactory.prototype.getTypeClass = function(itemType) {
         return ElementFactory.elements[itemType].classObject;
+      };
+
+      ElementFactory.getTypeProperties = function(itemName) {
+        var element_class, item, key, prop, prop_definition, properties, _ref;
+        item = ElementFactory.elements[itemName];
+        if (item) {
+          element_class = item.classObject;
+          if (element_class) {
+            properties = [];
+            _ref = item.classObject.properties;
+            for (key in _ref) {
+              prop_definition = _ref[key];
+              prop = extend({}, prop_definition);
+              prop.keys = [];
+              properties.push(prop);
+            }
+            console.log(properties);
+            return properties;
+          }
+        }
       };
 
       ElementFactory.prototype.create = function(itemName, values, time) {
@@ -54189,9 +54114,7 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
           console.warn("Can't create item: " + itemName);
           return false;
         }
-        console.log("will create a " + itemName);
-        console.log(values);
-        return item.create(values, time);
+        return new item.classObject(values);
       };
 
       return ElementFactory;
@@ -54204,137 +54127,48 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
 
 
 (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
-  define('cs!app/components/Orchestrator',['require','cs!app/components/ElementFactory','lodash','TweenMax','TimelineMax'],function(require) {
-    var ElementFactory, Orchestrator, TimelineMax, TweenMax, _;
-    ElementFactory = require('cs!app/components/ElementFactory');
+  define('cs!app/components/DataNormalizer',['require','lodash','cs!app/components/ElementFactory'],function(require) {
+    var DataNormalizer, ElementFactory, _;
     _ = require('lodash');
-    TweenMax = require('TweenMax');
-    TimelineMax = require('TimelineMax');
-    return Orchestrator = (function() {
-      function Orchestrator(timer, data, scene, defaultCamera) {
-        this.timer = timer;
-        this.data = data;
-        this.scene = scene;
-        this.defaultCamera = defaultCamera;
-        this.update = __bind(this.update, this);
-        this.factory = new ElementFactory();
-        this.mainTimeline = new TimelineMax({
-          paused: true
-        });
-        this.mainTimeline.duration(this.timer.totalDuration / 1000);
-        this.timer.updated.add(this.update);
-        this.update(0);
-      }
+    ElementFactory = require('cs!app/components/ElementFactory');
+    return DataNormalizer = (function() {
+      function DataNormalizer() {}
 
-      Orchestrator.prototype.update = function(timestamp) {
-        var activeCamera, el, first_key, item, item_property, key, key_index, next_key, propName, property, propertyTimeline, seconds, should_exist, tween, tween_duration, tween_time, type, val, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3;
-        activeCamera = this.defaultCamera;
-        seconds = timestamp / 1000;
-        _ref = this.data;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          item = _ref[_i];
-          should_exist = seconds >= item.start && seconds <= item.end ? true : false;
-          if ((item.object && should_exist === false) || item.isDirtyObject) {
-            item.isDirtyObject = false;
-            if (item.object) {
-              this.scene.remove(item.object.container);
-              item.object.destroy();
-              delete item.object;
+      DataNormalizer.normalizeItem = function(data_item, factory) {
+        var existing_prop, key, key2, new_prop, static_prop, static_properties, value2;
+        if (!data_item.classObject) {
+          data_item.classObject = factory.getTypeClass(data_item.type);
+        }
+        static_properties = data_item.classObject.properties;
+        if (!static_properties) {
+          return;
+        }
+        for (key in static_properties) {
+          static_prop = static_properties[key];
+          existing_prop = _.find(data_item.properties, function(prop) {
+            return prop.name === static_prop.name;
+          });
+          if (!existing_prop) {
+            new_prop = {};
+            for (key2 in static_prop) {
+              value2 = static_prop[key2];
+              new_prop[key2] = value2;
             }
-          }
-          if (should_exist === false) {
-            continue;
-          }
-          if (!item.classObject) {
-            item.classObject = this.factory.getTypeClass(item.type);
-          }
-          if (!item.values) {
-            item.values = {};
-            _ref1 = item.classObject.properties;
-            for (key in _ref1) {
-              property = _ref1[key];
-              item_property = _.find(item.properties, function(prop) {
-                return prop.name === key;
-              });
-              if (!item_property) {
-                item_property = {
-                  keys: [],
-                  name: property.name,
-                  val: property.val
-                };
-                item.properties.push(item_property);
-              }
-              if (item_property.keys.length) {
-                item_property.val = item_property.keys[0].val;
-              }
-              item.values[property.name] = item_property.val;
-            }
-          }
-          if (!item.timeline) {
-            item.timeline = new TimelineMax();
-            this.mainTimeline.add(item.timeline, 0);
-            item.isDirty = true;
-          }
-          if (item.timeline && item.isDirty && item.properties) {
-            console.log("dirty timeline");
-            console.log(item);
-            item.isDirty = false;
-            item.timeline.clear();
-            _ref2 = item.properties;
-            for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
-              property = _ref2[_j];
-              propertyTimeline = new TimelineMax();
-              propName = property.name;
-              first_key = property.keys.length > 0 ? property.keys[0] : false;
-              tween_time = 0;
-              if (first_key) {
-                tween_time = Math.min(-1, first_key.time - 0.1);
-              }
-              tween_duration = 0;
-              val = {};
-              val[propName] = first_key ? first_key.val : property.val;
-              tween = TweenLite.to(item.values, tween_duration, val);
-              propertyTimeline.add(tween, tween_time);
-              _ref3 = property.keys;
-              for (key_index = _k = 0, _len2 = _ref3.length; _k < _len2; key_index = ++_k) {
-                key = _ref3[key_index];
-                if (key_index < property.keys.length - 1) {
-                  next_key = property.keys[key_index + 1];
-                  tween_duration = next_key.time - key.time;
-                  val = {};
-                  val[propName] = next_key.val;
-                  tween = TweenLite.to(item.values, tween_duration, val);
-                  propertyTimeline.add(tween, key.time);
-                }
-              }
-              item.timeline.add(propertyTimeline, 0);
-            }
-            seconds = seconds - 0.0000001;
-          }
-          if (should_exist && !item.object) {
-            type = item.type;
-            el = this.factory.create(type, item.values, seconds - item.start);
-            this.scene.add(el.container);
-            item.object = el;
-          }
-          if (item.object && item.object.isCamera) {
-            activeCamera = item.object.container;
-            window.updateCameraAspect(activeCamera);
-          }
-          if (item.object) {
-            item.object.update(seconds - item.start, item.values);
+            new_prop.keys = [];
+            data_item.properties.push(new_prop);
           }
         }
-        window.activeCamera = activeCamera;
-        if (window.renderModel) {
-          window.renderModel.camera = activeCamera;
-        }
-        return this.mainTimeline.seek(seconds);
+        return data_item;
       };
 
-      return Orchestrator;
+      DataNormalizer.normalizeData = function(data, factory) {
+        data = _.map(data, function(item) {
+          return DataNormalizer.normalizeItem(item, factory);
+        });
+        return data;
+      };
+
+      return DataNormalizer;
 
     })();
   });
@@ -54342,20 +54176,22 @@ define('text!app/shaders/BasicNoise.frag',[],function () { return 'varying vec2 
 }).call(this);
 
 
-define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\n    "type": "Circles",\n    "label": "Test circles",\n    "start": 0,\n    "end": 2,\n    "collapsed": true,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0,\n        "keys": [\n          {\n            "time": 0,\n            "val": 0\n          },\n          {\n            "time": 1.3379999999999999,\n            "val": 1\n          },\n          {\n            "time": 2,\n            "val": 2\n          }\n        ]\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 2\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 8464\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 84\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "depth",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "percent_color",\n        "val": 0\n      }\n    ]\n  },\n  {\n    "id": "item2",\n    "type": "Circles",\n    "label": "Circles 2",\n    "start": 0.793,\n    "end": 4.800000000000006,\n    "collapsed": true,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0,\n        "keys": [\n          {\n            "time": 1.021,\n            "val": 0\n          },\n          {\n            "time": 1.9579999999999993,\n            "val": 1\n          },\n          {\n            "time": 2.2789999999999995,\n            "val": 1\n          },\n          {\n            "time": 4.435000000000008,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 5\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": -456453\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 265\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 3\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 50\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 70\n      },\n      {\n        "keys": [],\n        "name": "depth",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "percent_color",\n        "val": 0\n      }\n    ]\n  },\n  {\n    "id": "item3",\n    "type": "Circles",\n    "label": "Circles 3",\n    "start": 4.514,\n    "end": 12.172,\n    "collapsed": true,\n    "properties": [\n      {\n        "name": "progression",\n        "val": 0,\n        "keys": [\n          {\n            "time": 4.7250000000000005,\n            "val": 0\n          },\n          {\n            "time": 5.614999999999998,\n            "val": 0.5\n          },\n          {\n            "time": 11.668999999999995,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "name": "x",\n        "val": 100,\n        "keys": [\n          {\n            "time": 4.795000000000001,\n            "val": 100\n          }\n        ]\n      },\n      {\n        "name": "y",\n        "val": 0,\n        "keys": [\n          {\n            "time": 5.110000000000001,\n            "val": 0\n          }\n        ]\n      },\n      {\n        "name": "z",\n        "val": 120,\n        "keys": []\n      },\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 5\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 12002\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 80\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      },\n      {\n        "keys": [],\n        "name": "depth",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "percent_color",\n        "val": 0\n      }\n    ]\n  },\n  {\n    "id": "item4",\n    "type": "Circles",\n    "label": "Circles 4",\n    "start": 5.235,\n    "end": 11.328,\n    "collapsed": false,\n    "properties": [\n      {\n        "keys": [],\n        "name": "numItems",\n        "val": 5\n      },\n      {\n        "keys": [],\n        "name": "seed",\n        "val": 1325\n      },\n      {\n        "keys": [],\n        "name": "radius",\n        "val": 150\n      },\n      {\n        "keys": [],\n        "name": "circleRadius",\n        "val": 10\n      },\n      {\n        "keys": [],\n        "name": "circleRadiusMax",\n        "val": 20\n      },\n      {\n        "keys": [\n          {\n            "time": 5.235,\n            "val": 0\n          },\n          {\n            "time": 6.085000000000001,\n            "val": 1\n          },\n          {\n            "time": 11.049000000000001,\n            "val": 0\n          }\n        ],\n        "name": "progression",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "x",\n        "val": -100\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "depth",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "percent_color",\n        "val": 0.4\n      }\n    ]\n  },\n  {\n    "id": "item5",\n    "type": "Camera",\n    "label": "Camera 5",\n    "start": 0,\n    "end": 10.136,\n    "collapsed": false,\n    "properties": [\n      {\n        "keys": [\n          {\n            "time": 0,\n            "val": 200\n          },\n          {\n            "time": 10.098,\n            "val": 20\n          }\n        ],\n        "name": "x",\n        "val": 200\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 0\n      },\n      {\n        "keys": [\n          {\n            "time": 0,\n            "val": 600\n          },\n          {\n            "time": 10.098,\n            "val": 350\n          }\n        ],\n        "name": "z",\n        "val": 600\n      },\n      {\n        "keys": [\n          {\n            "time": 0,\n            "val": 60\n          },\n          {\n            "time": 10.098,\n            "val": 37\n          }\n        ],\n        "name": "target_x",\n        "val": 60\n      },\n      {\n        "keys": [],\n        "name": "target_y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "target_z",\n        "val": 0\n      }\n    ]\n  },\n  {\n    "id": "item6",\n    "type": "Camera",\n    "label": "Camera 6",\n    "start": 10.13,\n    "end": 14.156,\n    "collapsed": false,\n    "properties": [\n      {\n        "keys": [],\n        "name": "x",\n        "val": -20\n      },\n      {\n        "keys": [],\n        "name": "y",\n        "val": 100\n      },\n      {\n        "keys": [],\n        "name": "z",\n        "val": 300\n      },\n      {\n        "keys": [],\n        "name": "target_x",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "target_y",\n        "val": 0\n      },\n      {\n        "keys": [],\n        "name": "target_z",\n        "val": 0\n      }\n    ]\n  }\n]\n';});
+define('text!app/data.json',[],function () { return '{\n  "settings": {\n    "time": 0,\n    "duration": 240,\n    "domain": [\n      0,\n      20000\n    ]\n  },\n  "data": [\n    {\n      "id": "item1",\n      "type": "Circles",\n      "label": "Test circles",\n      "start": 0,\n      "end": 2,\n      "collapsed": true,\n      "properties": [\n        {\n          "name": "progression",\n          "val": 0,\n          "keys": [\n            {\n              "time": 0,\n              "val": 0\n            },\n            {\n              "time": 1.3379999999999999,\n              "val": 1\n            },\n            {\n              "time": 2,\n              "val": 2\n            }\n          ]\n        },\n        {\n          "keys": [],\n          "name": "numItems",\n          "val": 2\n        },\n        {\n          "keys": [],\n          "name": "seed",\n          "val": 8464\n        },\n        {\n          "keys": [],\n          "name": "randX",\n          "val": 84\n        },\n        {\n          "keys": [],\n          "name": "randY",\n          "val": 84\n        },\n        {\n          "keys": [],\n          "name": "circleRadius",\n          "val": 20\n        },\n        {\n          "keys": [],\n          "name": "circleRadiusMax",\n          "val": 20\n        },\n        {\n          "keys": [],\n          "name": "x",\n          "val": 0\n        },\n        {\n          "keys": [],\n          "name": "y",\n          "val": 0\n        },\n        {\n          "keys": [],\n          "name": "z",\n          "val": 0\n        },\n        {\n          "keys": [],\n          "name": "depth",\n          "val": 0\n        },\n        {\n          "keys": [],\n          "name": "percent_color",\n          "val": 0\n        },\n        {\n          "name": "randZ",\n          "label": "random z",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "randRotZ",\n          "label": "random rotation z",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "randScaleX",\n          "label": "random scale x",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "randScaleY",\n          "label": "random scale y",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "rotX",\n          "label": "rotation x",\n          "val": 0,\n          "keys": []\n        },\n        {\n          "name": "rotY",\n          "label": "rotation y",\n          "val": 0,\n          "keys": []\n        },\n        {\n          "name": "rotZ",\n          "label": "rotation z",\n          "val": 0,\n          "keys": []\n        }\n      ],\n      "values": {\n        "progression": 0,\n        "numItems": 2,\n        "seed": 8464,\n        "randX": 84,\n        "randY": 84,\n        "circleRadius": 20,\n        "circleRadiusMax": 20,\n        "x": 0,\n        "y": 0,\n        "z": 0,\n        "depth": 0,\n        "percent_color": 0,\n        "randZ": 0,\n        "randRotZ": 0,\n        "randScaleX": 0,\n        "randScaleY": 0,\n        "rotX": 0,\n        "rotY": 0,\n        "rotZ": 0\n      }\n    },\n    {\n      "id": "item2",\n      "type": "Circles",\n      "label": "Circles 2",\n      "start": 0.793,\n      "end": 4.800000000000006,\n      "collapsed": true,\n      "properties": [\n        {\n          "name": "progression",\n          "val": 0,\n          "keys": [\n            {\n              "time": 1.021,\n              "val": 0\n            },\n            {\n              "time": 1.9579999999999993,\n              "val": 1\n            },\n            {\n              "time": 2.2789999999999995,\n              "val": 1\n            },\n            {\n              "time": 4.435000000000008,\n              "val": 0\n            }\n          ]\n        },\n        {\n          "keys": [],\n          "name": "numItems",\n          "val": 5\n        },\n        {\n          "keys": [],\n          "name": "seed",\n          "val": -456453\n        },\n        {\n          "keys": [],\n          "name": "randX",\n          "val": 265\n        },\n        {\n          "keys": [],\n          "name": "randY",\n          "val": 265\n        },\n        {\n          "keys": [],\n          "name": "circleRadius",\n          "val": 3\n        },\n        {\n          "keys": [],\n          "name": "circleRadiusMax",\n          "val": 50\n        },\n        {\n          "keys": [],\n          "name": "x",\n          "val": 0\n        },\n        {\n          "keys": [],\n          "name": "y",\n          "val": 0\n        },\n        {\n          "keys": [],\n          "name": "z",\n          "val": 70\n        },\n        {\n          "keys": [],\n          "name": "depth",\n          "val": 0\n        },\n        {\n          "keys": [],\n          "name": "percent_color",\n          "val": 0\n        },\n        {\n          "name": "randZ",\n          "label": "random z",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "randRotZ",\n          "label": "random rotation z",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "randScaleX",\n          "label": "random scale x",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "randScaleY",\n          "label": "random scale y",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "rotX",\n          "label": "rotation x",\n          "val": 0,\n          "keys": []\n        },\n        {\n          "name": "rotY",\n          "label": "rotation y",\n          "val": 0,\n          "keys": []\n        },\n        {\n          "name": "rotZ",\n          "label": "rotation z",\n          "val": 0,\n          "keys": []\n        }\n      ],\n      "values": {\n        "progression": 0,\n        "numItems": 5,\n        "seed": -456453,\n        "randX": 265,\n        "randY": 265,\n        "circleRadius": 3,\n        "circleRadiusMax": 50,\n        "x": 0,\n        "y": 0,\n        "z": 70,\n        "depth": 0,\n        "percent_color": 0,\n        "randZ": 0,\n        "randRotZ": 0,\n        "randScaleX": 0,\n        "randScaleY": 0,\n        "rotX": 0,\n        "rotY": 0,\n        "rotZ": 0\n      }\n    },\n    {\n      "id": "item3",\n      "type": "Circles",\n      "label": "Circles 3",\n      "start": 4.514,\n      "end": 12.172,\n      "collapsed": true,\n      "properties": [\n        {\n          "name": "progression",\n          "val": 0,\n          "keys": [\n            {\n              "time": 4.7250000000000005,\n              "val": 0\n            },\n            {\n              "time": 5.614999999999998,\n              "val": 0.5\n            },\n            {\n              "time": 11.668999999999995,\n              "val": 0\n            }\n          ]\n        },\n        {\n          "name": "x",\n          "val": 100,\n          "keys": [\n            {\n              "time": 4.795000000000001,\n              "val": 100\n            }\n          ]\n        },\n        {\n          "name": "y",\n          "val": 0,\n          "keys": [\n            {\n              "time": 5.110000000000001,\n              "val": 0\n            }\n          ]\n        },\n        {\n          "name": "z",\n          "val": 120,\n          "keys": []\n        },\n        {\n          "keys": [],\n          "name": "numItems",\n          "val": 5\n        },\n        {\n          "keys": [],\n          "name": "seed",\n          "val": 12002\n        },\n        {\n          "keys": [],\n          "name": "randX",\n          "val": 80\n        },\n        {\n          "keys": [],\n          "name": "randY",\n          "val": 80\n        },\n        {\n          "keys": [],\n          "name": "circleRadius",\n          "val": 20\n        },\n        {\n          "keys": [],\n          "name": "circleRadiusMax",\n          "val": 20\n        },\n        {\n          "keys": [],\n          "name": "depth",\n          "val": 0\n        },\n        {\n          "keys": [],\n          "name": "percent_color",\n          "val": 0\n        },\n        {\n          "name": "randZ",\n          "label": "random z",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "randRotZ",\n          "label": "random rotation z",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "randScaleX",\n          "label": "random scale x",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "randScaleY",\n          "label": "random scale y",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "rotX",\n          "label": "rotation x",\n          "val": 0,\n          "keys": []\n        },\n        {\n          "name": "rotY",\n          "label": "rotation y",\n          "val": 0,\n          "keys": []\n        },\n        {\n          "name": "rotZ",\n          "label": "rotation z",\n          "val": 0,\n          "keys": []\n        }\n      ],\n      "values": {\n        "progression": 0,\n        "x": 100,\n        "y": 0,\n        "z": 120,\n        "numItems": 5,\n        "seed": 12002,\n        "randX": 80,\n        "randY": 80,\n        "circleRadius": 20,\n        "circleRadiusMax": 20,\n        "depth": 0,\n        "percent_color": 0,\n        "randZ": 0,\n        "randRotZ": 0,\n        "randScaleX": 0,\n        "randScaleY": 0,\n        "rotX": 0,\n        "rotY": 0,\n        "rotZ": 0\n      }\n    },\n    {\n      "id": "item4",\n      "type": "Circles",\n      "label": "Circles 4",\n      "start": 5.235,\n      "end": 11.328,\n      "collapsed": false,\n      "properties": [\n        {\n          "keys": [],\n          "name": "numItems",\n          "val": 5\n        },\n        {\n          "keys": [],\n          "name": "seed",\n          "val": 1325\n        },\n        {\n          "keys": [],\n          "name": "randX",\n          "val": 150\n        },\n        {\n          "keys": [],\n          "name": "randY",\n          "val": 150\n        },\n        {\n          "keys": [],\n          "name": "circleRadius",\n          "val": 10\n        },\n        {\n          "keys": [],\n          "name": "circleRadiusMax",\n          "val": 20\n        },\n        {\n          "keys": [\n            {\n              "time": 5.235,\n              "val": 0\n            },\n            {\n              "time": 6.085000000000001,\n              "val": 1\n            },\n            {\n              "time": 11.049000000000001,\n              "val": 0\n            }\n          ],\n          "name": "progression",\n          "val": 0\n        },\n        {\n          "keys": [],\n          "name": "x",\n          "val": -100\n        },\n        {\n          "keys": [],\n          "name": "y",\n          "val": 0\n        },\n        {\n          "keys": [],\n          "name": "z",\n          "val": 0\n        },\n        {\n          "keys": [],\n          "name": "depth",\n          "val": 0\n        },\n        {\n          "keys": [],\n          "name": "percent_color",\n          "val": 0.4\n        },\n        {\n          "name": "randZ",\n          "label": "random z",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "randRotZ",\n          "label": "random rotation z",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "randScaleX",\n          "label": "random scale x",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "randScaleY",\n          "label": "random scale y",\n          "val": 0,\n          "triggerRebuild": true,\n          "keys": []\n        },\n        {\n          "name": "rotX",\n          "label": "rotation x",\n          "val": 0,\n          "keys": []\n        },\n        {\n          "name": "rotY",\n          "label": "rotation y",\n          "val": 0,\n          "keys": []\n        },\n        {\n          "name": "rotZ",\n          "label": "rotation z",\n          "val": 0,\n          "keys": []\n        }\n      ],\n      "values": {\n        "numItems": 5,\n        "seed": 1325,\n        "randX": 150,\n        "randY": 150,\n        "circleRadius": 10,\n        "circleRadiusMax": 20,\n        "progression": 0,\n        "x": -100,\n        "y": 0,\n        "z": 0,\n        "depth": 0,\n        "percent_color": 0.4,\n        "randZ": 0,\n        "randRotZ": 0,\n        "randScaleX": 0,\n        "randScaleY": 0,\n        "rotX": 0,\n        "rotY": 0,\n        "rotZ": 0\n      }\n    },\n    {\n      "id": "item5",\n      "type": "Camera",\n      "label": "Camera 5",\n      "start": 0,\n      "end": 10.136,\n      "collapsed": false,\n      "properties": [\n        {\n          "keys": [\n            {\n              "time": 0,\n              "val": 200\n            },\n            {\n              "time": 10.098,\n              "val": 20\n            }\n          ],\n          "name": "x",\n          "val": 200\n        },\n        {\n          "keys": [],\n          "name": "y",\n          "val": 0\n        },\n        {\n          "keys": [\n            {\n              "time": 0,\n              "val": 600\n            },\n            {\n              "time": 10.098,\n              "val": 350\n            }\n          ],\n          "name": "z",\n          "val": 600\n        },\n        {\n          "keys": [\n            {\n              "time": 0,\n              "val": 60\n            },\n            {\n              "time": 10.098,\n              "val": 37\n            }\n          ],\n          "name": "target_x",\n          "val": 60\n        },\n        {\n          "keys": [],\n          "name": "target_y",\n          "val": 0\n        },\n        {\n          "keys": [],\n          "name": "target_z",\n          "val": 0\n        },\n        {\n          "name": "fov",\n          "label": "fov",\n          "val": 45,\n          "keys": []\n        }\n      ],\n      "values": {\n        "x": 200,\n        "y": 0,\n        "z": 600,\n        "target_x": 60,\n        "target_y": 0,\n        "target_z": 0,\n        "fov": 45\n      }\n    },\n    {\n      "id": "item6",\n      "type": "Camera",\n      "label": "Camera 6",\n      "start": 10.13,\n      "end": 14.156,\n      "collapsed": false,\n      "properties": [\n        {\n          "keys": [],\n          "name": "x",\n          "val": -20\n        },\n        {\n          "keys": [],\n          "name": "y",\n          "val": 100\n        },\n        {\n          "keys": [],\n          "name": "z",\n          "val": 300\n        },\n        {\n          "keys": [],\n          "name": "target_x",\n          "val": 0\n        },\n        {\n          "keys": [],\n          "name": "target_y",\n          "val": 0\n        },\n        {\n          "keys": [],\n          "name": "target_z",\n          "val": 0\n        },\n        {\n          "name": "fov",\n          "label": "fov",\n          "val": 45,\n          "keys": []\n        }\n      ],\n      "values": {\n        "x": -20,\n        "y": 100,\n        "z": 300,\n        "target_x": 0,\n        "target_y": 0,\n        "target_z": 0,\n        "fov": 45\n      }\n    }\n  ]\n}\n';});
 
 
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define('cs!app/Main',['require','threejs','cs!app/components/Background','cs!app/components/PostFX','cs!app/components/Timer','cs!app/components/Orchestrator','cs!app/components/Audio','text!app/data.json'],function(require) {
-    var App, Audio, Background, Orchestrator, PostFX, THREE, Timer, dataJson;
+  define('cs!app/Main',['require','threejs','TweenTime','cs!app/components/Background','cs!app/components/PostFX','cs!app/components/SceneManager','cs!app/components/Audio','cs!app/components/ElementFactory','cs!app/components/DataNormalizer','text!app/data.json'],function(require) {
+    var App, Audio, Background, DataNormalizer, ElementFactory, PostFX, SceneManager, THREE, TweenTime, dataJson;
     THREE = require('threejs');
+    TweenTime = require('TweenTime');
     Background = require('cs!app/components/Background');
     PostFX = require('cs!app/components/PostFX');
-    Timer = require('cs!app/components/Timer');
-    Orchestrator = require('cs!app/components/Orchestrator');
+    SceneManager = require('cs!app/components/SceneManager');
     Audio = require('cs!app/components/Audio');
+    ElementFactory = require('cs!app/components/ElementFactory');
+    DataNormalizer = require('cs!app/components/DataNormalizer');
     dataJson = require('text!app/data.json');
     return App = (function() {
       function App() {
@@ -54363,49 +54199,26 @@ define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\
         this.onWindowResize = __bind(this.onWindowResize, this);
         this.updateCameraAspect = __bind(this.updateCameraAspect, this);
         this.onAudioLoaded = __bind(this.onAudioLoaded, this);
-        var audio_url, container;
-        window.app = this;
+        this.onTimerSeeked = __bind(this.onTimerSeeked, this);
+        this.onTimerStatusChanged = __bind(this.onTimerStatusChanged, this);
+        var audio_url, conf, container, size;
         window.updateCameraAspect = this.updateCameraAspect;
-        this.timer = new Timer();
-        audio_url = 'http://localhost/SpaceTronOnTheGrid CB2.mp3';
+        audio_url = 'http://localhost/Space Tron On The Grid 8.mp3';
         this.audio = new Audio(audio_url, this.onAudioLoaded);
-        this.dataSample = [
-          {
-            id: 'item1',
-            label: 'Test circles',
-            type: 'Circles',
-            start: 1,
-            end: 10,
-            options: {
-              numItems: 12,
-              seed: 12002,
-              radius: 84
-            },
-            properties: [
-              {
-                name: 'progression',
-                keys: [
-                  {
-                    time: 2,
-                    val: 7
-                  }, {
-                    time: 3,
-                    val: 42
-                  }, {
-                    time: 5,
-                    val: -40
-                  }
-                ]
-              }
-            ]
-          }
-        ];
-        this.data = JSON.parse(dataJson);
-        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+        this.factory = new ElementFactory();
+        conf = JSON.parse(dataJson);
+        console.log(conf);
+        this.settings = conf.settings;
+        this.data = DataNormalizer.normalizeData(conf.data, this.factory);
+        this.tweenTime = new TweenTime(this.data);
+        this.tweenTime.timer.statusChanged.add(this.onTimerStatusChanged);
+        this.tweenTime.timer.seeked.add(this.onTimerSeeked);
+        size = this.getScreenSize();
+        this.camera = new THREE.PerspectiveCamera(45, size.width / size.height, 1, 2000);
         this.camera.position.z = 600;
         window.activeCamera = this.camera;
         this.scene = new THREE.Scene();
-        this.orchestrator = new Orchestrator(this.timer, this.data, this.scene, this.camera);
+        this.sceneManager = new SceneManager(this.tweenTime, this.data, this.scene, this.camera, this.factory);
         this.time = Date.now() * 0.0001;
         container = document.createElement('div');
         document.body.appendChild(container);
@@ -54413,14 +54226,26 @@ define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\
           antialias: false,
           alpha: false
         });
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setSize(size.width, size.height);
         this.renderer.setClearColor(0x111111, 1);
         this.createElements();
         container.appendChild(this.renderer.domElement);
         window.addEventListener('resize', this.onWindowResize, false);
-        this.postfx = new PostFX(this.scene, this.camera, this.renderer);
+        this.postfx = new PostFX(this.scene, this.camera, this.renderer, size);
         this.animate();
       }
+
+      App.prototype.onTimerStatusChanged = function(is_playing) {
+        if (is_playing) {
+          return this.audio.play();
+        } else {
+          return this.audio.pause();
+        }
+      };
+
+      App.prototype.onTimerSeeked = function(time) {
+        return this.audio.seek(time / 1000);
+      };
 
       App.prototype.onAudioLoaded = function() {
         console.log("audio loaded");
@@ -54448,7 +54273,7 @@ define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\
         object3.rotation.set(0.17, 0.35, -0.38);
         this.scene.add(object3);
         light1 = new THREE.PointLight(0xffffff, 3, 1400);
-        light1.position.set(100, 100, 200);
+        light1.position.set(100, 300, 200);
         return this.scene.add(light1);
       };
 
@@ -54534,6 +54359,9 @@ define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\
         var delta, newTime;
         newTime = Date.now() * 0.0001;
         delta = newTime - this.time;
+        if (this.particles) {
+          this.particles.update();
+        }
         this.camera.lookAt(this.scene.position);
         this.postfx.render(delta);
         return this.time = newTime;
@@ -54548,7 +54376,6 @@ define('text!app/data.json',[],function () { return '[\n  {\n    "id": "item1",\
 
 // We need to configure cs! and require.js plugins to boot.
 // @see: require-config.js
-
 require.config({
   paths: {
     "coffee-script": "bower_components/coffee-script/extras/coffee-script",
@@ -54558,6 +54385,7 @@ require.config({
 
 require(['cs!app/Main'], function (Main) {
   var app = new Main();
+  window.tweenTime = app.tweenTime;
 });
 
 define("boot", function(){});
