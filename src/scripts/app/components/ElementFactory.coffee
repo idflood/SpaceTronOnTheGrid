@@ -4,6 +4,9 @@ define (require) ->
   Boxes = require 'cs!app/elements/Boxes'
   Lines = require 'cs!app/elements/Lines'
 
+  SingleObject = require 'cs!app/elements/SingleObject'
+  Circle = require 'cs!app/elements/Circle'
+
   extend = (object, properties) ->
     for key, val of properties
       if typeof(object[key]) == 'object' && object[key] != null
@@ -16,16 +19,16 @@ define (require) ->
     @elements:
       Circles:
         classObject: Circles
-
       Boxes:
         classObject: Boxes
-
       Lines:
         classObject: Lines
-
       Camera:
         classObject: Camera
-
+      Box:
+        classObject: SingleObject
+      Circle:
+        classObject: Circle
 
     getTypeClass: (itemType) =>
       ElementFactory.elements[itemType].classObject

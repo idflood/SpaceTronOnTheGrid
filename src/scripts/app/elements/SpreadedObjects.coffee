@@ -3,9 +3,10 @@ define (require) ->
   THREE = require 'threejs'
   RNG = require 'rng'
   TweenMax = require 'TweenMax'
+  ElementBase = require 'cs!app/elements/ElementBase'
   Colors = require 'cs!app/components/Colors'
 
-  class SpreadedObjects
+  class SpreadedObjects extends ElementBase
     @properties:
       numItems: {name: 'numItems', label: 'num items', val: 20, triggerRebuild: true}
       seed: {name: 'seed', label: 'seed', val: 12002, triggerRebuild: true}
@@ -33,21 +34,17 @@ define (require) ->
         if !@values[key]?
           @values[key] = prop.val
 
+      # Set values cache
+      super
+
       @timeline = new TimelineMax()
       @container = new THREE.Object3D()
       @totalDuration = 0
       @items = []
       @items_position = []
-      @cache = @buildCache()
       @build(time)
 
     getItemClass: () -> return AnimatedCircle
-
-    buildCache: () ->
-      cache = {}
-      for key, prop of @values
-        cache[key] = prop.val
-      return cache
 
     rebuild: (time) ->
       @empty()
@@ -132,19 +129,6 @@ define (require) ->
       # Set initial properties
       @update(time, @values, true)
 
-    valueChanged: (key, values) ->
-      # Value can't change if it is not even set.
-      if !values[key]? then return false
-      new_val = values[key]
-      has_changed = true
-      if @cache[key]? && @cache[key] == new_val then has_changed = false
-
-      # Directly set the new cache value to avoid setting it multiple time to true.
-      @cache[key] = new_val
-      return has_changed
-
-    degreeToRadian: (degree) -> Math.PI * degree / 180
-
     update: (seconds, values = false, force = false) ->
       if values == false then values = @values
       needs_rebuild = false
@@ -181,6 +165,7 @@ define (require) ->
       return @rng.random(-scale, scale)
 
     destroy: () ->
+      super
       # clean up...
       if @container
         if @container.parent then @container.parent.remove(@container)

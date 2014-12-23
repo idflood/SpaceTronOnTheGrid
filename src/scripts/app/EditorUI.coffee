@@ -58,7 +58,7 @@ define (require) ->
         $link = $('<a href="#" data-key="' + element_name + '">' + element_name + '</a>')
         $container.append($link)
 
-      $container.find('.submenu--add').click (e) ->
+      $container.find('a').click (e) ->
         e.preventDefault()
         element_name = $(this).data('key')
         if ElementFactory.elements[element_name]
