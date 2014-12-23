@@ -1,11 +1,12 @@
 define (require) ->
   Editor = require 'Editor'
+  d3 = require 'd3'
 
   class EditorUI
     constructor: () ->
       @tweenTime = window.tweenTime
       @editor = new Editor(@tweenTime, {
-        onMenuCreated: @onMenuCreated,
+        #onMenuCreated: @onMenuCreated,
         json_replacer: (key, val) ->
           # filter some circular values
           if key == 'container' then return undefined
@@ -15,14 +16,39 @@ define (require) ->
           if key == 'classObject' then return undefined
           return val
       })
+      @onMenuCreated($('.timeline__menu'))
+      console.log @
 
     onMenuCreated: ($el) =>
-      $el.append('<span class="menu-item">Remove<div class="submenu submenu--remove"></div></span>')
+      $el.append('<a class="menu-item menu-item--remove">Remove</a>')
       $el.prepend('<span class="menu-item">Add<div class="submenu submenu--add"></div></span>')
 
       @initAdd($el)
+      @initRemove($el)
 
-    initAdd: ($el) ->
+    initRemove: ($el) =>
+      self = this
+      selectionManager = self.editor.selectionManager
+      data = window.tweenTime.data
+      $el.find('.menu-item--remove').click (e) ->
+        e.preventDefault()
+        for item in selectionManager.selection
+          # only remove full objects.
+          datum = d3.select(item).datum()
+          index = data.indexOf(datum)
+          if datum && datum.type && datum.id && index > -1
+            data.splice(index, 1)
+            # also remove the three.js object
+            if datum.object
+              datum.object.destroy()
+              delete datum.object
+
+        selectionManager.reset()
+        self.editor.render(false, false, true)
+        return
+      return
+
+    initAdd: ($el) =>
       if !window.ElementFactory then return
       $container = $el.find('.submenu--add')
       elements = window.ElementFactory.elements
@@ -32,7 +58,7 @@ define (require) ->
         $link = $('<a href="#" data-key="' + element_name + '">' + element_name + '</a>')
         $container.append($link)
 
-      $container.find('a').click (e) ->
+      $container.find('.submenu--add').click (e) ->
         e.preventDefault()
         element_name = $(this).data('key')
         if ElementFactory.elements[element_name]
@@ -56,3 +82,5 @@ define (require) ->
 
           self.tweenTime.data.push(data)
           self.editor.timeline._isDirty = true
+        return
+      return
