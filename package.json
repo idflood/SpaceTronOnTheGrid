@@ -13,5 +13,8 @@
     "grunt-contrib-requirejs": ">= 0.4.4",
     "grunt-notify": ">= 0.2.13"
   },
-  "engine": "node >= 0.8.x"
+  "engine": "node >= 0.8.x",
+  "devDependencies": {
+    "jit-grunt": "^0.9.1"
+  }
 }

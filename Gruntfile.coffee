@@ -130,13 +130,8 @@ module.exports = (grunt) ->
         options: {message: "Build complete"}
 
   # Load necessary plugins
-  grunt.loadNpmTasks "grunt-contrib-watch"
-  grunt.loadNpmTasks "grunt-contrib-compass"
-  grunt.loadNpmTasks "grunt-contrib-imagemin"
-  grunt.loadNpmTasks "grunt-contrib-copy"
-  grunt.loadNpmTasks "grunt-contrib-clean"
-  grunt.loadNpmTasks "grunt-contrib-requirejs"
-  grunt.loadNpmTasks "grunt-notify"
+  require('jit-grunt')(grunt)
+  
   grunt.registerTask "init", ["compass:clean", "compass:dev"]
   grunt.registerTask "default", ["compass:clean", "compass:dev", "requirejs", "watch"]
   grunt.registerTask "build", ["clean", "compass:clean", "copy", "imagemin", "compass:build", "requirejs", "notify:build"]
