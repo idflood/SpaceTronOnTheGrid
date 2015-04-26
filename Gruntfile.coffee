@@ -1,6 +1,8 @@
 #global module:false
 module.exports = (grunt) ->
   "use strict"
+  require('time-grunt')(grunt)
+  
   grunt.initConfig
     compass:
       clean:
@@ -131,7 +133,7 @@ module.exports = (grunt) ->
 
   # Load necessary plugins
   require('jit-grunt')(grunt)
-  
+
   grunt.registerTask "init", ["compass:clean", "compass:dev"]
   grunt.registerTask "default", ["compass:clean", "compass:dev", "requirejs", "watch"]
   grunt.registerTask "build", ["clean", "compass:clean", "copy", "imagemin", "compass:build", "requirejs", "notify:build"]
