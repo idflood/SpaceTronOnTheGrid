@@ -20,6 +20,7 @@ define (require) ->
       scaleY: {name: 'scaleY', label: 'scale y', val: 1}
       scaleZ: {name: 'scaleZ', label: 'scale z', val: 1}
       innerRadius: {name: 'innerRadius', label: 'innerRadius', val: 0.7, min: 0, max: 1}
+      angle: {name: 'angle', label: 'angle', val: 1, min: 0, max: 1}
       color: {name: 'color', label: 'color', 'type': 'color', val: "#888888"}
       opacity: {name: 'opacity', label: 'opacity', val: 1, min: 0, max: 1}
 
@@ -30,12 +31,14 @@ define (require) ->
       inner_radius = @values.innerRadius || 0.000000001
       # And neither 1.
       inner_radius = Math.min(0.999999999, inner_radius)
-      return new THREE.RingGeometry( 100 * inner_radius, 100, 30, 1, 0, Math.PI * 2 )
+      pi2 = Math.PI * 2
+      angle = @values.angle * pi2
+      return new THREE.RingGeometry( 100 * inner_radius, 100, 30, 1, 0, angle )
 
     update: (seconds, values = false, force = false) ->
       super
 
-      if force || @valueChanged("innerRadius", values)
+      if force || @valueChanged("innerRadius", values) || @valueChanged("angle", values)
         geom = @getGeometry()
         @container.geometry.dynamic = true
         @container.geometry.vertices = geom.vertices

@@ -19,18 +19,64 @@ define (require) ->
       })
       @onMenuCreated($('.timeline__menu'))
 
+
       $container = $(window.app.containerWebgl)
+      offset = new THREE.Vector3()
       projector = new THREE.Projector()
-      mouseVector = new THREE.Vector3(0, 0, 0.5)
-      $container.mousemove (e) =>
-        mouseVector.x = ( e.clientX / $container.width() ) * 2 - 1
-        mouseVector.y = -( e.clientY / $container.height() ) * 2 + 1
-        raycaster = projector.pickingRay( mouseVector.clone(), window.activeCamera )
+      mouse = new THREE.Vector2()
+      selectedObject = false
+      selectedObjectPos = new THREE.Vector3()
+
+      plane = new THREE.Mesh(
+        new THREE.PlaneBufferGeometry( 3000, 2000, 8, 8 ),
+        new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.25, transparent: true } )
+      )
+      plane.visible = false
+      #window.app.scene.add( plane )
+
+      getRaycaster = () =>
+        camera = window.activeCamera
+        vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera )
+        raycaster = new THREE.Raycaster(camera.position, vector.sub( camera.position ).normalize())
+        return raycaster
+
+      $container.mousedown (e) =>
+        e.preventDefault()
+        raycaster = getRaycaster()
         intersects = raycaster.intersectObjects( window.app.scene.children )
+
         if intersects.length
           element = intersects[0].object
           if element._data
-            console.log element
+            @editor.selectionManager.select(element._data)
+            selectedObject = element
+            selectedObjectPos = selectedObject.position.clone()
+
+            intersects = raycaster.intersectObject(plane)
+            offset.copy(intersects[ 0 ].point).sub(plane.position)
+      $(window).mouseup (e) =>
+        selectedObject = false
+
+      $container.mousemove (e) =>
+        mouse.x = ( e.clientX / $container.width() ) * 2 - 1
+        mouse.y = -( e.clientY / $container.height() ) * 2 + 1
+
+        if !selectedObject then return
+        if !selectedObject._data then return
+        prop_x = @tweenTime.getProperty('x', selectedObject._data)
+        prop_y = @tweenTime.getProperty('y', selectedObject._data)
+
+        raycaster = getRaycaster()
+        intersects = raycaster.intersectObject( plane )
+        pos = intersects[ 0 ].point.sub( offset )
+
+        posDiff = selectedObjectPos.clone().add(pos)
+
+        @tweenTime.setValue(prop_x, posDiff.x)
+        @tweenTime.setValue(prop_y, posDiff.y)
+        selectedObject._data._isDirty = true
+        @editor.timeline._isDirty = true
+
 
     onMenuCreated: ($el) =>
       $el.append('<a class="menu-item menu-item--remove">Remove</a>')

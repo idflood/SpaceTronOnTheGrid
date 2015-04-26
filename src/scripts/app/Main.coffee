@@ -96,17 +96,17 @@ define (require) ->
       material = new THREE.MeshPhongMaterial({color: 0x111111, specular: 0x666666, shininess: 30, shading: THREE.SmoothShading})
       #material.blending = THREE.AdditiveBlending
 
-      object = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 650, 1, 1 ), material )
+      object = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 650, 1, 1 ), material )
       object.position.set( 420, 0, -350 )
       object.rotation.set(0.1, 0.8, 0.7)
       @scene.add( object )
 
-      object2 = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 650, 1, 1 ), material )
+      object2 = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 650, 1, 1 ), material )
       object2.position.set( 320, 0, -450 )
       object2.rotation.set(0.17, 0.85, 0.78)
       @scene.add( object2 )
 
-      object3 = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 650, 1, 1 ), material )
+      object3 = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 650, 1, 1 ), material )
       object3.position.set( -120, -600, -950 )
       object3.rotation.set(0.17, 0.35, -0.38)
       @scene.add( object3 )
