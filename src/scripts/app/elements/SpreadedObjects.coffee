@@ -1,10 +1,11 @@
 define (require) ->
   _ = require 'lodash'
-  THREE = require 'threejs'
-  RNG = require 'rng'
+  THREE = require 'Three'
+  RNG = require 'exports?RNG!rng'
   TweenMax = require 'TweenMax'
-  ElementBase = require 'cs!app/elements/ElementBase'
-  Colors = require 'cs!app/components/Colors'
+  ElementBase = require 'app/elements/ElementBase'
+  Colors = require 'app/components/Colors'
+
 
   class SpreadedObjects extends ElementBase
     @properties:

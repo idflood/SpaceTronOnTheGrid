@@ -1,9 +1,9 @@
 define (require) ->
   _ = require 'lodash'
-  THREE = require 'threejs'
+  THREE = require 'Three'
 
-  Audio = require 'cs!app/components/Audio'
-  Colors = require 'cs!app/components/Colors'
+  Audio = require 'app/components/Audio'
+  Colors = require 'app/components/Colors'
 
   class Particles
     @circleGeom = new THREE.CircleGeometry( 10, 30, 0, Math.PI * 2 )

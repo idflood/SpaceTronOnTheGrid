@@ -1,16 +1,16 @@
 define (require) ->
   _ = require 'lodash'
-  THREE = require 'threejs'
+  THREE = require 'Three'
   RNG = require 'rng'
   TweenMax = require 'TweenMax'
 
-  Colors = require 'cs!app/components/Colors'
+  Colors = require 'app/components/Colors'
 
   # should not be a dependency.
-  Audio = require 'cs!app/components/Audio'
+  Audio = require 'app/components/Audio'
 
-  ShaderVertex = require 'text!app/shaders/BasicNoise.vert'
-  ShaderFragement = require 'text!app/shaders/BasicNoise.frag'
+  ShaderVertex = require 'raw!app/shaders/BasicNoise.vert'
+  ShaderFragement = require 'raw!app/shaders/BasicNoise.frag'
 
   class AnimatedObject
     @circleGeom = new THREE.CircleGeometry( 10, 30, 0, Math.PI * 2 )

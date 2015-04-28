@@ -1,6 +1,6 @@
 define (require) ->
   _ = require 'lodash'
-  ElementFactory = require 'cs!app/components/ElementFactory'
+  ElementFactory = require 'app/components/ElementFactory'
 
   class DataNormalizer
     @normalizeItem = (data_item, factory) ->

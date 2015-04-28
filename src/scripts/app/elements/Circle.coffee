@@ -1,12 +1,12 @@
 define (require) ->
   _ = require 'lodash'
-  THREE = require 'threejs'
+  THREE = require 'Three'
   RNG = require 'rng'
-  SingleObject = require 'cs!app/elements/SingleObject'
-  Colors = require 'cs!app/components/Colors'
+  SingleObject = require 'app/elements/SingleObject'
+  Colors = require 'app/components/Colors'
 
-  ShaderVertex = require 'text!app/shaders/BasicNoise.vert'
-  ShaderFragement = require 'text!app/shaders/BasicNoise.frag'
+  ShaderVertex = require 'raw!app/shaders/BasicNoise.vert'
+  ShaderFragement = require 'raw!app/shaders/BasicNoise.frag'
 
   class Circle extends SingleObject
     @properties:

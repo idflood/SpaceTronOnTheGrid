@@ -1,5 +1,5 @@
 define (require) ->
-  THREE = require 'threejs'
+  THREE = require 'Three'
 
   require 'vendors/three.js-extras/postprocessing/EffectComposer'
   require 'vendors/three.js-extras/postprocessing/MaskPass'

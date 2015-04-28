@@ -19,10 +19,24 @@
   </head>
   <body>
     <div class="loading-screen"></div>
-    <script src="assets/scripts/boot.js"></script>
-    <!-- dev only -->
-    <script src="assets/scripts/boot-editor.js"></script>
-    <!-- /dev only -->
+    <script src="src/scripts/bower_components/jquery/dist/jquery.js"></script>
+    <script src="src/scripts/bower_components/three.js/three.min.js"></script>
+    <script src="src/scripts/bower_components/js-signals/dist/signals.js"></script>
+    <script src="src/scripts/bower_components/lodash/dist/lodash.js"></script>
+    <script src="src/scripts/bower_components/d3/d3.js"></script>
+    <script src="src/scripts/bower_components/gsap/src/uncompressed/TweenMax.js"></script>
+    <script src="src/scripts/vendors/TweenTime/dist/scripts/TweenTime.Core.js"></script>
+    <script src="src/scripts/vendors/TweenTime/dist/scripts/TweenTime.Editor.js"></script>
+
+    <script src="assets/scripts/App.js"></script>
+    <script src="assets/scripts/Editor.js"></script>
+
+    <script>
+      window.app = new App();
+      window.tweenTime = app.tweenTime;
+
+      var editor = new EditorUI();
+    </script>
     <script>
         var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
         (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];

@@ -1,12 +1,12 @@
 define (require) ->
   _ = require 'lodash'
-  THREE = require 'threejs'
+  THREE = require 'Three'
   RNG = require 'rng'
-  ElementBase = require 'cs!app/elements/ElementBase'
-  Colors = require 'cs!app/components/Colors'
+  ElementBase = require 'app/elements/ElementBase'
+  Colors = require 'app/components/Colors'
 
-  ShaderVertex = require 'text!app/shaders/BasicNoise.vert'
-  ShaderFragement = require 'text!app/shaders/BasicNoise.frag'
+  ShaderVertex = require 'raw!app/shaders/BasicNoise.vert'
+  ShaderFragement = require 'raw!app/shaders/BasicNoise.frag'
 
   class SingleObject extends ElementBase
     @properties:

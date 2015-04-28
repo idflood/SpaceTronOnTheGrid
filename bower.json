@@ -3,11 +3,6 @@
   "version": "0.0.1",
   "dependencies": {
     "jquery": "~2.1.1",
-    "requirejs": "~2.1.14",
-    "almond": "~0.2.9",
-    "requirejs-text": "~2.0.12",
-    "require-cs": "~0.4.4",
-    "coffee-script": "~1.7.1",
     "three.js": "*",
     "rng-js": "~1.0.1",
     "d3": "~3.4.10",

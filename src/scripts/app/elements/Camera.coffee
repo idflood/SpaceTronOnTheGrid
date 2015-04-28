@@ -1,5 +1,5 @@
 define (require) ->
-  THREE = require 'threejs'
+  THREE = require 'Three'
 
   class Camera
     @properties:

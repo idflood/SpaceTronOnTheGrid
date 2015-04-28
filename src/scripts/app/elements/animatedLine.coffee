@@ -1,8 +1,8 @@
 define (require) ->
   _ = require 'lodash'
-  THREE = require 'threejs'
+  THREE = require 'Three'
 
-  AnimatedObject = require 'cs!app/elements/AnimatedObject'
+  AnimatedObject = require 'app/elements/AnimatedObject'
   class AnimatedLine extends AnimatedObject
     @circleGeom = new THREE.PlaneGeometry( 100, 1)
     @ringGeom = false

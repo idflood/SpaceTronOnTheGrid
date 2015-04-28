@@ -1,12 +1,12 @@
 define (require) ->
   THREE = window.THREE
-  Editor = require 'Editor'
+  TweenTimeEditor = require 'TweenTime.Editor'
   d3 = require 'd3'
 
-  class EditorUI
+  window.EditorUI = class EditorUI
     constructor: () ->
       @tweenTime = window.tweenTime
-      @editor = new Editor(@tweenTime, {
+      @editor = new TweenTimeEditor(@tweenTime, {
         #onMenuCreated: @onMenuCreated,
         json_replacer: (key, val) ->
           # filter some circular values

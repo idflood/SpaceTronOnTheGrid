@@ -1,11 +1,11 @@
 define (require) ->
-  Camera = require 'cs!app/elements/Camera'
-  Circles = require 'cs!app/elements/Circles'
-  Boxes = require 'cs!app/elements/Boxes'
-  Lines = require 'cs!app/elements/Lines'
+  Camera = require 'app/elements/Camera'
+  Circles = require 'app/elements/Circles'
+  Boxes = require 'app/elements/Boxes'
+  Lines = require 'app/elements/Lines'
 
-  SingleObject = require 'cs!app/elements/SingleObject'
-  Circle = require 'cs!app/elements/Circle'
+  SingleObject = require 'app/elements/SingleObject'
+  Circle = require 'app/elements/Circle'
 
   extend = (object, properties) ->
     for key, val of properties

@@ -7,24 +7,24 @@
 # blue: 406872
 
 define (require) ->
-  THREE = require 'threejs'
+  THREE = require 'Three'
 
   TweenTime = require 'TweenTime'
 
-  Background = require 'cs!app/components/Background'
-  PostFX = require 'cs!app/components/PostFX'
-  SceneManager = require 'cs!app/components/SceneManager'
-  Audio = require 'cs!app/components/Audio'
-  ElementFactory = require 'cs!app/components/ElementFactory'
-  DataNormalizer = require 'cs!app/components/DataNormalizer'
+  Background = require 'app/components/Background'
+  PostFX = require 'app/components/PostFX'
+  SceneManager = require 'app/components/SceneManager'
+  Audio = require 'app/components/Audio'
+  ElementFactory = require 'app/components/ElementFactory'
+  DataNormalizer = require 'app/components/DataNormalizer'
 
-  dataJson = require 'text!app/data.json'
+  dataJson = require 'raw!app/data.json'
 
-  #Circles = require 'cs!app/elements/Circles'
+  #Circles = require 'app/elements/Circles'
 
-  #Particles = require 'cs!app/elements/Particles'
+  #Particles = require 'app/elements/Particles'
 
-  class App
+  window.App = class App
     constructor: () ->
       window.updateCameraAspect = @updateCameraAspect
 

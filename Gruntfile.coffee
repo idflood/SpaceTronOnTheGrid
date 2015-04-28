@@ -2,7 +2,7 @@
 module.exports = (grunt) ->
   "use strict"
   require('time-grunt')(grunt)
-  
+
   grunt.initConfig
     compass:
       clean:
@@ -24,44 +24,8 @@ module.exports = (grunt) ->
           imagesDir: "assets/images"
           fontsDir: "assets/fonts"
 
-    requirejs:
-      compile:
-        options:
-          baseUrl: 'src/scripts'
-          mainConfigFile: 'src/scripts/require-config.js'
-          name: "bower_components/almond/almond"
-          out: "assets/scripts/boot.js"
-          generateSourceMaps: true
-          #optimize: "uglify2"
-          optimize: "none"
-          inlineText: true
-          preserveLicenseComments: false
-          include: "boot"
-          paths:
-            requireLib: "bower_components/requirejs/require"
-          exclude: ['coffee-script']
-          stubModules: ['cs']
-          pragmasOnSave:
-            excludeCoffeeScript: true
-
-      compileEditor:
-        options:
-          baseUrl: 'src/scripts'
-          mainConfigFile: 'src/scripts/require-config.js'
-          name: "bower_components/almond/almond"
-          out: "assets/scripts/boot-editor.js"
-          generateSourceMaps: true
-          #optimize: "uglify2"
-          optimize: "none"
-          inlineText: true
-          preserveLicenseComments: false
-          include: "boot-editor"
-          paths:
-            requireLib: "bower_components/requirejs/require"
-          exclude: ['coffee-script']
-          stubModules: ['cs']
-          pragmasOnSave:
-            excludeCoffeeScript: true
+    webpack:
+      main: require('./webpack.config.js')
 
     watch:
       sass:
@@ -74,7 +38,7 @@ module.exports = (grunt) ->
 
       compilejs:
         files: ["src/scripts/**", "!src/scripts/bower_components/**"]
-        tasks: ["requirejs"]
+        tasks: ["webpack"]
 
       reloadjs:
         options: {livereload: true}
@@ -135,5 +99,5 @@ module.exports = (grunt) ->
   require('jit-grunt')(grunt)
 
   grunt.registerTask "init", ["compass:clean", "compass:dev"]
-  grunt.registerTask "default", ["compass:clean", "compass:dev", "requirejs", "watch"]
-  grunt.registerTask "build", ["clean", "compass:clean", "copy", "imagemin", "compass:build", "requirejs", "notify:build"]
+  grunt.registerTask "default", ["compass:clean", "compass:dev", "webpack", "watch"]
+  grunt.registerTask "build", ["clean", "compass:clean", "copy", "imagemin", "compass:build", "webpack", "notify:build"]
