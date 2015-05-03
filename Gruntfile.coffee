@@ -37,7 +37,7 @@ module.exports = (grunt) ->
         files: ["assets/styles/*.css"]
 
       compilejs:
-        files: ["src/scripts/**", "!src/scripts/bower_components/**"]
+        files: ["src/scripts/**", "!src/scripts/bower_components/**", "!src/scripts/vendors/**"]
         tasks: ["webpack"]
 
       reloadjs:
