@@ -95,9 +95,17 @@ module.exports = (grunt) ->
       build:
         options: {message: "Build complete"}
 
+    browserSync:
+      bsFiles:
+        src : ['assets/scripts/*.js', 'assets/styles/*.css']
+      options:
+        watchTask: true
+        server:
+          baseDir: "./"
+
   # Load necessary plugins
   require('jit-grunt')(grunt)
 
   grunt.registerTask "init", ["compass:clean", "compass:dev"]
-  grunt.registerTask "default", ["compass:clean", "compass:dev", "webpack", "watch"]
+  grunt.registerTask "default", ['browserSync', "compass:clean", "compass:dev", "webpack", "watch"]
   grunt.registerTask "build", ["clean", "compass:clean", "copy", "imagemin", "compass:build", "webpack", "notify:build"]

@@ -5,8 +5,8 @@ define (require) ->
   ElementBase = require 'app/elements/ElementBase'
   Colors = require 'app/components/Colors'
 
-  ShaderVertex = require 'raw!app/shaders/BasicNoise.vert'
-  ShaderFragement = require 'raw!app/shaders/BasicNoise.frag'
+  ShaderVertex = require 'app/shaders/BasicNoise.vert'
+  ShaderFragement = require 'app/shaders/BasicNoise.frag'
 
   class SingleObject extends ElementBase
     @properties:

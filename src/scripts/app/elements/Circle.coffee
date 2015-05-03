@@ -4,9 +4,10 @@ define (require) ->
   RNG = require 'rng'
   SingleObject = require 'app/elements/SingleObject'
   Colors = require 'app/components/Colors'
+  RingGeometry2 = require 'app/geometries/RingGeometry2'
 
-  ShaderVertex = require 'raw!app/shaders/BasicNoise.vert'
-  ShaderFragement = require 'raw!app/shaders/BasicNoise.frag'
+  ShaderVertex = require 'app/shaders/BasicNoise.vert'
+  ShaderFragement = require 'app/shaders/BasicNoise.frag'
 
   class Circle extends SingleObject
     @properties:
@@ -33,7 +34,7 @@ define (require) ->
       inner_radius = Math.min(0.999999999, inner_radius)
       pi2 = Math.PI * 2
       angle = @values.angle * pi2
-      return new THREE.RingGeometry( 100 * inner_radius, 100, 30, 1, 0, angle )
+      return new RingGeometry2( 100 * inner_radius, 100, 30, 1, 0, angle )
 
     update: (seconds, values = false, force = false) ->
       super

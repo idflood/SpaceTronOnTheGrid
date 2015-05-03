@@ -19,6 +19,11 @@
     "grunt-webpack": "^1.0.8",
     "coffee-loader": "^0.7.2",
     "raw-loader": "^0.5.1",
-    "exports-loader": "^0.6.2"
+    "exports-loader": "^0.6.2",
+    "glslify": "^2.1.2",
+    "glslify-loader": "^1.0.2",
+    "glsl-noise": "0.0.0",
+    "grunt-browser-sync": "^1.9.2",
+    "glsl-aastep": "^1.0.1"
   }
 }

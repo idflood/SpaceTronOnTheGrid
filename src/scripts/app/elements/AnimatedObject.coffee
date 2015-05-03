@@ -9,8 +9,8 @@ define (require) ->
   # should not be a dependency.
   Audio = require 'app/components/Audio'
 
-  ShaderVertex = require 'raw!app/shaders/BasicNoise.vert'
-  ShaderFragement = require 'raw!app/shaders/BasicNoise.frag'
+  ShaderVertex = require 'app/shaders/BasicNoise.vert'
+  ShaderFragement = require 'app/shaders/BasicNoise.frag'
 
   class AnimatedObject
     @circleGeom = new THREE.CircleGeometry( 10, 30, 0, Math.PI * 2 )
@@ -68,8 +68,9 @@ define (require) ->
       tween = TweenLite.to(@animatedProperties, @values.duration, {scale: 0.00001, ease: Cubic.easeIn})
       @timeline.add(tween)
 
-      if @values.drawOutline then @renderOutline(@values.size, @values.color, @values.outlineWidth)
-      if @values.drawCircle then @renderCircle(@values.size, @values.fillColor)
+      #if @values.drawOutline then @renderOutline(@values.size, @values.color, @values.outlineWidth)
+      #if @values.drawCircle then @renderCircle(@values.size, @values.fillColor)
+      @renderCircle(@values.size, @values.fillColor)
 
     getGeometry: () ->
       return AnimatedObject.circleGeom
@@ -91,6 +92,10 @@ define (require) ->
         time: {
           type: 'f',
           value: 0.0
+        },
+        seed: {
+          type: 'f',
+          value: Math.random() * 1000
         },
         strength: {
           type: 'f',

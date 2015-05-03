@@ -15,9 +15,7 @@ module.exports = {
     path: path.join(__dirname, "assets/scripts/"),
     publicPath: "assets/",
     filename: "[name].js",
-    chunkFilename: "Spacetron.[hash].js",
-    //library: ["ThreeNodes", "[name]"],
-    //libraryTarget: "umd"
+    chunkFilename: "Spacetron.[hash].js"
   },
   externals: {
     "Three": "THREE",
@@ -31,7 +29,13 @@ module.exports = {
       amd: 'signals'
     },
     'lodash': "_",
-    "$": "jQuery"
+    "$": "jQuery",
+    'draggable-number.js': {
+      root: 'DraggableNumber',
+      commonjs: 'DraggableNumber',
+      commonjs2: 'DraggableNumber',
+      amd: 'DraggableNumber'
+    },
   },
   resolve: {
     root: __dirname + '/src/scripts',
@@ -42,7 +46,9 @@ module.exports = {
   },
   module: {
     loaders: [
-      {test: /\.coffee$/, loader: "coffee-loader", exclude: /node_modules/}
+      {test: /\.coffee$/, loader: "coffee-loader", exclude: /node_modules/},
+      { test: /\.(glsl|frag|vert)$/, loader: 'raw', exclude: /node_modules/ },
+      { test: /\.(glsl|frag|vert)$/, loader: 'glslify', exclude: /node_modules/ }
     ]
   },
   plugins: [
