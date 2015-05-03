@@ -6,6 +6,7 @@
 # purple: 715160
 # blue: 406872
 
+
 define (require) ->
   THREE = require 'Three'
 
@@ -28,7 +29,7 @@ define (require) ->
     constructor: () ->
       window.updateCameraAspect = @updateCameraAspect
 
-      audio_url = 'http://localhost/Space Tron On The Grid 8.mp3'
+      audio_url = './assets/08 - Space Tron On The Grid.mp3'
       @audio = new Audio(audio_url, @onAudioLoaded)
       @factory = new ElementFactory()
 
