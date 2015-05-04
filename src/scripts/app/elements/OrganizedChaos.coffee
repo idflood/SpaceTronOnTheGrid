@@ -1,6 +1,8 @@
 define (require) ->
   _ = require 'lodash'
   THREE = require 'Three'
+  RNG = require 'rng'
+  ElementBase = require 'app/elements/ElementBase'
 
   Audio = require 'app/components/Audio'
   Colors = require 'app/components/Colors'
@@ -9,7 +11,7 @@ define (require) ->
   ShaderVertex = require 'app/shaders/BasicNoise.vert'
   ShaderFragement = require 'app/shaders/BasicNoise.frag'
 
-  class OrganizedChaos
+  class OrganizedChaos extends ElementBase
     @lineGeom = new THREE.PlaneGeometry( 100, 1)
     @circleGeom = new THREE.CircleGeometry( 10, 30, 0, Math.PI * 2 )
     @ringGeom = new THREE.RingGeometry( 10 - 1, 10 + 1, 30, 1, 0, Math.PI * 2 )
@@ -17,6 +19,11 @@ define (require) ->
 
     @properties:
       numItems: {name: 'numItems', label: 'num items', val: 10, triggerRebuild: true}
+      x: {name: 'x', label: 'x', val: 0}
+      y: {name: 'y', label: 'y', val: 0}
+      z: {name: 'z', label: 'z', val: 0}
+
+    getDefaultProperties: () -> OrganizedChaos.properties
 
     constructor: (@values = {}, time = 0) ->
       # Set the default value of instance properties.
@@ -24,9 +31,27 @@ define (require) ->
         if !@values[key]?
           @values[key] = prop.val
 
+      # Set values cache
+      super
+
       @container = new THREE.Object3D()
-      @container.position.set(0, 0, 100)
+      @container.position.set(0, 0, 0)
       @items = []
+      @build()
+
+    rebuild: (time) ->
+      @empty()
+      @build(time)
+
+    empty: () ->
+      if !@items || !@items.length then return
+
+      for item in @items
+        @container.remove(item)
+        #item.destroy()
+      @items = []
+
+    build: (time = 0) ->
 
       @speed = Math.random() * 2 - 1
       @scale = Math.random() * 2 + 0.1
@@ -146,7 +171,12 @@ define (require) ->
       return material
 
     update: (seconds, values = false, force = false) ->
+      if values == false then values = @values
+
       volume = Audio.instance.mid
+
+      if force || @valueChanged("x", values) || @valueChanged("y", values) || @valueChanged("z", values)
+        @container.position.set(values.x, values.y, values.z)
       #current = @el.scale.x
       #if volume > 0.2 && Math.random() < 0.1
       #  current += volume * 10
@@ -157,3 +187,10 @@ define (require) ->
 
       #for item in @items
       #  item.update()
+      return
+
+    destroy: () ->
+      for child in @container.children
+        @container.remove(child)
+
+      @container = null

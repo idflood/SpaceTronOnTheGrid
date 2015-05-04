@@ -6,6 +6,7 @@ define (require) ->
 
   SingleObject = require 'app/elements/SingleObject'
   Circle = require 'app/elements/Circle'
+  OrganizedChaos = require 'app/elements/OrganizedChaos'
 
   extend = (object, properties) ->
     for key, val of properties
@@ -17,6 +18,8 @@ define (require) ->
 
   class ElementFactory
     @elements:
+      Chaos:
+        classObject: OrganizedChaos
       Circles:
         classObject: Circles
       Boxes:

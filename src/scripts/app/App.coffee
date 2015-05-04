@@ -50,7 +50,7 @@ define (require) ->
       window.activeCamera = @camera
 
       @scene = new THREE.Scene()
-      @scene.fog = new THREE.FogExp2( 0x111111, 0.0025 )
+      @scene.fog = new THREE.FogExp2( 0x111111, 0.0045 )
       #@orchestrator = new Orchestrator(@timer, @data, @scene, @camera)
       @sceneManager = new SceneManager(@tweenTime, @data, @scene, @camera, @factory)
 
@@ -85,9 +85,9 @@ define (require) ->
       #@particles = new Particles()
       #@scene.add(@particles.container)
 
-      @chaos = new OrganizedChaos()
-      @chaos.container.position.z = 300
-      @scene.add(@chaos.container)
+      #@chaos = new OrganizedChaos()
+      #@chaos.container.position.z = 300
+      #@scene.add(@chaos.container)
 
       @animate()
 

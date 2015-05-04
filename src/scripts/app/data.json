@@ -1,30 +1,32 @@
 {
   "settings": {
-    "time": 0,
+    "time": 1000.8830000006128,
     "duration": 240,
     "domain": [
       0,
-      20000
+      31809
     ]
   },
   "data": [
     {
-      "id": "item5",
+      "id": "camera1",
       "type": "Camera",
-      "label": "Camera 5",
+      "label": "Camera 1",
       "start": 0,
-      "end": 10.136,
+      "end": 180,
       "collapsed": false,
       "properties": [
         {
           "keys": [
             {
               "time": 0,
-              "val": 600
+              "val": 600,
+              "ease": "Quad.easeOut"
             },
             {
-              "time": 10.098,
-              "val": 350
+              "time": 181.07699999999994,
+              "val": -3650,
+              "ease": "Quad.easeOut"
             }
           ],
           "name": "z",
@@ -40,17 +42,42 @@
           "label": "fov",
           "val": 45,
           "keys": []
+        },
+        {
+          "name": "x",
+          "label": "x",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "y",
+          "label": "y",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "target_x",
+          "label": "target x",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "target_z",
+          "label": "target z",
+          "val": -10000,
+          "keys": []
         }
       ],
       "values": {
         "x": 0,
         "y": 0,
-        "z": 600,
+        "z": 553.1470404619704,
         "target_x": 0,
         "target_y": 0,
-        "target_z": -1500,
+        "target_z": -10000,
         "fov": 45
-      }
+      },
+      "isDirtyObject": false
     }
   ]
 }
