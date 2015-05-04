@@ -23,7 +23,8 @@ define (require) ->
 
   #Circles = require 'app/elements/Circles'
 
-  #Particles = require 'app/elements/Particles'
+  Particles = require 'app/elements/Particles'
+  OrganizedChaos = require 'app/elements/OrganizedChaos'
 
   window.App = class App
     constructor: () ->
@@ -49,6 +50,7 @@ define (require) ->
       window.activeCamera = @camera
 
       @scene = new THREE.Scene()
+      @scene.fog = new THREE.FogExp2( 0x111111, 0.0025 )
       #@orchestrator = new Orchestrator(@timer, @data, @scene, @camera)
       @sceneManager = new SceneManager(@tweenTime, @data, @scene, @camera, @factory)
 
@@ -57,7 +59,8 @@ define (require) ->
       @containerWebgl = container # Save for use in EditorUI for object picking.
       document.body.appendChild( container )
 
-      @renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } )
+      @renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } )
+      @renderer.setPixelRatio( window.devicePixelRatio )
       @renderer.setSize(size.width, size.height)
 
       #@renderer.setClearColor( 0xe1d8c7, 1)
@@ -66,7 +69,11 @@ define (require) ->
       #circles = new Circles(@scene, 10, 4323, 130, 20, 50)
       #circles2 = new Circles(@scene, 20, 51232, 180, 4, 10)
 
-      @createElements()
+      light1 = new THREE.PointLight( 0xffffff, 3, 1400 )
+      light1.position.set(100, 300, 700)
+      @scene.add(light1)
+
+      #@createElements()
 
       container.appendChild( @renderer.domElement )
 
@@ -77,6 +84,10 @@ define (require) ->
 
       #@particles = new Particles()
       #@scene.add(@particles.container)
+
+      @chaos = new OrganizedChaos()
+      @chaos.container.position.z = 300
+      @scene.add(@chaos.container)
 
       @animate()
 
@@ -111,10 +122,6 @@ define (require) ->
       object3.position.set( -120, -600, -950 )
       object3.rotation.set(0.17, 0.35, -0.38)
       @scene.add( object3 )
-
-      light1 = new THREE.PointLight( 0xffffff, 3, 1400 )
-      light1.position.set(100, 300, 200)
-      @scene.add(light1)
 
 
     __createElementsBackup: () ->
@@ -187,6 +194,7 @@ define (require) ->
       delta = newTime - @time
 
       if @particles then @particles.update()
+      if @chaos then @chaos.update()
       @camera.lookAt( @scene.position )
       @postfx.render(delta)
 

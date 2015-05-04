@@ -57,7 +57,7 @@ define (require) ->
 
 
     update: (seconds, values = false, force = false) ->
-      @container.rotation.z += @speed / 100
+      #@container.rotation.z += @speed / 100
 
       volume = Audio.instance.mid
       current = @el.scale.x

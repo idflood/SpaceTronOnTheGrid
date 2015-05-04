@@ -1,6 +1,8 @@
 define (require) ->
   THREE = window.THREE
   TweenTimeEditor = require 'TweenTime.Editor'
+  require 'vendors/three.js-extras/Projector'
+
   d3 = require 'd3'
 
   window.EditorUI = class EditorUI
