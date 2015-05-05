@@ -1,10 +1,10 @@
 {
   "settings": {
-    "time": 1000.8830000006128,
+    "time": 0,
     "duration": 240,
     "domain": [
       0,
-      31809
+      59367
     ]
   },
   "data": [
@@ -13,19 +13,19 @@
       "type": "Camera",
       "label": "Camera 1",
       "start": 0,
-      "end": 180,
-      "collapsed": false,
+      "end": 240,
+      "collapsed": true,
       "properties": [
         {
           "keys": [
             {
               "time": 0,
-              "val": 600,
+              "val": 200,
               "ease": "Quad.easeOut"
             },
             {
-              "time": 181.07699999999994,
-              "val": -3650,
+              "time": 240,
+              "val": -3850,
               "ease": "Quad.easeOut"
             }
           ],
@@ -71,11 +71,161 @@
       "values": {
         "x": 0,
         "y": 0,
-        "z": 553.1470404619704,
+        "z": 200,
         "target_x": 0,
         "target_y": 0,
         "target_z": -10000,
         "fov": 45
+      },
+      "isDirtyObject": false
+    },
+    {
+      "isDirty": true,
+      "id": "item2",
+      "label": "Chaos 2",
+      "type": "Chaos",
+      "start": 0,
+      "end": 21.687,
+      "collapsed": false,
+      "properties": [
+        {
+          "name": "numItems",
+          "label": "num items",
+          "val": 145,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "seed",
+          "label": "seed",
+          "val": 50,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "depth",
+          "label": "depth",
+          "val": 8,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "spread",
+          "label": "spread",
+          "val": -130,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "maxChilds",
+          "label": "maxChilds",
+          "val": 3,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "x",
+          "label": "x",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "y",
+          "label": "y",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "z",
+          "label": "z",
+          "val": 0,
+          "keys": []
+        }
+      ],
+      "values": {
+        "numItems": 145,
+        "seed": 50,
+        "depth": 8,
+        "spread": -130,
+        "maxChilds": 3,
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "isDirtyObject": false
+    },
+    {
+      "isDirty": true,
+      "id": "item3",
+      "label": "Chaos 3",
+      "type": "Chaos",
+      "start": 5.627,
+      "end": 43.101,
+      "collapsed": false,
+      "properties": [
+        {
+          "name": "numItems",
+          "label": "num items",
+          "val": 186,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "seed",
+          "label": "seed",
+          "val": 27042,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "depth",
+          "label": "depth",
+          "val": 20,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "spread",
+          "label": "spread",
+          "val": 40,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "maxChilds",
+          "label": "maxChilds",
+          "val": 9,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "x",
+          "label": "x",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "y",
+          "label": "y",
+          "val": -20,
+          "keys": []
+        },
+        {
+          "name": "z",
+          "label": "z",
+          "val": -490,
+          "keys": []
+        }
+      ],
+      "values": {
+        "numItems": 186,
+        "seed": 27042,
+        "depth": 20,
+        "spread": 40,
+        "maxChilds": 9,
+        "x": 0,
+        "y": -20,
+        "z": -490
       },
       "isDirtyObject": false
     }
