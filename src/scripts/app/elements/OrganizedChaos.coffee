@@ -1,7 +1,7 @@
 define (require) ->
   _ = require 'lodash'
   THREE = require 'Three'
-  RNG = require 'rng'
+  RNG = require 'exports?RNG!rng'
   ElementBase = require 'app/elements/ElementBase'
 
   Audio = require 'app/components/Audio'
@@ -17,8 +17,13 @@ define (require) ->
     @ringGeom = new THREE.RingGeometry( 10 - 1, 10 + 1, 30, 1, 0, Math.PI * 2 )
     @ringGeom2 = new CircleGeometry2( 10, 30, 0, Math.PI * 2 )
 
+
     @properties:
       numItems: {name: 'numItems', label: 'num items', val: 10, triggerRebuild: true}
+      seed: {name: 'seed', label: 'seed', val: 10042, triggerRebuild: true}
+      depth: {name: 'depth', label: 'depth', val: 20, triggerRebuild: true}
+      spread: {name: 'spread', label: 'spread', val: 300, triggerRebuild: true}
+      maxChilds: {name: 'maxChilds', label: 'maxChilds', val: 8, triggerRebuild: true}
       x: {name: 'x', label: 'x', val: 0}
       y: {name: 'y', label: 'y', val: 0}
       z: {name: 'z', label: 'z', val: 0}
@@ -52,44 +57,32 @@ define (require) ->
       @items = []
 
     build: (time = 0) ->
-
-      @speed = Math.random() * 2 - 1
-      @scale = Math.random() * 2 + 0.1
+      rngX = new RNG(@values.seed + "x")
+      rngY = new RNG(@values.seed + "y")
+      rngRotationZ = new RNG(@values.seed + "rotationZ")
+      rngChilds = new RNG(@values.seed + "childs")
+      rngSpacing = new RNG(@values.seed + "spacing")
 
       material = new THREE.MeshPhongMaterial({ ambient: 0x030303, color: 0xdddddd, specular: 0xffffff, shininess: 10, shading: THREE.FlatShading })
       material.blending = THREE.AdditiveBlending
 
-
-
       geom = OrganizedChaos.circleGeom
-      #if Math.random() < 0.7
-      #  geom = OrganizedChaos.ringGeom
 
-      spread = 300
+      spread = @values.spread
       spread_half = spread / 2
-
-      #@el = new THREE.Mesh(geom , material )
-      #@el.position.x = Math.random() * spread - spread_half
-      #@el.position.y = Math.random() * spread - spread_half
-      #@el.position.z = Math.random() * spread - spread_half
-
-      #@el.rotation.x = Math.random() * 0.4 - 0.2
-
-      #@el.scale.set(@scale, @scale, @scale)
-      #@container.add(@el)
-
 
       for i in [0..@values.numItems - 1]
         num_childs = 1
         scale = Math.random() + 0.2
 
-        position = new THREE.Vector3(Math.random() * spread - spread_half, Math.random() * spread - spread_half, i * -20)
-        rotation = Math.random() * 0.1 + Math.PI / 2
-        if Math.random() > 0.7
-
+        posX = rngX.random(spread * 100) * 0.01 - spread_half
+        posY = rngY.random(spread * 100) * 0.01 - spread_half
+        position = new THREE.Vector3(posX, posY, i * -@values.depth)
+        rotation = rngRotationZ.random(0, 1000) * 100 + Math.PI / 2
+        if rngRotationZ.random(0, 1000) * 0.01 > 0.7
           scale *= 0.3
 
-        num_childs = parseInt(Math.random() * 7, 10) + 1
+        num_childs = parseInt(rngChilds.random(0, @values.maxChilds), 10)
         #num_childs = 6
 
         #material = @getMaterial(0xffffff)
@@ -107,7 +100,7 @@ define (require) ->
         @addItem(geom, material, i, scale, position, rotation)
 
         if num_childs > 1
-          spacing = 30 + Math.random() * 40
+          spacing = 30 + rngSpacing.random(0, 100) * 0.4
           offset = position.clone().normalize().multiplyScalar(spacing)
           offset.z = 0
 
@@ -117,7 +110,7 @@ define (require) ->
             @addItem(geom, material, i, scale, pos2, rotation)
 
     addItem: (geom, material, i, scale, position, rotation) ->
-      position.y = position.y * 0.1
+      #position.y = position.y * 0.1
 
       item = new THREE.Mesh(geom , material )
       item.position.x = position.x
@@ -172,6 +165,12 @@ define (require) ->
 
     update: (seconds, values = false, force = false) ->
       if values == false then values = @values
+      needs_rebuild = false
+
+      # Check if any of the invaldating property changed.
+      for key, prop of OrganizedChaos.properties
+        if prop.triggerRebuild && @valueChanged(key, values)
+          needs_rebuild = true
 
       volume = Audio.instance.mid
 
@@ -187,6 +186,11 @@ define (require) ->
 
       #for item in @items
       #  item.update()
+      # save the new values
+      @values = _.merge(@values, values)
+
+      if needs_rebuild == true
+        @rebuild(seconds)
       return
 
     destroy: () ->
