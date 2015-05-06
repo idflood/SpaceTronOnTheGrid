@@ -69,7 +69,7 @@ define (require) ->
       #circles = new Circles(@scene, 10, 4323, 130, 20, 50)
       #circles2 = new Circles(@scene, 20, 51232, 180, 4, 10)
 
-      light1 = new THREE.PointLight( 0xffffff, 3, 1400 )
+      light1 = new THREE.DirectionalLight( 0xffffff, 0.4 )
       light1.position.set(100, 300, 700)
       @scene.add(light1)
 
