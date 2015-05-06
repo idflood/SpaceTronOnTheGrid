@@ -44,6 +44,9 @@ define (require) ->
       @tweenTime.timer.statusChanged.add(@onTimerStatusChanged)
       @tweenTime.timer.seeked.add(@onTimerSeeked)
 
+      if @settings.time
+        @tweenTime.timer.seek([@settings.time])
+
       size = @getScreenSize()
       @camera = new THREE.PerspectiveCamera( 45, size.width / size.height, 1, 2000 )
       @camera.position.z = 600

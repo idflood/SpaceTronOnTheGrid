@@ -19,14 +19,14 @@ define (require) ->
 
 
     @properties:
-      numItems: {name: 'numItems', label: 'num items', val: 10, triggerRebuild: true}
-      seed: {name: 'seed', label: 'seed', val: 10042, triggerRebuild: true}
-      depth: {name: 'depth', label: 'depth', val: 20, triggerRebuild: true}
-      spread: {name: 'spread', label: 'spread', val: 300, triggerRebuild: true}
-      maxChilds: {name: 'maxChilds', label: 'maxChilds', val: 8, triggerRebuild: true}
-      x: {name: 'x', label: 'x', val: 0}
-      y: {name: 'y', label: 'y', val: 0}
-      z: {name: 'z', label: 'z', val: 0}
+      numItems: {name: 'numItems', label: 'num items', val: 10, triggerRebuild: true, group: "global"}
+      seed: {name: 'seed', label: 'seed', val: 10042, triggerRebuild: true, group: "global"}
+      depth: {name: 'depth', label: 'depth', val: 20, triggerRebuild: true, group: "global"}
+      spread: {name: 'spread', label: 'spread', val: 300, triggerRebuild: true, group: "global"}
+      maxChilds: {name: 'maxChilds', label: 'maxChilds', val: 8, triggerRebuild: true, group: "global"}
+      x: {name: 'x', label: 'x', val: 0, group: "position"}
+      y: {name: 'y', label: 'y', val: 0, group: "position"}
+      z: {name: 'z', label: 'z', val: 0, group: "position"}
 
     getDefaultProperties: () -> OrganizedChaos.properties
 

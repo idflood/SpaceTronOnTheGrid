@@ -21,7 +21,6 @@ define (require) ->
       })
       @onMenuCreated($('.timeline__menu'))
 
-
       $container = $(window.app.containerWebgl)
       offset = new THREE.Vector3()
       projector = new THREE.Projector()
