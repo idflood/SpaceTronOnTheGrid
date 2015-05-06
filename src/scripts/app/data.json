@@ -4,7 +4,7 @@
     "duration": 240,
     "domain": [
       0,
-      59367
+      83646
     ]
   },
   "data": [
@@ -84,35 +84,35 @@
       "id": "item2",
       "label": "Chaos 2",
       "type": "Chaos",
-      "start": 0,
-      "end": 21.687,
+      "start": 3.086,
+      "end": 41.33200000000003,
       "collapsed": false,
       "properties": [
         {
           "name": "numItems",
           "label": "num items",
-          "val": 145,
+          "val": 7,
           "triggerRebuild": true,
           "keys": []
         },
         {
           "name": "seed",
           "label": "seed",
-          "val": 50,
+          "val": 70,
           "triggerRebuild": true,
           "keys": []
         },
         {
           "name": "depth",
           "label": "depth",
-          "val": 8,
+          "val": 17.6,
           "triggerRebuild": true,
           "keys": []
         },
         {
           "name": "spread",
           "label": "spread",
-          "val": -130,
+          "val": 12.7,
           "triggerRebuild": true,
           "keys": []
         },
@@ -138,19 +138,19 @@
         {
           "name": "z",
           "label": "z",
-          "val": 0,
+          "val": -418,
           "keys": []
         }
       ],
       "values": {
-        "numItems": 145,
-        "seed": 50,
-        "depth": 8,
-        "spread": -130,
+        "numItems": 7,
+        "seed": 70,
+        "depth": 17.6,
+        "spread": 12.7,
         "maxChilds": 3,
         "x": 0,
         "y": 0,
-        "z": 0
+        "z": -418
       },
       "isDirtyObject": false
     },
@@ -159,42 +159,42 @@
       "id": "item3",
       "label": "Chaos 3",
       "type": "Chaos",
-      "start": 5.627,
-      "end": 43.101,
+      "start": -0.035,
+      "end": 37.43900000000004,
       "collapsed": false,
       "properties": [
         {
           "name": "numItems",
           "label": "num items",
-          "val": 186,
+          "val": 1,
           "triggerRebuild": true,
           "keys": []
         },
         {
           "name": "seed",
           "label": "seed",
-          "val": 27042,
+          "val": 20042,
           "triggerRebuild": true,
           "keys": []
         },
         {
           "name": "depth",
           "label": "depth",
-          "val": 20,
+          "val": 22,
           "triggerRebuild": true,
           "keys": []
         },
         {
           "name": "spread",
           "label": "spread",
-          "val": 40,
+          "val": 0,
           "triggerRebuild": true,
           "keys": []
         },
         {
           "name": "maxChilds",
           "label": "maxChilds",
-          "val": 9,
+          "val": 1,
           "triggerRebuild": true,
           "keys": []
         },
@@ -207,25 +207,100 @@
         {
           "name": "y",
           "label": "y",
-          "val": -20,
+          "val": -1.15,
           "keys": []
         },
         {
           "name": "z",
           "label": "z",
-          "val": -490,
+          "val": -80,
           "keys": []
         }
       ],
       "values": {
-        "numItems": 186,
-        "seed": 27042,
-        "depth": 20,
-        "spread": 40,
-        "maxChilds": 9,
+        "numItems": 1,
+        "seed": 20042,
+        "depth": 22,
+        "spread": 0,
+        "maxChilds": 1,
         "x": 0,
-        "y": -20,
-        "z": -490
+        "y": -1.15,
+        "z": -80
+      },
+      "isDirtyObject": false
+    },
+    {
+      "isDirty": true,
+      "id": "item4",
+      "label": "Chaos 4",
+      "type": "Chaos",
+      "start": 12.727,
+      "end": 39.6,
+      "collapsed": false,
+      "properties": [
+        {
+          "name": "numItems",
+          "label": "num items",
+          "val": 30,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "seed",
+          "label": "seed",
+          "val": 137042,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "depth",
+          "label": "depth",
+          "val": 12,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "spread",
+          "label": "spread",
+          "val": 60,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "maxChilds",
+          "label": "maxChilds",
+          "val": 8,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "x",
+          "label": "x",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "y",
+          "label": "y",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "z",
+          "label": "z",
+          "val": -640,
+          "keys": []
+        }
+      ],
+      "values": {
+        "numItems": 30,
+        "seed": 137042,
+        "depth": 12,
+        "spread": 60,
+        "maxChilds": 8,
+        "x": 0,
+        "y": 0,
+        "z": -640
       },
       "isDirtyObject": false
     }
