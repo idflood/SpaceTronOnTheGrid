@@ -19,6 +19,7 @@ float turbulence( vec3 p ) {
 void main() {
     vUv = uv;
 
+
     float time2 = time + seed;
 
     // add time to the noise parameters so it's animated
@@ -34,5 +35,6 @@ void main() {
     vec3 normal2 = normalize(position - 0.5);
     float strengthMultiplier = 15.0;
     vec3 newPosition = position + vec3(normal2.x, normal2.y, 0.0) * displacement * strength * strengthMultiplier;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
+    //gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 }

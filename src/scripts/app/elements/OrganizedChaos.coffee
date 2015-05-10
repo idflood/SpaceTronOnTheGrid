@@ -17,16 +17,23 @@ define (require) ->
     @ringGeom = new THREE.RingGeometry( 10 - 1, 10 + 1, 30, 1, 0, Math.PI * 2 )
     @ringGeom2 = new CircleGeometry2( 10, 30, 0, Math.PI * 2 )
 
-
     @properties:
       numItems: {name: 'numItems', label: 'num items', val: 10, triggerRebuild: true, group: "global"}
       seed: {name: 'seed', label: 'seed', val: 10042, triggerRebuild: true, group: "global"}
       depth: {name: 'depth', label: 'depth', val: 20, triggerRebuild: true, group: "global"}
       spread: {name: 'spread', label: 'spread', val: 300, triggerRebuild: true, group: "global"}
+      spreadY: {name: 'spreadY', label: 'spreadY', val: 300, triggerRebuild: true, group: "global"}
       maxChilds: {name: 'maxChilds', label: 'maxChilds', val: 8, triggerRebuild: true, group: "global"}
       x: {name: 'x', label: 'x', val: 0, group: "position"}
       y: {name: 'y', label: 'y', val: 0, group: "position"}
       z: {name: 'z', label: 'z', val: 0, group: "position"}
+      rotationX: {name: 'rotationX', label: 'x', val: 0, group: "rotation", triggerRebuild: true}
+      rotationY: {name: 'rotationY', label: 'y', val: 0, group: "rotation", triggerRebuild: true}
+      rotationZ: {name: 'rotationZ', label: 'z', val: 0, group: "rotation", triggerRebuild: true}
+      rotationRandX: {name: 'rotationRandX', label: 'rand x', val: 0, group: "rotation", triggerRebuild: true}
+      rotationRandY: {name: 'rotationRandY', label: 'rand y', val: 0, group: "rotation", triggerRebuild: true}
+      rotationRandZ: {name: 'rotationRandZ', label: 'rand z', val: 1, group: "rotation", triggerRebuild: true}
+      circles: {name: 'circles', label: 'circles', val: 0, triggerRebuild: true, group: "geometry"}
 
     getDefaultProperties: () -> OrganizedChaos.properties
 
@@ -59,11 +66,15 @@ define (require) ->
     build: (time = 0) ->
       rngX = new RNG(@values.seed + "x")
       rngY = new RNG(@values.seed + "y")
+      rngRotationX = new RNG(@values.seed + "rotationX")
+      rngRotationY = new RNG(@values.seed + "rotationY")
       rngRotationZ = new RNG(@values.seed + "rotationZ")
       rngChilds = new RNG(@values.seed + "childs")
       rngSpacing = new RNG(@values.seed + "spacing")
+      rngType = new RNG(@values.seed + "type")
 
-      material = new THREE.MeshPhongMaterial({ ambient: 0x030303, color: 0xdddddd, specular: 0xffffff, shininess: 10, shading: THREE.FlatShading })
+      #material = new THREE.MeshPhongMaterial({ ambient: 0x030303, color: 0xdddddd, specular: 0xffffff, shininess: 10, shading: THREE.FlatShading, side: THREE.DoubleSide })
+      material = new THREE.MeshBasicMaterial({color: 0xdddddd, shading: THREE.FlatShading, side: THREE.DoubleSide})
       material.blending = THREE.AdditiveBlending
 
       geom = OrganizedChaos.circleGeom
@@ -71,31 +82,42 @@ define (require) ->
       spread = @values.spread
       spread_half = spread / 2
 
+      spreadY = @values.spreadY
+      spreadY_half = spreadY / 2
+
+      #material = @getMaterial(0xffffff)
+
       for i in [0..@values.numItems - 1]
         num_childs = 1
         scale = Math.random() + 0.2
 
         posX = rngX.random(spread * 100) * 0.01 - spread_half
-        posY = rngY.random(spread * 100) * 0.01 - spread_half
+        posY = rngY.random(spreadY * 100) * 0.01 - spreadY_half
         position = new THREE.Vector3(posX, posY, i * -@values.depth)
-        rotation = rngRotationZ.random(0, 1000) * 100 + Math.PI / 2
-        if rngRotationZ.random(0, 1000) * 0.01 > 0.7
-          scale *= 0.3
+        rotationX = (rngRotationX.random(0, 1000) / 1000 * Math.PI) * @values.rotationRandX + @values.rotationX * Math.PI
+        rotationY = (rngRotationY.random(0, 1000) / 1000 * Math.PI) * @values.rotationRandY + @values.rotationY * Math.PI
+        rotationZ = (rngRotationZ.random(0, 1000) / 1000 * Math.PI) * @values.rotationRandZ + @values.rotationZ * Math.PI
+        rotation = new THREE.Vector3(rotationX, rotationY, rotationZ)
+        #if rngRotationZ.random(0, 1000) * 0.01 > 0.7
+        #  scale *= 0.3
 
         num_childs = parseInt(rngChilds.random(0, @values.maxChilds), 10)
         #num_childs = 6
 
         #material = @getMaterial(0xffffff)
         #geom = OrganizedChaos.circleGeom
-        geom = OrganizedChaos.ringGeom2
+        #geom = OrganizedChaos.ringGeom2
 
 
-        #if Math.random() < 0.7
-        #  geom = OrganizedChaos.ringGeom
+        itemType = rngType.random(0, 1000) / 1000
+
 
         #if Math.random() < 0.7
         #  geom = OrganizedChaos.lineGeom
         geom = OrganizedChaos.lineGeom
+
+        if Math.random() < @values.circles
+          geom = OrganizedChaos.ringGeom
 
         @addItem(geom, material, i, scale, position, rotation)
 
@@ -116,7 +138,7 @@ define (require) ->
       item.position.x = position.x
       item.position.y = position.y
       item.position.z = position.z
-      item.rotation.set(0,0, rotation)
+      item.rotation.set(rotation.x, rotation.y, rotation.z)
       item.scale.set(scale, scale, scale)
       @container.add(item)
       @items.push(item)
@@ -126,7 +148,7 @@ define (require) ->
       item2.position.x = position.x * -1
       item2.position.y = position.y
       item2.position.z = position.z
-      item2.rotation.set(0,0, rotation * -1)
+      item2.rotation.set(rotation.x, rotation.y * -1, rotation.z * -1)
       item2.scale.set(scale, scale, scale)
       @container.add(item2)
       @items.push(item2)
@@ -147,16 +169,20 @@ define (require) ->
         },
         color: {
           type: 'c',
-          value: color
-        }
+          value: new THREE.Color(color)
+        },
+        fogColor:    { type: "c", value: new THREE.Color(0x111111) },
+        fogDensity:      { type: "f", 0.2045}
       }
       material = new THREE.ShaderMaterial({
         vertexShader: ShaderVertex,
         fragmentShader: ShaderFragement,
+        side: THREE.DoubleSide,
         uniforms: uniforms,
         transparent: true,
         depthWrite: false,
-        depthTest: false
+        depthTest: false,
+        fog: true
         })
 
       #material = new THREE.MeshPhongMaterial({ ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading })

@@ -7,7 +7,7 @@ define (require) ->
 
     constructor: (mp3Url, @onLoadedCallback) ->
       window.audio = this
-      muted = false
+      muted = true
       @fftSize = 512
       @filters = {}
       @playing = false

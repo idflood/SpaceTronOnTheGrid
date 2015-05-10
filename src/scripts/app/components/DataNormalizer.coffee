@@ -21,7 +21,7 @@ define (require) ->
           new_prop.keys = []
           data_item.properties.push(new_prop)
         # Add the group information.
-        if !existing_prop.group && static_prop.group
+        if existing_prop && !existing_prop.group && static_prop.group
           existing_prop.group = static_prop.group
       return data_item
 

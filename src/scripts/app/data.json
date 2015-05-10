@@ -1,10 +1,10 @@
 {
   "settings": {
-    "time": 0,
+    "time": 19066,
     "duration": 240,
     "domain": [
       0,
-      83646
+      48000
     ]
   },
   "data": [
@@ -71,7 +71,7 @@
       "values": {
         "x": 0,
         "y": 0,
-        "z": 200,
+        "z": -417.91803746874996,
         "target_x": 0,
         "target_y": 0,
         "target_z": -10000,
