@@ -27,12 +27,12 @@ define (require) ->
       x: {name: 'x', label: 'x', val: 0, group: "position"}
       y: {name: 'y', label: 'y', val: 0, group: "position"}
       z: {name: 'z', label: 'z', val: 0, group: "position"}
-      rotationX: {name: 'rotationX', label: 'x', val: 0, group: "rotation", triggerRebuild: true}
-      rotationY: {name: 'rotationY', label: 'y', val: 0, group: "rotation", triggerRebuild: true}
-      rotationZ: {name: 'rotationZ', label: 'z', val: 0, group: "rotation", triggerRebuild: true}
-      rotationRandX: {name: 'rotationRandX', label: 'rand x', val: 0, group: "rotation", triggerRebuild: true}
-      rotationRandY: {name: 'rotationRandY', label: 'rand y', val: 0, group: "rotation", triggerRebuild: true}
-      rotationRandZ: {name: 'rotationRandZ', label: 'rand z', val: 1, group: "rotation", triggerRebuild: true}
+      rotationX: {name: 'rotationX', label: 'x', val: 0, min: 0, max: 2, group: "rotation", triggerRebuild: true}
+      rotationY: {name: 'rotationY', label: 'y', val: 0, min: 0, max: 2, group: "rotation", triggerRebuild: true}
+      rotationZ: {name: 'rotationZ', label: 'z', val: 0, min: 0, max: 2, group: "rotation", triggerRebuild: true}
+      rotationRandX: {name: 'rotationRandX', label: 'rand x', val: 0, min: 0, max: 1, group: "rotation", triggerRebuild: true}
+      rotationRandY: {name: 'rotationRandY', label: 'rand y', val: 0, min: 0, max: 1, group: "rotation", triggerRebuild: true}
+      rotationRandZ: {name: 'rotationRandZ', label: 'rand z', val: 1, min: 0, max: 1, group: "rotation", triggerRebuild: true}
       circles: {name: 'circles', label: 'circles', val: 0, triggerRebuild: true, group: "geometry"}
 
     getDefaultProperties: () -> OrganizedChaos.properties
