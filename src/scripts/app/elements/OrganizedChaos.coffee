@@ -34,6 +34,8 @@ define (require) ->
       rotationRandY: {name: 'rotationRandY', label: 'rand y', val: 0, min: 0, max: 1, group: "rotation", triggerRebuild: true}
       rotationRandZ: {name: 'rotationRandZ', label: 'rand z', val: 1, min: 0, max: 1, group: "rotation", triggerRebuild: true}
       circles: {name: 'circles', label: 'circles', val: 0, triggerRebuild: true, group: "geometry"}
+      materialColors: {name: 'materialColors', label: 'percent colors', val: 0, triggerRebuild: true, group: "material"}
+      materialAnimated: {name: 'materialAnimated', label: 'percent animated', val: 0, triggerRebuild: true, group: "material"}
 
     getDefaultProperties: () -> OrganizedChaos.properties
 
@@ -76,6 +78,8 @@ define (require) ->
       #material = new THREE.MeshPhongMaterial({ ambient: 0x030303, color: 0xdddddd, specular: 0xffffff, shininess: 10, shading: THREE.FlatShading, side: THREE.DoubleSide })
       material = new THREE.MeshBasicMaterial({color: 0xdddddd, shading: THREE.FlatShading, side: THREE.DoubleSide})
       material.blending = THREE.AdditiveBlending
+
+      material = window.shaders.getMaterialLine()
 
       geom = OrganizedChaos.circleGeom
 
@@ -134,24 +138,42 @@ define (require) ->
     addItem: (geom, material, i, scale, position, rotation) ->
       #position.y = position.y * 0.1
 
-      item = new THREE.Mesh(geom , material )
+      quaternion = new THREE.Quaternion()
+      quaternion.setFromAxisAngle(new THREE.Vector3(rotation.x, rotation.y, rotation.z), Math.PI / 2)
+      item = new THREE.Mesh(geom , material)
+      #item.useQuaternion = true
       item.position.x = position.x
       item.position.y = position.y
       item.position.z = position.z
-      item.rotation.set(rotation.x, rotation.y, rotation.z)
+      item.rotation.setFromQuaternion(quaternion)
+      #item.rotation.set(rotation.x, rotation.y, rotation.z)
       item.scale.set(scale, scale, scale)
+      item.updateMatrix()
       @container.add(item)
       @items.push(item)
 
       # mirroring
-      item2 = new THREE.Mesh(geom , material )
-      item2.position.x = position.x * -1
+      item2Container = new THREE.Object3D()
+
+      @container.add(item2Container)
+      item2 = new THREE.Mesh(geom , material)
+      #item2.useQuaternion = true
+      item2.position.x = position.x
       item2.position.y = position.y
       item2.position.z = position.z
-      item2.rotation.set(rotation.x, rotation.y * -1, rotation.z * -1)
+      # mirror rotation
+      item2.rotation.setFromQuaternion(quaternion)
+      #item2.rotation.setFromQuaternion(new THREE.Quaternion(-quaternion.x, quaternion.y, quaternion.z, -quaternion.w))
+      #item2.rotation = new THREE.Quaternion(quaternion.x, -quaternion.y, -quaternion.z, quaternion.w)
+      #item2.rotation.set(rotation.x, rotation.y * -1, rotation.z * -1)
+      #item2.rotation.set(rotation.x, rotation.y, rotation.z * -1)
       item2.scale.set(scale, scale, scale)
-      @container.add(item2)
-      @items.push(item2)
+      item2.updateMatrix()
+      #@container.add(item2)
+      item2Container.add(item2)
+      item2Container.scale.x = -1
+      #@items.push(item2)
+      @items.push(item2Container)
 
     getMaterial: (color) ->
       uniforms = {

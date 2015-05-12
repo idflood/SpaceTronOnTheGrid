@@ -12,6 +12,7 @@ define (require) ->
 
   TweenTime = require 'TweenTime'
 
+  Shaders = require 'app/components/Shaders'
   Background = require 'app/components/Background'
   PostFX = require 'app/components/PostFX'
   SceneManager = require 'app/components/SceneManager'
@@ -29,6 +30,8 @@ define (require) ->
   window.App = class App
     constructor: () ->
       window.updateCameraAspect = @updateCameraAspect
+
+      @shaders = new Shaders()
 
       audio_url = './assets/08 - Space Tron On The Grid.mp3'
       @audio = new Audio(audio_url, @onAudioLoaded)
@@ -190,6 +193,7 @@ define (require) ->
     animate: () =>
       requestAnimationFrame(@animate)
       @audio.update()
+      @shaders.update()
       @render()
 
     render: () ->
