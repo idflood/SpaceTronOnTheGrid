@@ -8,20 +8,30 @@ define (require) ->
   class Shaders
     constructor: () ->
       window.shaders = this
+      @shaders = []
 
       # A non dynamic shader, can be used for all geometries
       @simpleMaterial = new THREE.MeshBasicMaterial({color: 0xdddddd, shading: THREE.FlatShading, side: THREE.DoubleSide})
 
-      @lineMaterial1 = @createMaterialLine()
+      for i in [0...50]
+
+        @shaders.push(@createMaterialLine(0xdddddd))
+      console.log @shaders
 
     update: () ->
-      @lineMaterial1.uniforms.percent.value = (@lineMaterial1.uniforms.percent.value + 0.01) % 2
+
+      for shader in @shaders
+        #shader.uniforms.percent.value = (shader.uniforms.percent.value + 0.01) % 2
+
+        shader.uniforms.percent.value = Math.max(0, shader.uniforms.percent.value - shader.speed * 0.03)
+        if window.audio.mid > 0.8 && Math.random() < 0.02
+          shader.uniforms.percent.value = 2
       #console.log @lineMaterial1.uniforms.percent.value
 
-    getMaterialLine: () ->
-      if Math.random() <= 0.5
+    getMaterialLine: (animated) ->
+      if animated == false
         return @simpleMaterial
-      return @lineMaterial1
+      return @shaders[Math.floor(Math.random() * @shaders.length)]
 
     createMaterialLine: (color) ->
       uniforms = {
@@ -48,5 +58,6 @@ define (require) ->
         fog: true
         })
 
-      #material.blending = THREE.AdditiveBlending
+      material.speed = Math.random() + 0.5 # custom property for per shader transition speed
+      material.blending = THREE.AdditiveBlending
       return material

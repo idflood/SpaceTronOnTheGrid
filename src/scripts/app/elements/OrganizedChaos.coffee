@@ -11,11 +11,18 @@ define (require) ->
   ShaderVertex = require 'app/shaders/BasicNoise.vert'
   ShaderFragement = require 'app/shaders/BasicNoise.frag'
 
+
+
+
   class OrganizedChaos extends ElementBase
     @lineGeom = new THREE.PlaneGeometry( 100, 1)
     @circleGeom = new THREE.CircleGeometry( 10, 30, 0, Math.PI * 2 )
     @ringGeom = new THREE.RingGeometry( 10 - 1, 10 + 1, 30, 1, 0, Math.PI * 2 )
     @ringGeom2 = new CircleGeometry2( 10, 30, 0, Math.PI * 2 )
+
+    @TYPE_LINE = 0
+    @TYPE_SQUARE = 1
+    @TYPE_CIRCLE = 2
 
     @properties:
       numItems: {name: 'numItems', label: 'num items', val: 10, triggerRebuild: true, group: "global"}
@@ -34,6 +41,9 @@ define (require) ->
       rotationRandY: {name: 'rotationRandY', label: 'rand y', val: 0, min: 0, max: 1, group: "rotation", triggerRebuild: true}
       rotationRandZ: {name: 'rotationRandZ', label: 'rand z', val: 1, min: 0, max: 1, group: "rotation", triggerRebuild: true}
       circles: {name: 'circles', label: 'circles', val: 0, triggerRebuild: true, group: "geometry"}
+      squares: {name: 'squares', label: 'squares', val: 0, triggerRebuild: true, group: "geometry"}
+      lineWidth: {name: 'lineWidth', label: 'line width', val: 1, triggerRebuild: true, group: "line"}
+      lineWidthRand: {name: 'lineWidthRand', label: 'line width randomness', val: 0, triggerRebuild: true, group: "line"}
       materialColors: {name: 'materialColors', label: 'percent colors', val: 0, triggerRebuild: true, group: "material"}
       materialAnimated: {name: 'materialAnimated', label: 'percent animated', val: 0, triggerRebuild: true, group: "material"}
 
@@ -65,21 +75,33 @@ define (require) ->
         #item.destroy()
       @items = []
 
+    getItemType: (rng) ->
+      itemType = rng.random(0, 1000) / 1000
+
+      if itemType < @values.circles
+        return OrganizedChaos.TYPE_CIRCLE
+
+      if itemType < @values.circles + @values.squares
+        return OrganizedChaos.TYPE_SQUARE
+
+      return OrganizedChaos.TYPE_LINE
+
     build: (time = 0) ->
       rngX = new RNG(@values.seed + "x")
       rngY = new RNG(@values.seed + "y")
       rngRotationX = new RNG(@values.seed + "rotationX")
       rngRotationY = new RNG(@values.seed + "rotationY")
       rngRotationZ = new RNG(@values.seed + "rotationZ")
+      rngScale = new RNG(@values.seed + "scale")
+      rngScaleLine = new RNG(@values.seed + "scaleLine")
       rngChilds = new RNG(@values.seed + "childs")
       rngSpacing = new RNG(@values.seed + "spacing")
       rngType = new RNG(@values.seed + "type")
+      rngShaderAnim = new RNG(@values.seed + "shaderAnim")
 
       #material = new THREE.MeshPhongMaterial({ ambient: 0x030303, color: 0xdddddd, specular: 0xffffff, shininess: 10, shading: THREE.FlatShading, side: THREE.DoubleSide })
-      material = new THREE.MeshBasicMaterial({color: 0xdddddd, shading: THREE.FlatShading, side: THREE.DoubleSide})
-      material.blending = THREE.AdditiveBlending
-
-      material = window.shaders.getMaterialLine()
+      #material = new THREE.MeshBasicMaterial({color: 0xdddddd, shading: THREE.FlatShading, side: THREE.DoubleSide})
+      #material.blending = THREE.AdditiveBlending
 
       geom = OrganizedChaos.circleGeom
 
@@ -91,9 +113,13 @@ define (require) ->
 
       #material = @getMaterial(0xffffff)
 
-      for i in [0..@values.numItems - 1]
+      for i in [0...@values.numItems]
+        animated = false
+        if rngShaderAnim.random(100) / 100 < @values.materialAnimated
+          animated = true
+        material = window.shaders.getMaterialLine(animated)
         num_childs = 1
-        scale = Math.random() + 0.2
+        scale = rngScale.random(0, 100) / 100 + 0.2
 
         posX = rngX.random(spread * 100) * 0.01 - spread_half
         posY = rngY.random(spreadY * 100) * 0.01 - spreadY_half
@@ -102,6 +128,8 @@ define (require) ->
         rotationY = (rngRotationY.random(0, 1000) / 1000 * Math.PI) * @values.rotationRandY + @values.rotationY * Math.PI
         rotationZ = (rngRotationZ.random(0, 1000) / 1000 * Math.PI) * @values.rotationRandZ + @values.rotationZ * Math.PI
         rotation = new THREE.Vector3(rotationX, rotationY, rotationZ)
+        scale = new THREE.Vector3(scale, scale, scale)
+
         #if rngRotationZ.random(0, 1000) * 0.01 > 0.7
         #  scale *= 0.3
 
@@ -113,15 +141,20 @@ define (require) ->
         #geom = OrganizedChaos.ringGeom2
 
 
-        itemType = rngType.random(0, 1000) / 1000
+        itemType = @getItemType(rngType)
 
 
         #if Math.random() < 0.7
         #  geom = OrganizedChaos.lineGeom
         geom = OrganizedChaos.lineGeom
 
-        if Math.random() < @values.circles
+        if itemType == OrganizedChaos.TYPE_LINE
+          scale.y = (scale.y * @values.lineWidth) * (rngScaleLine.random(1, 100) / 100) * (@values.lineWidthRand + 1)
+
+        if itemType == OrganizedChaos.TYPE_CIRCLE
           geom = OrganizedChaos.ringGeom
+
+
 
         @addItem(geom, material, i, scale, position, rotation)
 
@@ -147,7 +180,7 @@ define (require) ->
       item.position.z = position.z
       item.rotation.setFromQuaternion(quaternion)
       #item.rotation.set(rotation.x, rotation.y, rotation.z)
-      item.scale.set(scale, scale, scale)
+      item.scale.copy(scale)
       item.updateMatrix()
       @container.add(item)
       @items.push(item)
@@ -167,7 +200,7 @@ define (require) ->
       #item2.rotation = new THREE.Quaternion(quaternion.x, -quaternion.y, -quaternion.z, quaternion.w)
       #item2.rotation.set(rotation.x, rotation.y * -1, rotation.z * -1)
       #item2.rotation.set(rotation.x, rotation.y, rotation.z * -1)
-      item2.scale.set(scale, scale, scale)
+      item2.scale.copy(scale)
       item2.updateMatrix()
       #@container.add(item2)
       item2Container.add(item2)

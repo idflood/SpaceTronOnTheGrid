@@ -133,6 +133,8 @@ define (require) ->
       @bass = bins[1]
       @mid = bins[2]
       @high = bins[3]
+      #if Math.random() < 0.04
+      #  console.log(@bass, @mid, @high)
 
       @now = @context.currentTime - @timeDelay
 
