@@ -38,6 +38,11 @@ vec2  whiteCompliment( in vec2 a )  { return saturate( vec2(1.0) - a ); }
 vec3  whiteCompliment( in vec3 a )  { return saturate( vec3(1.0) - a ); }
 vec4  whiteCompliment( in vec4 a )  { return saturate( vec4(1.0) - a ); }
 
+float quadraticInOut(float t) {
+  float p = 2.0 * t * t;
+  return t < 0.5 ? p : -p + (4.0 * t) - 1.0;
+}
+
 vec3 inputToLinear( in vec3 a ) {
   return a;
 }
@@ -53,7 +58,9 @@ void main() {
 
   float alpha = 0.0;
 
-  if (vUv.x < percent && vUv.x >= percent - 1.0) {
+  float percentInOut = quadraticInOut(percent / 2.0) * 2.0;
+
+  if (vUv.x < percentInOut && vUv.x >= percentInOut - 1.0) {
     alpha = 1.0;
   }
 
