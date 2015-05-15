@@ -24,8 +24,10 @@ define (require) ->
         #shader.uniforms.percent.value = (shader.uniforms.percent.value + 0.01) % 2
 
         shader.uniforms.percent.value = Math.max(0, shader.uniforms.percent.value - shader.speed * 0.03)
-        if window.audio.mid > 0.8 && Math.random() < 0.02
-          shader.uniforms.percent.value = 2
+        # Only bump value if it is not already animating.
+        if shader.uniforms.percent.value < 0.01
+          if window.audio.mid > 0.8 && Math.random() < 0.02
+            shader.uniforms.percent.value = 2
       #console.log @lineMaterial1.uniforms.percent.value
 
     getMaterialLine: (animated) ->
