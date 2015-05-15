@@ -33,6 +33,12 @@ define (require) ->
         new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.25, transparent: true } )
       )
       plane.visible = false
+
+
+      @editor.onSelect.add((item, addToSelection) ->
+        # Trigger window resize in order to resize the 3d render.
+        window.dispatchEvent(new Event('resize'))
+      )
       #window.app.scene.add( plane )
 
       getRaycaster = () =>
