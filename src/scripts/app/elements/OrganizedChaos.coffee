@@ -134,13 +134,10 @@ define (require) ->
         #  scale *= 0.3
 
         num_childs = parseInt(rngChilds.random(0, @values.maxChilds), 10)
-        #num_childs = 6
 
         #material = @getMaterial(0xffffff)
         #geom = OrganizedChaos.circleGeom
         #geom = OrganizedChaos.ringGeom2
-
-
         itemType = @getItemType(rngType)
 
 
@@ -150,11 +147,11 @@ define (require) ->
 
         if itemType == OrganizedChaos.TYPE_LINE
           scale.y = (scale.y * @values.lineWidth) * (rngScaleLine.random(1, 100) / 100) * (@values.lineWidthRand + 1)
+          # Define a minimum scale to avoid invisible lines
+          scale.y = Math.max(0.5, scale.y)
 
         if itemType == OrganizedChaos.TYPE_CIRCLE
           geom = OrganizedChaos.ringGeom
-
-
 
         @addItem(geom, material, i, scale, position, rotation)
 
@@ -169,17 +166,13 @@ define (require) ->
             @addItem(geom, material, i, scale, pos2, rotation)
 
     addItem: (geom, material, i, scale, position, rotation) ->
-      #position.y = position.y * 0.1
-
       quaternion = new THREE.Quaternion()
       quaternion.setFromAxisAngle(new THREE.Vector3(rotation.x, rotation.y, rotation.z), Math.PI / 2)
       item = new THREE.Mesh(geom , material)
-      #item.useQuaternion = true
       item.position.x = position.x
       item.position.y = position.y
       item.position.z = position.z
       item.rotation.setFromQuaternion(quaternion)
-      #item.rotation.set(rotation.x, rotation.y, rotation.z)
       item.scale.copy(scale)
       item.updateMatrix()
       @container.add(item)
@@ -190,7 +183,6 @@ define (require) ->
 
       @container.add(item2Container)
       item2 = new THREE.Mesh(geom , material)
-      #item2.useQuaternion = true
       item2.position.x = position.x
       item2.position.y = position.y
       item2.position.z = position.z
@@ -205,7 +197,6 @@ define (require) ->
       #@container.add(item2)
       item2Container.add(item2)
       item2Container.scale.x = -1
-      #@items.push(item2)
       @items.push(item2Container)
 
     getMaterial: (color) ->
