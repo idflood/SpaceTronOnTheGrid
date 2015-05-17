@@ -1,6 +1,7 @@
 define (require) ->
   THREE = require 'Three'
   Audio = require 'app/components/Audio'
+  Global = require 'app/elements/Global'
 
   ShaderVertex = require 'app/shaders/Basic.vert'
   LineFragement = require 'app/shaders/Line.frag'
@@ -44,8 +45,25 @@ define (require) ->
         shader.uniforms.percent.value = Math.max(0, shader.uniforms.percent.value - shader.speed * 0.03)
         # Only bump value if it is not already animating.
         if shader.uniforms.percent.value < 0.01
-          if window.audio.mid > 0.8 && Math.random() < 0.02
-            shader.uniforms.percent.value = 2
+          # only bump values once in a while. Without this
+          # every shaders would animate on the first boum.
+          if Math.random() < 0.02
+            bassSensibility = 0
+            midSensibility = 0
+            highSensibility = 0
+
+            globalValues = false
+            if window.global && window.global.values
+              globalValues = window.global.values
+              bassSensibility = globalValues.bassSensibility
+              midSensibility = globalValues.midSensibility
+              highSensibility = globalValues.highSensibility
+
+
+            if window.audio.bass > bassSensibility || window.audio.mid > midSensibility || window.audio.high > highSensibility
+              shader.uniforms.percent.value = 2
+            if globalValues && Math.random() < globalValues.autoAnimate
+              shader.uniforms.percent.value = 2
       #console.log @lineMaterial1.uniforms.percent.value
 
     getMaterialLine: (animated, color) ->

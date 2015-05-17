@@ -1,5 +1,6 @@
 define (require) ->
   Camera = require 'app/elements/Camera'
+  Global = require 'app/elements/Global'
   Circles = require 'app/elements/Circles'
   Boxes = require 'app/elements/Boxes'
   Lines = require 'app/elements/Lines'
@@ -28,6 +29,8 @@ define (require) ->
         classObject: Lines
       Camera:
         classObject: Camera
+      Global:
+        classObject: Global
       Box:
         classObject: SingleObject
       Circle:

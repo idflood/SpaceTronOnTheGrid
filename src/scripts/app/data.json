@@ -1,13 +1,81 @@
 {
   "settings": {
-    "time": 106743,
+    "time": 27840.76799999841,
     "duration": 240,
     "domain": [
-      47984,
-      169413
+      0,
+      240000
     ]
   },
   "data": [
+    {
+      "id": "gloabl",
+      "type": "Global",
+      "label": "Global",
+      "start": 0,
+      "end": 240,
+      "collapsed": false,
+      "properties": [
+        {
+          "name": "bassSensibility",
+          "label": "bassSensibility",
+          "val": 5,
+          "keys": [
+            {
+              "time": 130.80899999999997,
+              "val": 5,
+              "ease": "Quad.easeOut"
+            },
+            {
+              "time": 138.7439999999998,
+              "val": 0.8,
+              "ease": "Quad.easeOut"
+            }
+          ]
+        },
+        {
+          "name": "midSensibility",
+          "label": "midSensibility",
+          "val": 0.8,
+          "keys": []
+        },
+        {
+          "name": "highSensibility",
+          "label": "highSensibility",
+          "val": 5,
+          "keys": []
+        },
+        {
+          "name": "autoAnimate",
+          "label": "autoAnimate",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "keys": [
+            {
+              "time": 216.852,
+              "val": 0
+            },
+            {
+              "time": 236.5629999999993,
+              "val": 0.2,
+              "ease": "Quad.easeOut"
+            },
+            {
+              "time": 240,
+              "val": 1,
+              "ease": "Quad.easeOut"
+            }
+          ]
+        }
+      ],
+      "values": {
+        "bassSensibility": 5,
+        "midSensibility": 0.8,
+        "highSensibility": 5,
+        "autoAnimate": 0
+      }
+    },
     {
       "id": "camera1",
       "type": "Camera",
@@ -71,7 +139,7 @@
       "values": {
         "x": 0,
         "y": 0,
-        "z": -2601.4308403046875,
+        "z": -685.1261132384802,
         "target_x": 0,
         "target_y": 0,
         "target_z": -10000,

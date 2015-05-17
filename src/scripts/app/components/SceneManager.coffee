@@ -22,7 +22,8 @@ define (require) ->
           # Save reference to the custom object class in data
           item.object = el
           # And a reference to the data from the 3d container
-          el.container._data = item
+          if el.container
+            el.container._data = item
 
         # Remove the item from the scene
         if (item.object && should_exist == false) || item.isDirtyObject
@@ -40,7 +41,7 @@ define (require) ->
 
 
         # Add item to scene if it exists.
-        if should_exist && !item.object.container.parent
+        if should_exist && item.object.container && !item.object.container.parent
           @scene.add(item.object.container)
 
         # If this is a camera set it as the active camera.
