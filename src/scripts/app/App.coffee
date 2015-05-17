@@ -28,8 +28,12 @@ define (require) ->
   OrganizedChaos = require 'app/elements/OrganizedChaos'
 
   window.App = class App
-    constructor: () ->
+    constructor: (options = {}) ->
       window.updateCameraAspect = @updateCameraAspect
+
+      @autoplay = false
+      if options.autoplay?
+        @autoplay = options.autoplay
 
       @shaders = new Shaders()
 
@@ -39,7 +43,6 @@ define (require) ->
 
       # Convert loaded data
       conf = JSON.parse(dataJson)
-      console.log conf
       @settings = conf.settings
       @data = DataNormalizer.normalizeData(conf.data, @factory)
 
@@ -47,6 +50,8 @@ define (require) ->
       @tweenTime.timer.statusChanged.add(@onTimerStatusChanged)
       @tweenTime.timer.seeked.add(@onTimerSeeked)
 
+      if options.time?
+        @tweenTime.timer.seek([options.time])
       if @settings.time
         @tweenTime.timer.seek([@settings.time])
 
@@ -79,21 +84,12 @@ define (require) ->
       light1.position.set(100, 300, 700)
       @scene.add(light1)
 
-      #@createElements()
-
       container.appendChild( @renderer.domElement )
 
       window.addEventListener('resize', @onWindowResize, false)
 
       @postfx = new PostFX(@scene, @camera, @renderer, size)
-      #new Background(@scene)
 
-      #@particles = new Particles()
-      #@scene.add(@particles.container)
-
-      #@chaos = new OrganizedChaos()
-      #@chaos.container.position.z = 300
-      #@scene.add(@chaos.container)
 
       @animate()
 
@@ -109,6 +105,8 @@ define (require) ->
     onAudioLoaded: () =>
       console.log "audio loaded"
       $('body').addClass('is-audio-loaded')
+      if @autoplay
+        @tweenTime.timer.play()
 
     createElements: () ->
       material = new THREE.MeshPhongMaterial({color: 0x111111, specular: 0x666666, shininess: 30, shading: THREE.SmoothShading})

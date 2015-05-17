@@ -1,10 +1,10 @@
 {
   "settings": {
-    "time": 27840.76799999841,
+    "time": 158631.67400000268,
     "duration": 240,
     "domain": [
       0,
-      240000
+      239935
     ]
   },
   "data": [
@@ -29,6 +29,16 @@
             {
               "time": 138.7439999999998,
               "val": 0.8,
+              "ease": "Quad.easeOut"
+            },
+            {
+              "time": 144.14699999999996,
+              "val": 0.4,
+              "ease": "Quad.easeOut"
+            },
+            {
+              "time": 177.71099999999998,
+              "val": 0.6,
               "ease": "Quad.easeOut"
             }
           ]
@@ -70,7 +80,7 @@
         }
       ],
       "values": {
-        "bassSensibility": 5,
+        "bassSensibility": 0.5353737988297647,
         "midSensibility": 0.8,
         "highSensibility": 5,
         "autoAnimate": 0
@@ -139,7 +149,7 @@
       "values": {
         "x": 0,
         "y": 0,
-        "z": -685.1261132384802,
+        "z": -3384.4746852783082,
         "target_x": 0,
         "target_y": 0,
         "target_z": -10000,
@@ -2537,14 +2547,14 @@
       "id": "item11",
       "label": "Chaos 11",
       "type": "Chaos",
-      "start": 115.261,
-      "end": 151.148,
+      "start": 112.889,
+      "end": 152.972,
       "collapsed": false,
       "properties": [
         {
           "name": "numItems",
           "label": "num items",
-          "val": 46,
+          "val": 64,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -2552,7 +2562,7 @@
         {
           "name": "seed",
           "label": "seed",
-          "val": 44042,
+          "val": 44402,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -2759,7 +2769,7 @@
         {
           "name": "materialBlue",
           "label": "percent blue",
-          "val": 0.2,
+          "val": 0.3,
           "min": 0,
           "max": 1,
           "triggerRebuild": true,
@@ -2768,8 +2778,8 @@
         }
       ],
       "values": {
-        "numItems": 46,
-        "seed": 44042,
+        "numItems": 64,
+        "seed": 44402,
         "depth": 12,
         "spread": 300,
         "spreadY": 300,
@@ -2793,7 +2803,7 @@
         "horizontalSymmetry": 1,
         "verticalSymmetry": 0,
         "materialRed": 0,
-        "materialBlue": 0.2
+        "materialBlue": 0.3
       },
       "isDirtyObject": false
     },
@@ -2809,7 +2819,7 @@
         {
           "name": "numItems",
           "label": "num items",
-          "val": 48,
+          "val": 80,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -2817,7 +2827,7 @@
         {
           "name": "seed",
           "label": "seed",
-          "val": 60042,
+          "val": 516,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -2825,7 +2835,7 @@
         {
           "name": "depth",
           "label": "depth",
-          "val": 12,
+          "val": 6,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -3014,7 +3024,7 @@
         {
           "name": "materialRed",
           "label": "percent red",
-          "val": 0,
+          "val": 0.2,
           "min": 0,
           "max": 1,
           "triggerRebuild": true,
@@ -3033,9 +3043,9 @@
         }
       ],
       "values": {
-        "numItems": 48,
-        "seed": 60042,
-        "depth": 12,
+        "numItems": 80,
+        "seed": 516,
+        "depth": 6,
         "spread": 220,
         "spreadY": 50,
         "maxChilds": 12,
@@ -3057,7 +3067,7 @@
         "lineHeight": 0.5,
         "lineHeightRand": 1,
         "materialAnimated": 0.95,
-        "materialRed": 0,
+        "materialRed": 0.2,
         "materialBlue": 0.3
       },
       "isDirtyObject": false

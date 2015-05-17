@@ -105,5 +105,5 @@ define (require) ->
         })
 
       material.speed = Math.random() + 0.5 # custom property for per shader transition speed
-      #material.blending = THREE.AdditiveBlending
+      material.blending = THREE.AdditiveBlending
       return material
