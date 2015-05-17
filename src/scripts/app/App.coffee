@@ -65,7 +65,7 @@ define (require) ->
       @containerWebgl = container # Save for use in EditorUI for object picking.
       document.body.appendChild( container )
 
-      @renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } )
+      @renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } )
       @renderer.setPixelRatio( window.devicePixelRatio )
       @renderer.setSize(size.width, size.height)
 

@@ -24,6 +24,10 @@
     "glslify-loader": "^1.0.2",
     "glsl-noise": "0.0.0",
     "grunt-browser-sync": "^1.9.2",
-    "glsl-aastep": "^1.0.1"
+    "glsl-aastep": "^1.0.1",
+    "glsl-fxaa": "~2.1.0",
+    "glsl-random": "0.0.5",
+    "glsl-blend-soft-light": "~1.0.5",
+    "glsl-luma": "~1.0.1"
   }
 }

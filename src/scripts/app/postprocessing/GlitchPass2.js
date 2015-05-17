@@ -90,4 +90,3 @@ THREE.GlitchPass2.prototype = {
     return texture;
   }
 };
-

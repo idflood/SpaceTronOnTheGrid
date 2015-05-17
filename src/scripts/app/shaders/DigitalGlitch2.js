@@ -124,4 +124,3 @@ THREE.DigitalGlitch2 = {
   ].join("\n")
 
 };
-
