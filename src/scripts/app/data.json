@@ -1,10 +1,10 @@
 {
   "settings": {
-    "time": 21875,
+    "time": 70000,
     "duration": 240,
     "domain": [
-      0,
-      78843
+      49373,
+      120022
     ]
   },
   "data": [
@@ -71,7 +71,7 @@
       "values": {
         "x": 0,
         "y": 0,
-        "z": -504.6356201171877,
+        "z": -1817.9687500000002,
         "target_x": 0,
         "target_y": 0,
         "target_z": -10000,
@@ -115,7 +115,7 @@
         {
           "name": "spread",
           "label": "spread",
-          "val": 182.7,
+          "val": 302.7,
           "triggerRebuild": true,
           "keys": [],
           "group": "global"
@@ -145,7 +145,7 @@
         {
           "name": "z",
           "label": "z",
-          "val": -418,
+          "val": -358,
           "keys": [],
           "group": "position"
         },
@@ -236,7 +236,7 @@
         {
           "name": "materialAnimated",
           "label": "percent animated",
-          "val": 0.1,
+          "val": 0.2,
           "triggerRebuild": true,
           "group": "material",
           "keys": []
@@ -252,7 +252,7 @@
         {
           "name": "lineWidth",
           "label": "line width",
-          "val": 1,
+          "val": 6.2,
           "triggerRebuild": true,
           "group": "line",
           "keys": []
@@ -264,17 +264,33 @@
           "triggerRebuild": true,
           "group": "line",
           "keys": []
+        },
+        {
+          "name": "lineHeight",
+          "label": "line height",
+          "val": 0.06,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeightRand",
+          "label": "line height randomness",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
         }
       ],
       "values": {
         "numItems": 18.8,
         "seed": 85,
         "depth": 17.6,
-        "spread": 182.7,
+        "spread": 302.7,
         "maxChilds": 2,
         "x": 0,
         "y": 0,
-        "z": -418,
+        "z": -358,
         "spreadY": 0,
         "rotationX": 0,
         "rotationY": 0,
@@ -284,10 +300,12 @@
         "rotationRandZ": 0,
         "circles": 0,
         "materialColors": 0,
-        "materialAnimated": 0.1,
+        "materialAnimated": 0.2,
         "squares": 0,
-        "lineWidth": 1,
-        "lineWidthRand": 0
+        "lineWidth": 6.2,
+        "lineWidthRand": 0,
+        "lineHeight": 0.06,
+        "lineHeightRand": 0
       },
       "isDirtyObject": false
     },
@@ -464,7 +482,7 @@
         {
           "name": "lineWidth",
           "label": "line width",
-          "val": 2.3,
+          "val": 11.8,
           "triggerRebuild": true,
           "group": "line",
           "keys": []
@@ -472,6 +490,22 @@
         {
           "name": "lineWidthRand",
           "label": "line width randomness",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeight",
+          "label": "line height",
+          "val": 1,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeightRand",
+          "label": "line height randomness",
           "val": 0,
           "triggerRebuild": true,
           "group": "line",
@@ -498,8 +532,10 @@
         "materialColors": 0,
         "materialAnimated": 0,
         "squares": 0,
-        "lineWidth": 2.3,
-        "lineWidthRand": 0
+        "lineWidth": 11.8,
+        "lineWidthRand": 0,
+        "lineHeight": 1,
+        "lineHeightRand": 0
       },
       "isDirtyObject": false
     },
@@ -508,8 +544,8 @@
       "id": "item4",
       "label": "Chaos 4",
       "type": "Chaos",
-      "start": 12.727,
-      "end": 39.6,
+      "start": 12.4,
+      "end": 39.27300000000001,
       "collapsed": false,
       "properties": [
         {
@@ -660,7 +696,7 @@
         {
           "name": "materialAnimated",
           "label": "percent animated",
-          "val": 0.1,
+          "val": 0.5,
           "triggerRebuild": true,
           "group": "material",
           "keys": []
@@ -688,6 +724,22 @@
           "triggerRebuild": true,
           "group": "line",
           "keys": []
+        },
+        {
+          "name": "lineHeight",
+          "label": "line height",
+          "val": 0.548,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeightRand",
+          "label": "line height randomness",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
         }
       ],
       "values": {
@@ -708,10 +760,12 @@
         "rotationRandZ": 0.05,
         "circles": 0,
         "materialColors": 0,
-        "materialAnimated": 0.1,
+        "materialAnimated": 0.5,
         "squares": 0,
         "lineWidth": 0.62,
-        "lineWidthRand": 4.3
+        "lineWidthRand": 4.3,
+        "lineHeight": 0.548,
+        "lineHeightRand": 0
       },
       "isDirtyObject": false
     },
@@ -720,7 +774,7 @@
       "id": "item5",
       "label": "Chaos 5",
       "type": "Chaos",
-      "start": 23.284,
+      "start": 17.74,
       "end": 52.301,
       "collapsed": false,
       "properties": [
@@ -896,9 +950,25 @@
         {
           "name": "materialAnimated",
           "label": "percent animated",
-          "val": 0.5,
+          "val": 1,
           "triggerRebuild": true,
           "group": "material",
+          "keys": []
+        },
+        {
+          "name": "lineHeight",
+          "label": "line height",
+          "val": 1,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeightRand",
+          "label": "line height randomness",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "line",
           "keys": []
         }
       ],
@@ -923,7 +993,9 @@
         "lineWidth": 1,
         "lineWidthRand": 0,
         "materialColors": 0,
-        "materialAnimated": 0.5
+        "materialAnimated": 1,
+        "lineHeight": 1,
+        "lineHeightRand": 0
       },
       "isDirtyObject": false
     },
@@ -932,14 +1004,14 @@
       "id": "item6",
       "label": "Chaos 6",
       "type": "Chaos",
-      "start": 35.08,
-      "end": 62.643,
+      "start": 27.607,
+      "end": 87.155,
       "collapsed": false,
       "properties": [
         {
           "name": "numItems",
           "label": "num items",
-          "val": 40,
+          "val": 80,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -947,7 +1019,7 @@
         {
           "name": "seed",
           "label": "seed",
-          "val": 7042,
+          "val": 9142,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -955,7 +1027,7 @@
         {
           "name": "depth",
           "label": "depth",
-          "val": 6.6,
+          "val": 3.5,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -963,7 +1035,7 @@
         {
           "name": "spread",
           "label": "spread",
-          "val": 270,
+          "val": -140,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -971,7 +1043,7 @@
         {
           "name": "spreadY",
           "label": "spreadY",
-          "val": 300,
+          "val": 60,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -979,7 +1051,7 @@
         {
           "name": "maxChilds",
           "label": "maxChilds",
-          "val": 15,
+          "val": 4,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -1001,7 +1073,7 @@
         {
           "name": "z",
           "label": "z",
-          "val": -1220,
+          "val": -1800,
           "group": "position",
           "keys": []
         },
@@ -1018,7 +1090,7 @@
         {
           "name": "rotationY",
           "label": "y",
-          "val": 0.1,
+          "val": 0.3,
           "min": 0,
           "max": 2,
           "group": "rotation",
@@ -1028,7 +1100,7 @@
         {
           "name": "rotationZ",
           "label": "z",
-          "val": 1.1,
+          "val": 0,
           "min": 0,
           "max": 2,
           "group": "rotation",
@@ -1038,7 +1110,7 @@
         {
           "name": "rotationRandX",
           "label": "rand x",
-          "val": 0.7,
+          "val": 0,
           "min": 0,
           "max": 1,
           "group": "rotation",
@@ -1048,7 +1120,7 @@
         {
           "name": "rotationRandY",
           "label": "rand y",
-          "val": 0.2,
+          "val": 0,
           "min": 0,
           "max": 1,
           "group": "rotation",
@@ -1058,7 +1130,7 @@
         {
           "name": "rotationRandZ",
           "label": "rand z",
-          "val": 1,
+          "val": 0,
           "min": 0,
           "max": 1,
           "group": "rotation",
@@ -1092,7 +1164,7 @@
         {
           "name": "lineWidthRand",
           "label": "line width randomness",
-          "val": 2,
+          "val": 2.5,
           "triggerRebuild": true,
           "group": "line",
           "keys": []
@@ -1108,34 +1180,1202 @@
         {
           "name": "materialAnimated",
           "label": "percent animated",
+          "val": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "lineHeight",
+          "label": "line height",
+          "val": 0.41,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeightRand",
+          "label": "line height randomness",
+          "val": 4.1,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        }
+      ],
+      "values": {
+        "numItems": 80,
+        "seed": 9142,
+        "depth": 3.5,
+        "spread": -140,
+        "spreadY": 60,
+        "maxChilds": 4,
+        "x": 0,
+        "y": 0,
+        "z": -1800,
+        "rotationX": 0,
+        "rotationY": 0.3,
+        "rotationZ": 0,
+        "rotationRandX": 0,
+        "rotationRandY": 0,
+        "rotationRandZ": 0,
+        "circles": 0,
+        "squares": 0,
+        "lineWidth": 0.9,
+        "lineWidthRand": 2.5,
+        "materialColors": 0,
+        "materialAnimated": 1,
+        "lineHeight": 0.41,
+        "lineHeightRand": 4.1
+      },
+      "isDirtyObject": false
+    },
+    {
+      "isDirty": true,
+      "id": "item7",
+      "label": "Chaos 7",
+      "type": "Chaos",
+      "start": 21.222,
+      "end": 72.32999999999998,
+      "collapsed": false,
+      "properties": [
+        {
+          "name": "numItems",
+          "label": "num items",
+          "val": 78,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "seed",
+          "label": "seed",
+          "val": 9642,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "depth",
+          "label": "depth",
+          "val": 10,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "spread",
+          "label": "spread",
+          "val": 170,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "spreadY",
+          "label": "spreadY",
+          "val": 158.4,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "maxChilds",
+          "label": "maxChilds",
+          "val": 8,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "x",
+          "label": "x",
+          "val": 0,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "y",
+          "label": "y",
+          "val": -17,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "z",
+          "label": "z",
+          "val": -1010,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "rotationX",
+          "label": "x",
+          "val": 0,
+          "min": 0,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationY",
+          "label": "y",
+          "val": 0.1,
+          "min": 0,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationZ",
+          "label": "z",
+          "val": 1.4,
+          "min": 0,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandX",
+          "label": "rand x",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandY",
+          "label": "rand y",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandZ",
+          "label": "rand z",
+          "val": 0.56,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "circles",
+          "label": "circles",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
+        },
+        {
+          "name": "squares",
+          "label": "squares",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
+        },
+        {
+          "name": "lineWidth",
+          "label": "line width",
+          "val": 0.4,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineWidthRand",
+          "label": "line width randomness",
+          "val": 3,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "materialColors",
+          "label": "percent colors",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialAnimated",
+          "label": "percent animated",
+          "val": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "lineHeight",
+          "label": "line height",
+          "val": 0.2,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeightRand",
+          "label": "line height randomness",
+          "val": 3,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        }
+      ],
+      "values": {
+        "numItems": 78,
+        "seed": 9642,
+        "depth": 10,
+        "spread": 170,
+        "spreadY": 158.4,
+        "maxChilds": 8,
+        "x": 0,
+        "y": -17,
+        "z": -1010,
+        "rotationX": 0,
+        "rotationY": 0.1,
+        "rotationZ": 1.4,
+        "rotationRandX": 0,
+        "rotationRandY": 0,
+        "rotationRandZ": 0.56,
+        "circles": 0,
+        "squares": 0,
+        "lineWidth": 0.4,
+        "lineWidthRand": 3,
+        "materialColors": 0,
+        "materialAnimated": 1,
+        "lineHeight": 0.2,
+        "lineHeightRand": 3
+      },
+      "isDirtyObject": false
+    },
+    {
+      "isDirty": true,
+      "id": "item8",
+      "label": "Chaos 8",
+      "type": "Chaos",
+      "start": 60.202,
+      "end": 107.71,
+      "collapsed": false,
+      "properties": [
+        {
+          "name": "numItems",
+          "label": "num items",
+          "val": 64,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "seed",
+          "label": "seed",
+          "val": 3842,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "depth",
+          "label": "depth",
+          "val": 12,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "spread",
+          "label": "spread",
+          "val": -291,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "spreadY",
+          "label": "spreadY",
+          "val": 167,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "maxChilds",
+          "label": "maxChilds",
+          "val": 12,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "x",
+          "label": "x",
+          "val": 0,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "y",
+          "label": "y",
+          "val": 0,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "z",
+          "label": "z",
+          "val": -2200,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "rotationX",
+          "label": "x",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationY",
+          "label": "y",
+          "val": -0.3,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationZ",
+          "label": "z",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandX",
+          "label": "rand x",
+          "val": 0.05,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandY",
+          "label": "rand y",
+          "val": 0.04,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandZ",
+          "label": "rand z",
+          "val": 0.05,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "circles",
+          "label": "circles",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
+        },
+        {
+          "name": "squares",
+          "label": "squares",
+          "val": 0.4,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
+        },
+        {
+          "name": "lineWidth",
+          "label": "line width",
           "val": 0.5,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineWidthRand",
+          "label": "line width randomness",
+          "val": 2.3,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeight",
+          "label": "line height",
+          "val": 3.3,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeightRand",
+          "label": "line height randomness",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "materialColors",
+          "label": "percent colors",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialAnimated",
+          "label": "percent animated",
+          "val": 1,
           "triggerRebuild": true,
           "group": "material",
           "keys": []
         }
       ],
       "values": {
-        "numItems": 40,
-        "seed": 7042,
-        "depth": 6.6,
-        "spread": 270,
-        "spreadY": 300,
-        "maxChilds": 15,
+        "numItems": 64,
+        "seed": 3842,
+        "depth": 12,
+        "spread": -291,
+        "spreadY": 167,
+        "maxChilds": 12,
         "x": 0,
         "y": 0,
-        "z": -1220,
+        "z": -2200,
         "rotationX": 0,
-        "rotationY": 0.1,
-        "rotationZ": 1.1,
-        "rotationRandX": 0.7,
-        "rotationRandY": 0.2,
-        "rotationRandZ": 1,
+        "rotationY": -0.3,
+        "rotationZ": 0,
+        "rotationRandX": 0.05,
+        "rotationRandY": 0.04,
+        "rotationRandZ": 0.05,
+        "circles": 0,
+        "squares": 0.4,
+        "lineWidth": 0.5,
+        "lineWidthRand": 2.3,
+        "lineHeight": 3.3,
+        "lineHeightRand": 0,
+        "materialColors": 0,
+        "materialAnimated": 1
+      },
+      "isDirtyObject": false
+    },
+    {
+      "isDirty": true,
+      "id": "item9",
+      "label": "Chaos 9",
+      "type": "Chaos",
+      "start": 73.107,
+      "end": 130.643,
+      "collapsed": false,
+      "properties": [
+        {
+          "name": "numItems",
+          "label": "num items",
+          "val": 50,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "seed",
+          "label": "seed",
+          "val": 32042,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "depth",
+          "label": "depth",
+          "val": 6.7,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "spread",
+          "label": "spread",
+          "val": 235,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "spreadY",
+          "label": "spreadY",
+          "val": 96,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "maxChilds",
+          "label": "maxChilds",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "x",
+          "label": "x",
+          "val": 0,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "y",
+          "label": "y",
+          "val": 0,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "z",
+          "label": "z",
+          "val": -2600,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "rotationX",
+          "label": "x",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationY",
+          "label": "y",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationZ",
+          "label": "z",
+          "val": -0.2,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandX",
+          "label": "rand x",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandY",
+          "label": "rand y",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandZ",
+          "label": "rand z",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "circles",
+          "label": "circles",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
+        },
+        {
+          "name": "squares",
+          "label": "squares",
+          "val": 0.6,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
+        },
+        {
+          "name": "lineWidth",
+          "label": "line width",
+          "val": 1,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineWidthRand",
+          "label": "line width randomness",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeight",
+          "label": "line height",
+          "val": 1,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeightRand",
+          "label": "line height randomness",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "materialColors",
+          "label": "percent colors",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialAnimated",
+          "label": "percent animated",
+          "val": 0.96,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        }
+      ],
+      "values": {
+        "numItems": 50,
+        "seed": 32042,
+        "depth": 6.7,
+        "spread": 235,
+        "spreadY": 96,
+        "maxChilds": 0,
+        "x": 0,
+        "y": 0,
+        "z": -2600,
+        "rotationX": 0,
+        "rotationY": 0,
+        "rotationZ": -0.2,
+        "rotationRandX": 0,
+        "rotationRandY": 0,
+        "rotationRandZ": 0,
+        "circles": 0,
+        "squares": 0.6,
+        "lineWidth": 1,
+        "lineWidthRand": 0,
+        "lineHeight": 1,
+        "lineHeightRand": 0,
+        "materialColors": 0,
+        "materialAnimated": 0.96
+      },
+      "isDirtyObject": false
+    },
+    {
+      "isDirty": true,
+      "id": "item10",
+      "label": "Chaos 10",
+      "type": "Chaos",
+      "start": 102.377,
+      "end": 141.892,
+      "collapsed": false,
+      "properties": [
+        {
+          "name": "numItems",
+          "label": "num items",
+          "val": 75,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "seed",
+          "label": "seed",
+          "val": 15042,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "depth",
+          "label": "depth",
+          "val": 1,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "spread",
+          "label": "spread",
+          "val": 260,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "spreadY",
+          "label": "spreadY",
+          "val": 100,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "maxChilds",
+          "label": "maxChilds",
+          "val": 8.1,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "x",
+          "label": "x",
+          "val": 0,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "y",
+          "label": "y",
+          "val": 0,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "z",
+          "label": "z",
+          "val": -3000,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "rotationX",
+          "label": "x",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationY",
+          "label": "y",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationZ",
+          "label": "z",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandX",
+          "label": "rand x",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandY",
+          "label": "rand y",
+          "val": 0.8,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandZ",
+          "label": "rand z",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "circles",
+          "label": "circles",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
+        },
+        {
+          "name": "squares",
+          "label": "squares",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
+        },
+        {
+          "name": "lineWidth",
+          "label": "line width",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineWidthRand",
+          "label": "line width randomness",
+          "val": 1,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeight",
+          "label": "line height",
+          "val": 0.1,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeightRand",
+          "label": "line height randomness",
+          "val": 3.5,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "materialColors",
+          "label": "percent colors",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialAnimated",
+          "label": "percent animated",
+          "val": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        }
+      ],
+      "values": {
+        "numItems": 75,
+        "seed": 15042,
+        "depth": 1,
+        "spread": 260,
+        "spreadY": 100,
+        "maxChilds": 8.1,
+        "x": 0,
+        "y": 0,
+        "z": -3000,
+        "rotationX": 0,
+        "rotationY": 0,
+        "rotationZ": 0,
+        "rotationRandX": 0,
+        "rotationRandY": 0.8,
+        "rotationRandZ": 0,
         "circles": 0,
         "squares": 0,
-        "lineWidth": 0.9,
-        "lineWidthRand": 2,
+        "lineWidth": 0,
+        "lineWidthRand": 1,
+        "lineHeight": 0.1,
+        "lineHeightRand": 3.5,
         "materialColors": 0,
-        "materialAnimated": 0.5
+        "materialAnimated": 1
+      },
+      "isDirtyObject": false
+    },
+    {
+      "isDirty": true,
+      "id": "item11",
+      "label": "Chaos 11",
+      "type": "Chaos",
+      "start": 115.261,
+      "end": 151.148,
+      "collapsed": false,
+      "properties": [
+        {
+          "name": "numItems",
+          "label": "num items",
+          "val": 46,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "seed",
+          "label": "seed",
+          "val": 44042,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "depth",
+          "label": "depth",
+          "val": 12,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "spread",
+          "label": "spread",
+          "val": 300,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "spreadY",
+          "label": "spreadY",
+          "val": 300,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "maxChilds",
+          "label": "maxChilds",
+          "val": 3,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "x",
+          "label": "x",
+          "val": 0,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "y",
+          "label": "y",
+          "val": 0,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "z",
+          "label": "z",
+          "val": -3200,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "rotationX",
+          "label": "x",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationY",
+          "label": "y",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationZ",
+          "label": "z",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandX",
+          "label": "rand x",
+          "val": 0.225,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandY",
+          "label": "rand y",
+          "val": 0.368,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandZ",
+          "label": "rand z",
+          "val": 0.75,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "circles",
+          "label": "circles",
+          "val": 0.4,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
+        },
+        {
+          "name": "squares",
+          "label": "squares",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
+        },
+        {
+          "name": "lineWidth",
+          "label": "line width",
+          "val": 1,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineWidthRand",
+          "label": "line width randomness",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeight",
+          "label": "line height",
+          "val": 1,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeightRand",
+          "label": "line height randomness",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "materialColors",
+          "label": "percent colors",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialAnimated",
+          "label": "percent animated",
+          "val": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        }
+      ],
+      "values": {
+        "numItems": 46,
+        "seed": 44042,
+        "depth": 12,
+        "spread": 300,
+        "spreadY": 300,
+        "maxChilds": 3,
+        "x": 0,
+        "y": 0,
+        "z": -3200,
+        "rotationX": 0,
+        "rotationY": 0,
+        "rotationZ": 0,
+        "rotationRandX": 0.225,
+        "rotationRandY": 0.368,
+        "rotationRandZ": 0.75,
+        "circles": 0.4,
+        "squares": 0,
+        "lineWidth": 1,
+        "lineWidthRand": 0,
+        "lineHeight": 1,
+        "lineHeightRand": 0,
+        "materialColors": 0,
+        "materialAnimated": 1
       },
       "isDirtyObject": false
     }

@@ -12,8 +12,6 @@ define (require) ->
   ShaderFragement = require 'app/shaders/BasicNoise.frag'
 
 
-
-
   class OrganizedChaos extends ElementBase
     @lineGeom = new THREE.PlaneBufferGeometry( 100, 1)
     @circleGeom = new THREE.CircleGeometry( 10, 30, 0, Math.PI * 2 )
