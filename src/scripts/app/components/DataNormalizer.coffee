@@ -7,7 +7,7 @@ define (require) ->
       if !data_item.classObject
         data_item.classObject = factory.getTypeClass(data_item.type)
       static_properties = data_item.classObject.properties
-      console.log static_properties
+
       if !static_properties then return
       for key, static_prop of static_properties
         existing_prop = _.find(data_item.properties, (prop) -> prop.name == static_prop.name)

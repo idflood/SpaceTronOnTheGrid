@@ -14,9 +14,7 @@ define (require) ->
       @simpleMaterial = new THREE.MeshBasicMaterial({color: 0xdddddd, shading: THREE.FlatShading, side: THREE.DoubleSide})
 
       for i in [0...50]
-
         @shaders.push(@createMaterialLine(0xdddddd))
-      console.log @shaders
 
     update: () ->
 
