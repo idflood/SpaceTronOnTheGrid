@@ -1,10 +1,10 @@
 {
   "settings": {
-    "time": 70000,
+    "time": 106743,
     "duration": 240,
     "domain": [
       47984,
-      95984
+      169413
     ]
   },
   "data": [
@@ -71,7 +71,7 @@
       "values": {
         "x": 0,
         "y": 0,
-        "z": -1817.9687500000002,
+        "z": -2601.4308403046875,
         "target_x": 0,
         "target_y": 0,
         "target_z": -10000,
@@ -226,14 +226,6 @@
           "keys": []
         },
         {
-          "name": "materialColors",
-          "label": "percent colors",
-          "val": 0,
-          "triggerRebuild": true,
-          "group": "material",
-          "keys": []
-        },
-        {
           "name": "materialAnimated",
           "label": "percent animated",
           "val": 0,
@@ -300,6 +292,26 @@
           "triggerRebuild": true,
           "group": "global",
           "keys": []
+        },
+        {
+          "name": "materialRed",
+          "label": "percent red",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialBlue",
+          "label": "percent blue",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
         }
       ],
       "values": {
@@ -319,7 +331,6 @@
         "rotationRandY": 0,
         "rotationRandZ": 0,
         "circles": 0,
-        "materialColors": 0,
         "materialAnimated": 0,
         "squares": 0,
         "lineWidth": 6.2,
@@ -327,7 +338,9 @@
         "lineHeight": 0.06,
         "lineHeightRand": 0,
         "horizontalSymmetry": 1,
-        "verticalSymmetry": 0
+        "verticalSymmetry": 0,
+        "materialRed": 0,
+        "materialBlue": 0
       },
       "isDirtyObject": false
     },
@@ -478,14 +491,6 @@
           "keys": []
         },
         {
-          "name": "materialColors",
-          "label": "percent colors",
-          "val": 0,
-          "triggerRebuild": true,
-          "group": "material",
-          "keys": []
-        },
-        {
           "name": "materialAnimated",
           "label": "percent animated",
           "val": 0,
@@ -552,6 +557,26 @@
           "triggerRebuild": true,
           "group": "global",
           "keys": []
+        },
+        {
+          "name": "materialRed",
+          "label": "percent red",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialBlue",
+          "label": "percent blue",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
         }
       ],
       "values": {
@@ -571,7 +596,6 @@
         "rotationRandY": 0,
         "rotationRandZ": 0,
         "circles": 0,
-        "materialColors": 0,
         "materialAnimated": 0,
         "squares": 0,
         "lineWidth": 11.8,
@@ -579,7 +603,9 @@
         "lineHeight": 1,
         "lineHeightRand": 0,
         "horizontalSymmetry": 1,
-        "verticalSymmetry": 0
+        "verticalSymmetry": 0,
+        "materialRed": 0,
+        "materialBlue": 0
       },
       "isDirtyObject": false
     },
@@ -730,14 +756,6 @@
           "keys": []
         },
         {
-          "name": "materialColors",
-          "label": "percent colors",
-          "val": 0,
-          "triggerRebuild": true,
-          "group": "material",
-          "keys": []
-        },
-        {
           "name": "materialAnimated",
           "label": "percent animated",
           "val": 0,
@@ -804,6 +822,26 @@
           "triggerRebuild": true,
           "group": "global",
           "keys": []
+        },
+        {
+          "name": "materialRed",
+          "label": "percent red",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialBlue",
+          "label": "percent blue",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
         }
       ],
       "values": {
@@ -823,7 +861,6 @@
         "rotationRandY": 0,
         "rotationRandZ": 0.05,
         "circles": 0,
-        "materialColors": 0,
         "materialAnimated": 0,
         "squares": 0,
         "lineWidth": 0.62,
@@ -831,7 +868,9 @@
         "lineHeight": 0.548,
         "lineHeightRand": 0,
         "horizontalSymmetry": 1,
-        "verticalSymmetry": 0
+        "verticalSymmetry": 0,
+        "materialRed": 0,
+        "materialBlue": 0
       },
       "isDirtyObject": false
     },
@@ -1006,14 +1045,6 @@
           "keys": []
         },
         {
-          "name": "materialColors",
-          "label": "percent colors",
-          "val": 0,
-          "triggerRebuild": true,
-          "group": "material",
-          "keys": []
-        },
-        {
           "name": "materialAnimated",
           "label": "percent animated",
           "val": 1,
@@ -1056,6 +1087,26 @@
           "triggerRebuild": true,
           "group": "global",
           "keys": []
+        },
+        {
+          "name": "materialRed",
+          "label": "percent red",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialBlue",
+          "label": "percent blue",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
         }
       ],
       "values": {
@@ -1078,12 +1129,13 @@
         "squares": 0,
         "lineWidth": 1,
         "lineWidthRand": 0,
-        "materialColors": 0,
         "materialAnimated": 1,
         "lineHeight": 1,
         "lineHeightRand": 0,
         "horizontalSymmetry": 1,
-        "verticalSymmetry": 0
+        "verticalSymmetry": 0,
+        "materialRed": 0,
+        "materialBlue": 0
       },
       "isDirtyObject": false
     },
@@ -1258,14 +1310,6 @@
           "keys": []
         },
         {
-          "name": "materialColors",
-          "label": "percent colors",
-          "val": 0,
-          "triggerRebuild": true,
-          "group": "material",
-          "keys": []
-        },
-        {
           "name": "materialAnimated",
           "label": "percent animated",
           "val": 1,
@@ -1308,6 +1352,26 @@
           "triggerRebuild": true,
           "group": "global",
           "keys": []
+        },
+        {
+          "name": "materialRed",
+          "label": "percent red",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialBlue",
+          "label": "percent blue",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
         }
       ],
       "values": {
@@ -1330,12 +1394,13 @@
         "squares": 0,
         "lineWidth": 0.9,
         "lineWidthRand": 2.5,
-        "materialColors": 0,
         "materialAnimated": 1,
         "lineHeight": 0.41,
         "lineHeightRand": 4.1,
         "horizontalSymmetry": 1,
-        "verticalSymmetry": 0
+        "verticalSymmetry": 0,
+        "materialRed": 0,
+        "materialBlue": 0
       },
       "isDirtyObject": false
     },
@@ -1510,14 +1575,6 @@
           "keys": []
         },
         {
-          "name": "materialColors",
-          "label": "percent colors",
-          "val": 0,
-          "triggerRebuild": true,
-          "group": "material",
-          "keys": []
-        },
-        {
           "name": "materialAnimated",
           "label": "percent animated",
           "val": 1,
@@ -1560,6 +1617,26 @@
           "triggerRebuild": true,
           "group": "global",
           "keys": []
+        },
+        {
+          "name": "materialRed",
+          "label": "percent red",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialBlue",
+          "label": "percent blue",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
         }
       ],
       "values": {
@@ -1582,12 +1659,13 @@
         "squares": 0,
         "lineWidth": 0.4,
         "lineWidthRand": 3,
-        "materialColors": 0,
         "materialAnimated": 1,
         "lineHeight": 0.2,
         "lineHeightRand": 3,
         "horizontalSymmetry": 1,
-        "verticalSymmetry": 0
+        "verticalSymmetry": 0,
+        "materialRed": 0,
+        "materialBlue": 0
       },
       "isDirtyObject": false
     },
@@ -1778,14 +1856,6 @@
           "keys": []
         },
         {
-          "name": "materialColors",
-          "label": "percent colors",
-          "val": 0,
-          "triggerRebuild": true,
-          "group": "material",
-          "keys": []
-        },
-        {
           "name": "materialAnimated",
           "label": "percent animated",
           "val": 0.8,
@@ -1812,6 +1882,26 @@
           "triggerRebuild": true,
           "group": "global",
           "keys": []
+        },
+        {
+          "name": "materialRed",
+          "label": "percent red",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialBlue",
+          "label": "percent blue",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
         }
       ],
       "values": {
@@ -1836,10 +1926,11 @@
         "lineWidthRand": 2.3,
         "lineHeight": 3.3,
         "lineHeightRand": 0,
-        "materialColors": 0,
         "materialAnimated": 0.8,
         "horizontalSymmetry": 1,
-        "verticalSymmetry": 0
+        "verticalSymmetry": 0,
+        "materialRed": 0,
+        "materialBlue": 0
       },
       "isDirtyObject": false
     },
@@ -2030,14 +2121,6 @@
           "keys": []
         },
         {
-          "name": "materialColors",
-          "label": "percent colors",
-          "val": 0,
-          "triggerRebuild": true,
-          "group": "material",
-          "keys": []
-        },
-        {
           "name": "materialAnimated",
           "label": "percent animated",
           "val": 0.96,
@@ -2064,6 +2147,26 @@
           "triggerRebuild": true,
           "group": "global",
           "keys": []
+        },
+        {
+          "name": "materialRed",
+          "label": "percent red",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialBlue",
+          "label": "percent blue",
+          "val": 0.53,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
         }
       ],
       "values": {
@@ -2088,10 +2191,11 @@
         "lineWidthRand": 0,
         "lineHeight": 1,
         "lineHeightRand": 0,
-        "materialColors": 0,
         "materialAnimated": 0.96,
         "horizontalSymmetry": 1,
-        "verticalSymmetry": 0
+        "verticalSymmetry": 0,
+        "materialRed": 0,
+        "materialBlue": 0.53
       },
       "isDirtyObject": false
     },
@@ -2282,14 +2386,6 @@
           "keys": []
         },
         {
-          "name": "materialColors",
-          "label": "percent colors",
-          "val": 0,
-          "triggerRebuild": true,
-          "group": "material",
-          "keys": []
-        },
-        {
           "name": "materialAnimated",
           "label": "percent animated",
           "val": 1,
@@ -2316,6 +2412,26 @@
           "triggerRebuild": true,
           "group": "global",
           "keys": []
+        },
+        {
+          "name": "materialRed",
+          "label": "percent red",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialBlue",
+          "label": "percent blue",
+          "val": 0.2,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
         }
       ],
       "values": {
@@ -2340,10 +2456,11 @@
         "lineWidthRand": 1,
         "lineHeight": 0.1,
         "lineHeightRand": 3.5,
-        "materialColors": 0,
         "materialAnimated": 1,
         "horizontalSymmetry": 1,
-        "verticalSymmetry": 0
+        "verticalSymmetry": 0,
+        "materialRed": 0,
+        "materialBlue": 0.2
       },
       "isDirtyObject": false
     },
@@ -2421,7 +2538,7 @@
         {
           "name": "z",
           "label": "z",
-          "val": -3200,
+          "val": -3000,
           "group": "position",
           "keys": []
         },
@@ -2534,14 +2651,6 @@
           "keys": []
         },
         {
-          "name": "materialColors",
-          "label": "percent colors",
-          "val": 0,
-          "triggerRebuild": true,
-          "group": "material",
-          "keys": []
-        },
-        {
           "name": "materialAnimated",
           "label": "percent animated",
           "val": 1,
@@ -2568,6 +2677,26 @@
           "triggerRebuild": true,
           "group": "global",
           "keys": []
+        },
+        {
+          "name": "materialRed",
+          "label": "percent red",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialBlue",
+          "label": "percent blue",
+          "val": 0.2,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
         }
       ],
       "values": {
@@ -2579,7 +2708,7 @@
         "maxChilds": 3,
         "x": 0,
         "y": 0,
-        "z": -3200,
+        "z": -3000,
         "rotationX": 0,
         "rotationY": 0,
         "rotationZ": 0,
@@ -2592,10 +2721,541 @@
         "lineWidthRand": 0,
         "lineHeight": 1,
         "lineHeightRand": 0,
-        "materialColors": 0,
         "materialAnimated": 1,
         "horizontalSymmetry": 1,
-        "verticalSymmetry": 0
+        "verticalSymmetry": 0,
+        "materialRed": 0,
+        "materialBlue": 0.2
+      },
+      "isDirtyObject": false
+    },
+    {
+      "isDirty": true,
+      "id": "item12",
+      "label": "Chaos 12",
+      "type": "Chaos",
+      "start": 122.274,
+      "end": 212.46800000000002,
+      "collapsed": false,
+      "properties": [
+        {
+          "name": "numItems",
+          "label": "num items",
+          "val": 48,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "seed",
+          "label": "seed",
+          "val": 60042,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "depth",
+          "label": "depth",
+          "val": 12,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "spread",
+          "label": "spread",
+          "val": 220,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "spreadY",
+          "label": "spreadY",
+          "val": 50,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "maxChilds",
+          "label": "maxChilds",
+          "val": 12,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "horizontalSymmetry",
+          "label": "horizontalSymmetry",
+          "val": 0.8,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "verticalSymmetry",
+          "label": "verticalSymmetry",
+          "val": 0.6,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "x",
+          "label": "x",
+          "val": 0,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "y",
+          "label": "y",
+          "val": 0,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "z",
+          "label": "z",
+          "val": -3300,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "rotationX",
+          "label": "x",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationY",
+          "label": "y",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationZ",
+          "label": "z",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandX",
+          "label": "rand x",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandY",
+          "label": "rand y",
+          "val": 1,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandZ",
+          "label": "rand z",
+          "val": 0.03,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "circles",
+          "label": "circles",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
+        },
+        {
+          "name": "squares",
+          "label": "squares",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
+        },
+        {
+          "name": "lineWidth",
+          "label": "line width",
+          "val": 1,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineWidthRand",
+          "label": "line width randomness",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeight",
+          "label": "line height",
+          "val": 0.5,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeightRand",
+          "label": "line height randomness",
+          "val": 1,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "materialAnimated",
+          "label": "percent animated",
+          "val": 0.95,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialRed",
+          "label": "percent red",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialBlue",
+          "label": "percent blue",
+          "val": 0.3,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        }
+      ],
+      "values": {
+        "numItems": 48,
+        "seed": 60042,
+        "depth": 12,
+        "spread": 220,
+        "spreadY": 50,
+        "maxChilds": 12,
+        "horizontalSymmetry": 0.8,
+        "verticalSymmetry": 0.6,
+        "x": 0,
+        "y": 0,
+        "z": -3300,
+        "rotationX": 0,
+        "rotationY": 0,
+        "rotationZ": 0,
+        "rotationRandX": 0,
+        "rotationRandY": 1,
+        "rotationRandZ": 0.03,
+        "circles": 0,
+        "squares": 0,
+        "lineWidth": 1,
+        "lineWidthRand": 0,
+        "lineHeight": 0.5,
+        "lineHeightRand": 1,
+        "materialAnimated": 0.95,
+        "materialRed": 0,
+        "materialBlue": 0.3
+      },
+      "isDirtyObject": false
+    },
+    {
+      "isDirty": true,
+      "id": "item13",
+      "label": "Chaos 13",
+      "type": "Chaos",
+      "start": 151.87,
+      "end": 241.144,
+      "collapsed": false,
+      "properties": [
+        {
+          "name": "numItems",
+          "label": "num items",
+          "val": 60,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "seed",
+          "label": "seed",
+          "val": 3914,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "depth",
+          "label": "depth",
+          "val": 4.2,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "spread",
+          "label": "spread",
+          "val": 121,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "spreadY",
+          "label": "spreadY",
+          "val": 27,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "maxChilds",
+          "label": "maxChilds",
+          "val": 16,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "horizontalSymmetry",
+          "label": "horizontalSymmetry",
+          "val": 0.3,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "verticalSymmetry",
+          "label": "verticalSymmetry",
+          "val": 0.6,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "global",
+          "keys": []
+        },
+        {
+          "name": "x",
+          "label": "x",
+          "val": 0,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "y",
+          "label": "y",
+          "val": 0,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "z",
+          "label": "z",
+          "val": -3900,
+          "group": "position",
+          "keys": []
+        },
+        {
+          "name": "rotationX",
+          "label": "x",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationY",
+          "label": "y",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationZ",
+          "label": "z",
+          "val": 0,
+          "min": -2,
+          "max": 2,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandX",
+          "label": "rand x",
+          "val": 0.76,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandY",
+          "label": "rand y",
+          "val": 0.6,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotationRandZ",
+          "label": "rand z",
+          "val": 0,
+          "min": 0,
+          "max": 1,
+          "group": "rotation",
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "circles",
+          "label": "circles",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
+        },
+        {
+          "name": "squares",
+          "label": "squares",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
+        },
+        {
+          "name": "lineWidth",
+          "label": "line width",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineWidthRand",
+          "label": "line width randomness",
+          "val": 1.62,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeight",
+          "label": "line height",
+          "val": 0.2,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "lineHeightRand",
+          "label": "line height randomness",
+          "val": 1.2,
+          "triggerRebuild": true,
+          "group": "line",
+          "keys": []
+        },
+        {
+          "name": "materialAnimated",
+          "label": "percent animated",
+          "val": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialRed",
+          "label": "percent red",
+          "val": 0.3,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        },
+        {
+          "name": "materialBlue",
+          "label": "percent blue",
+          "val": 0.3,
+          "min": 0,
+          "max": 1,
+          "triggerRebuild": true,
+          "group": "material",
+          "keys": []
+        }
+      ],
+      "values": {
+        "numItems": 60,
+        "seed": 3914,
+        "depth": 4.2,
+        "spread": 121,
+        "spreadY": 27,
+        "maxChilds": 16,
+        "horizontalSymmetry": 0.3,
+        "verticalSymmetry": 0.6,
+        "x": 0,
+        "y": 0,
+        "z": -3900,
+        "rotationX": 0,
+        "rotationY": 0,
+        "rotationZ": 0,
+        "rotationRandX": 0.76,
+        "rotationRandY": 0.6,
+        "rotationRandZ": 0,
+        "circles": 0,
+        "squares": 0,
+        "lineWidth": 0,
+        "lineWidthRand": 1.62,
+        "lineHeight": 0.2,
+        "lineHeightRand": 1.2,
+        "materialAnimated": 1,
+        "materialRed": 0.3,
+        "materialBlue": 0.3
       },
       "isDirtyObject": false
     }

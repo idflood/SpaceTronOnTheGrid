@@ -6,21 +6,41 @@ define (require) ->
   LineFragement = require 'app/shaders/Line.frag'
 
   class Shaders
+    @COLOR_WHITE = 0
+    @COLOR_RED = 1
+    @COLOR_BLUE = 2
+
     constructor: () ->
       window.shaders = this
       @shaders = []
+      @shadersWhite = []
+      @shadersRed = []
+      @shadersBlue = []
 
+      red = 0xe66c00
+      blue = 0x27acef
+
+      num_shaders = 50
       # A non dynamic shader, can be used for all geometries
       @simpleMaterial = new THREE.MeshBasicMaterial({color: 0xdddddd, shading: THREE.FlatShading, side: THREE.DoubleSide})
+      @simpleMaterialRed = new THREE.MeshBasicMaterial({color: red, shading: THREE.FlatShading, side: THREE.DoubleSide})
+      @simpleMaterialBlue = new THREE.MeshBasicMaterial({color: blue, shading: THREE.FlatShading, side: THREE.DoubleSide})
 
-      for i in [0...50]
-        @shaders.push(@createMaterialLine(0xdddddd))
+      for i in [0...num_shaders]
+        mat = @createMaterialLine(0xdddddd)
+        @shaders.push(mat)
+        @shadersWhite.push(mat )
+
+        mat = @createMaterialLine(red)
+        @shaders.push(mat)
+        @shadersRed.push(mat)
+
+        mat = @createMaterialLine(blue)
+        @shaders.push(mat)
+        @shadersBlue.push(mat)
 
     update: () ->
-
       for shader in @shaders
-        #shader.uniforms.percent.value = (shader.uniforms.percent.value + 0.01) % 2
-
         shader.uniforms.percent.value = Math.max(0, shader.uniforms.percent.value - shader.speed * 0.03)
         # Only bump value if it is not already animating.
         if shader.uniforms.percent.value < 0.01
@@ -28,10 +48,18 @@ define (require) ->
             shader.uniforms.percent.value = 2
       #console.log @lineMaterial1.uniforms.percent.value
 
-    getMaterialLine: (animated) ->
+    getMaterialLine: (animated, color) ->
       if animated == false
+        switch color
+          when Shaders.COLOR_RED then return @simpleMaterialRed
+          when Shaders.COLOR_BLUE then return @simpleMaterialBlue
         return @simpleMaterial
-      return @shaders[Math.floor(Math.random() * @shaders.length)]
+
+      shaders = @shadersWhite
+      if color == Shaders.COLOR_RED then shaders = @shadersRed
+      if color == Shaders.COLOR_BLUE then shaders = @shadersBlue
+
+      return shaders[Math.floor(Math.random() * shaders.length)]
 
     createMaterialLine: (color) ->
       uniforms = {
@@ -59,5 +87,5 @@ define (require) ->
         })
 
       material.speed = Math.random() + 0.5 # custom property for per shader transition speed
-      material.blending = THREE.AdditiveBlending
+      #material.blending = THREE.AdditiveBlending
       return material

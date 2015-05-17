@@ -6,6 +6,7 @@ define (require) ->
 
   Audio = require 'app/components/Audio'
   Colors = require 'app/components/Colors'
+  Shaders = require 'app/components/Shaders'
 
   CircleGeometry2 = require 'app/geometries/CircleGeometry2'
   ShaderVertex = require 'app/shaders/BasicNoise.vert'
@@ -48,7 +49,8 @@ define (require) ->
       lineWidthRand: {name: 'lineWidthRand', label: 'line width randomness', val: 0, triggerRebuild: true, group: "line"}
       lineHeight: {name: 'lineHeight', label: 'line height', val: 1, triggerRebuild: true, group: "line"}
       lineHeightRand: {name: 'lineHeightRand', label: 'line height randomness', val: 0, triggerRebuild: true, group: "line"}
-      materialColors: {name: 'materialColors', label: 'percent colors', val: 0, triggerRebuild: true, group: "material"}
+      materialRed: {name: 'materialRed', label: 'percent red', val: 0, min: 0, max: 1, triggerRebuild: true, group: "material"}
+      materialBlue: {name: 'materialBlue', label: 'percent blue', val: 0, min: 0, max: 1, triggerRebuild: true, group: "material"}
       materialAnimated: {name: 'materialAnimated', label: 'percent animated', val: 0, triggerRebuild: true, group: "material"}
 
     getDefaultProperties: () -> OrganizedChaos.properties
@@ -90,6 +92,17 @@ define (require) ->
 
       return OrganizedChaos.TYPE_LINE
 
+    getItemColor: (rng) ->
+      itemColor = rng.random(0, 1000) / 1000
+
+      if itemColor < @values.materialBlue
+        return Shaders.COLOR_BLUE
+
+      if itemColor < @values.materialBlue + @values.materialRed
+        return Shaders.COLOR_RED
+
+      return Shaders.COLOR_WHITE
+
     build: (time = 0) ->
       rngX = new RNG(@values.seed + "x")
       rngY = new RNG(@values.seed + "y")
@@ -105,13 +118,12 @@ define (require) ->
       rngVerticalSymmetry = new RNG(@values.seed + "verticalSymmetry")
       rngSpacing = new RNG(@values.seed + "spacing")
       rngType = new RNG(@values.seed + "type")
+      rngColor = new RNG(@values.seed + "color")
       rngShaderAnim = new RNG(@values.seed + "shaderAnim")
 
       #material = new THREE.MeshPhongMaterial({ ambient: 0x030303, color: 0xdddddd, specular: 0xffffff, shininess: 10, shading: THREE.FlatShading, side: THREE.DoubleSide })
       #material = new THREE.MeshBasicMaterial({color: 0xdddddd, shading: THREE.FlatShading, side: THREE.DoubleSide})
       #material.blending = THREE.AdditiveBlending
-
-      geom = OrganizedChaos.circleGeom
 
       spread = @values.spread
       spread_half = spread / 2
@@ -125,7 +137,7 @@ define (require) ->
         animated = false
         if rngShaderAnim.random(100) / 100 < @values.materialAnimated
           animated = true
-        material = window.shaders.getMaterialLine(animated)
+
         num_childs = 1
         scale = rngScale.random(0, 100) / 100 + 0.2
 
@@ -142,7 +154,10 @@ define (require) ->
         verticalSymmetry = false
         num_childs = parseInt(rngChilds.random(0, @values.maxChilds), 10)
         itemType = @getItemType(rngType)
+        itemColor = @getItemColor(rngColor)
+
         geom = OrganizedChaos.lineGeom
+        material = window.shaders.getMaterialLine(animated, itemColor)
 
         if @values.horizontalSymmetry && rngHorizontalSymmetry.random(0, 100) / 100 <= @values.horizontalSymmetry
           horizontalSymmetry = true
