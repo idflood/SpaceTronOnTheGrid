@@ -1,10 +1,10 @@
 {
   "settings": {
-    "time": 158631.67400000268,
+    "time": 32597.593000002205,
     "duration": 240,
     "domain": [
       0,
-      239935
+      48000
     ]
   },
   "data": [
@@ -80,7 +80,7 @@
         }
       ],
       "values": {
-        "bassSensibility": 0.5353737988297647,
+        "bassSensibility": 5,
         "midSensibility": 0.8,
         "highSensibility": 5,
         "autoAnimate": 0
@@ -149,7 +149,7 @@
       "values": {
         "x": 0,
         "y": 0,
-        "z": -3384.4746852783082,
+        "z": -825.4544854333233,
         "target_x": 0,
         "target_y": 0,
         "target_z": -10000,
@@ -306,7 +306,7 @@
         {
           "name": "materialAnimated",
           "label": "percent animated",
-          "val": 0,
+          "val": 0.3,
           "triggerRebuild": true,
           "group": "material",
           "keys": []
@@ -409,7 +409,7 @@
         "rotationRandY": 0,
         "rotationRandZ": 0,
         "circles": 0,
-        "materialAnimated": 0,
+        "materialAnimated": 0.3,
         "squares": 0,
         "lineWidth": 6.2,
         "lineWidthRand": 0,
@@ -836,7 +836,7 @@
         {
           "name": "materialAnimated",
           "label": "percent animated",
-          "val": 0,
+          "val": 0.4,
           "triggerRebuild": true,
           "group": "material",
           "keys": []
@@ -939,7 +939,7 @@
         "rotationRandY": 0,
         "rotationRandZ": 0.05,
         "circles": 0,
-        "materialAnimated": 0,
+        "materialAnimated": 0.4,
         "squares": 0,
         "lineWidth": 0.62,
         "lineWidthRand": 4.3,

@@ -52,7 +52,7 @@ define (require) ->
 
       if options.time?
         @tweenTime.timer.seek([options.time])
-      if @settings.time
+      else if @settings.time
         @tweenTime.timer.seek([@settings.time])
 
       size = @getScreenSize()
@@ -74,11 +74,7 @@ define (require) ->
       @renderer.setPixelRatio( window.devicePixelRatio )
       @renderer.setSize(size.width, size.height)
 
-      #@renderer.setClearColor( 0xe1d8c7, 1)
       @renderer.setClearColor( 0x111111, 1)
-
-      #circles = new Circles(@scene, 10, 4323, 130, 20, 50)
-      #circles2 = new Circles(@scene, 20, 51232, 180, 4, 10)
 
       light1 = new THREE.DirectionalLight( 0xffffff, 0.4 )
       light1.position.set(100, 300, 700)
@@ -90,7 +86,7 @@ define (require) ->
 
       @postfx = new PostFX(@scene, @camera, @renderer, size)
 
-
+      @onWindowResize()
       @animate()
 
     onTimerStatusChanged: (is_playing) =>
@@ -108,56 +104,6 @@ define (require) ->
       if @autoplay
         @tweenTime.timer.play()
 
-    createElements: () ->
-      material = new THREE.MeshPhongMaterial({color: 0x111111, specular: 0x666666, shininess: 30, shading: THREE.SmoothShading})
-      #material.blending = THREE.AdditiveBlending
-
-      object = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 650, 1, 1 ), material )
-      object.position.set( 420, 0, -350 )
-      object.rotation.set(0.1, 0.8, 0.7)
-      @scene.add( object )
-
-      object2 = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 650, 1, 1 ), material )
-      object2.position.set( 320, 0, -450 )
-      object2.rotation.set(0.17, 0.85, 0.78)
-      @scene.add( object2 )
-
-      object3 = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 650, 1, 1 ), material )
-      object3.position.set( -120, -600, -950 )
-      object3.rotation.set(0.17, 0.35, -0.38)
-      @scene.add( object3 )
-
-
-    __createElementsBackup: () ->
-      #material = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide } )
-      #material = new THREE.MeshBasicMaterial({color: 0xaf1925, transparent: true})
-      material = new THREE.MeshBasicMaterial({color: 0xd7888e, transparent: true})
-      material.blending = THREE.MultiplyBlending
-
-      materialBlack = new THREE.MeshBasicMaterial({color: 0x222222, transparent: true, wireframe: false})
-      materialBlack.blending = THREE.MultiplyBlending
-
-      material2 = new THREE.MeshBasicMaterial({color: 0x406872, transparent: true})
-      material2.blending = THREE.MultiplyBlending
-
-      object = new THREE.Mesh( new THREE.CircleGeometry( 50, 50, 0, Math.PI * 2 ), material )
-      #object = new THREE.Mesh( new THREE.BoxGeometry(30, 30, 30 , 2, 2, 2), material )
-      object.position.set( 20, 0, 0 )
-      #object.rotation.set(Math.PI / -2, 0, 0)
-      @scene.add( object )
-
-      object = new THREE.Mesh( new THREE.RingGeometry( 43, 50, 50, 1, 0, Math.PI * 2 ), materialBlack )
-      #object = new THREE.Mesh( new THREE.BoxGeometry(30, 30, 30 , 2, 2, 2), material )
-      object.position.set( 20, 0, 0 )
-      #object.rotation.set(Math.PI / -2, 0, 0)
-      @scene.add( object )
-
-      #object = new THREE.Mesh( new THREE.SphereGeometry( 75, 20, 10 ), material );
-      #object = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 2, 2 ), material2 );
-      object = new THREE.Mesh( new THREE.RingGeometry( 40, 50, 4, 1, 0, Math.PI * 2 ), material2 );
-      object.position.set( -20, 0, 0 );
-      object.rotation.set(0, 0, Math.PI / 4)
-      @scene.add( object )
 
     getScreenSize: () ->
       SCREEN_WIDTH = window.innerWidth
