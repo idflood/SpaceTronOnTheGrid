@@ -4,7 +4,7 @@ define (require) ->
 
   AnimatedObject = require 'app/elements/AnimatedObject'
   class AnimatedLine extends AnimatedObject
-    @circleGeom = new THREE.PlaneGeometry( 100, 1)
+    @circleGeom = new THREE.PlaneBufferGeometry( 100, 1)
     @ringGeom = false
     @ringGeom2 = false
     @noOutline = true

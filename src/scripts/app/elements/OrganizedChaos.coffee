@@ -15,10 +15,12 @@ define (require) ->
 
 
   class OrganizedChaos extends ElementBase
-    @lineGeom = new THREE.PlaneGeometry( 100, 1)
+    @lineGeom = new THREE.PlaneBufferGeometry( 100, 1)
     @circleGeom = new THREE.CircleGeometry( 10, 30, 0, Math.PI * 2 )
     @ringGeom = new THREE.RingGeometry( 10 - 1, 10 + 1, 30, 1, 0, Math.PI * 2 )
     @ringGeom2 = new CircleGeometry2( 10, 30, 0, Math.PI * 2 )
+
+    @squareGeom = new CircleGeometry2( 10, 4, 0, Math.PI * 2 )
 
     @TYPE_LINE = 0
     @TYPE_SQUARE = 1
@@ -31,12 +33,14 @@ define (require) ->
       spread: {name: 'spread', label: 'spread', val: 300, triggerRebuild: true, group: "global"}
       spreadY: {name: 'spreadY', label: 'spreadY', val: 300, triggerRebuild: true, group: "global"}
       maxChilds: {name: 'maxChilds', label: 'maxChilds', val: 8, triggerRebuild: true, group: "global"}
+      horizontalSymmetry: {name: 'horizontalSymmetry', label: 'horizontalSymmetry', val: 1, min: 0, max: 1, triggerRebuild: true, group: "global"}
+      verticalSymmetry: {name: 'verticalSymmetry', label: 'verticalSymmetry', val: 0, min: 0, max: 1, triggerRebuild: true, group: "global"}
       x: {name: 'x', label: 'x', val: 0, group: "position"}
       y: {name: 'y', label: 'y', val: 0, group: "position"}
       z: {name: 'z', label: 'z', val: 0, group: "position"}
-      rotationX: {name: 'rotationX', label: 'x', val: 0, min: 0, max: 2, group: "rotation", triggerRebuild: true}
-      rotationY: {name: 'rotationY', label: 'y', val: 0, min: 0, max: 2, group: "rotation", triggerRebuild: true}
-      rotationZ: {name: 'rotationZ', label: 'z', val: 0, min: 0, max: 2, group: "rotation", triggerRebuild: true}
+      rotationX: {name: 'rotationX', label: 'x', val: 0, min: -2, max: 2, group: "rotation", triggerRebuild: true}
+      rotationY: {name: 'rotationY', label: 'y', val: 0, min: -2, max: 2, group: "rotation", triggerRebuild: true}
+      rotationZ: {name: 'rotationZ', label: 'z', val: 0, min: -2, max: 2, group: "rotation", triggerRebuild: true}
       rotationRandX: {name: 'rotationRandX', label: 'rand x', val: 0, min: 0, max: 1, group: "rotation", triggerRebuild: true}
       rotationRandY: {name: 'rotationRandY', label: 'rand y', val: 0, min: 0, max: 1, group: "rotation", triggerRebuild: true}
       rotationRandZ: {name: 'rotationRandZ', label: 'rand z', val: 1, min: 0, max: 1, group: "rotation", triggerRebuild: true}
@@ -44,6 +48,8 @@ define (require) ->
       squares: {name: 'squares', label: 'squares', val: 0, triggerRebuild: true, group: "geometry"}
       lineWidth: {name: 'lineWidth', label: 'line width', val: 1, triggerRebuild: true, group: "line"}
       lineWidthRand: {name: 'lineWidthRand', label: 'line width randomness', val: 0, triggerRebuild: true, group: "line"}
+      lineHeight: {name: 'lineHeight', label: 'line height', val: 1, triggerRebuild: true, group: "line"}
+      lineHeightRand: {name: 'lineHeightRand', label: 'line height randomness', val: 0, triggerRebuild: true, group: "line"}
       materialColors: {name: 'materialColors', label: 'percent colors', val: 0, triggerRebuild: true, group: "material"}
       materialAnimated: {name: 'materialAnimated', label: 'percent animated', val: 0, triggerRebuild: true, group: "material"}
 
@@ -94,7 +100,11 @@ define (require) ->
       rngRotationZ = new RNG(@values.seed + "rotationZ")
       rngScale = new RNG(@values.seed + "scale")
       rngScaleLine = new RNG(@values.seed + "scaleLine")
+      rngScaleSquare = new RNG(@values.seed + "scaleSquare")
+      rngScaleLineHeight = new RNG(@values.seed + "scaleLineHeight")
       rngChilds = new RNG(@values.seed + "childs")
+      rngHorizontalSymmetry = new RNG(@values.seed + "horizontalSymmetry")
+      rngVerticalSymmetry = new RNG(@values.seed + "verticalSymmetry")
       rngSpacing = new RNG(@values.seed + "spacing")
       rngType = new RNG(@values.seed + "type")
       rngShaderAnim = new RNG(@values.seed + "shaderAnim")
@@ -130,30 +140,38 @@ define (require) ->
         rotation = new THREE.Vector3(rotationX, rotationY, rotationZ)
         scale = new THREE.Vector3(scale, scale, scale)
 
-        #if rngRotationZ.random(0, 1000) * 0.01 > 0.7
-        #  scale *= 0.3
-
+        horizontalSymmetry = false
+        verticalSymmetry = false
         num_childs = parseInt(rngChilds.random(0, @values.maxChilds), 10)
-
-        #material = @getMaterial(0xffffff)
-        #geom = OrganizedChaos.circleGeom
-        #geom = OrganizedChaos.ringGeom2
         itemType = @getItemType(rngType)
-
-
-        #if Math.random() < 0.7
-        #  geom = OrganizedChaos.lineGeom
         geom = OrganizedChaos.lineGeom
+
+        if @values.horizontalSymmetry && rngHorizontalSymmetry.random(0, 100) / 100 <= @values.horizontalSymmetry
+          horizontalSymmetry = true
+
+
+        if @values.verticalSymmetry && rngVerticalSymmetry.random(0, 100) / 100 <= @values.verticalSymmetry
+          verticalSymmetry = true
 
         if itemType == OrganizedChaos.TYPE_LINE
           scale.y = (scale.y * @values.lineWidth) * (rngScaleLine.random(1, 100) / 100) * (@values.lineWidthRand + 1)
           # Define a minimum scale to avoid invisible lines
           scale.y = Math.max(0.5, scale.y)
 
-        if itemType == OrganizedChaos.TYPE_CIRCLE
-          geom = OrganizedChaos.ringGeom
+          scale.x = (scale.x * @values.lineHeight) * (rngScaleLineHeight.random(1, 100) / 100) * (@values.lineHeightRand + 1)
+          # Define a minimum scale to avoid invisible lines
+          scale.x = Math.max(0.01, scale.x)
 
-        @addItem(geom, material, i, scale, position, rotation)
+        if itemType == OrganizedChaos.TYPE_CIRCLE
+          geom = OrganizedChaos.ringGeom2
+
+        else if itemType == OrganizedChaos.TYPE_SQUARE
+          geom = OrganizedChaos.squareGeom
+          rnd = 0.5 + rngScaleSquare.random(0, 100) / 100
+          scale.multiplyScalar(rnd)
+
+
+        @addItem(geom, material, i, scale, position, rotation, horizontalSymmetry, verticalSymmetry)
 
         if num_childs > 1
           spacing = 30 + rngSpacing.random(0, 100) * 0.4
@@ -163,9 +181,9 @@ define (require) ->
 
           for ii in [0..num_childs - 1]
             pos2 = position.clone().add(offset.multiplyScalar(ii + 1))
-            @addItem(geom, material, i, scale, pos2, rotation)
+            @addItem(geom, material, i, scale, pos2, rotation, horizontalSymmetry, verticalSymmetry)
 
-    addItem: (geom, material, i, scale, position, rotation) ->
+    addItem: (geom, material, i, scale, position, rotation, horizontalSymmetry, verticalSymmetry) ->
       quaternion = new THREE.Quaternion()
       quaternion.setFromAxisAngle(new THREE.Vector3(rotation.x, rotation.y, rotation.z), Math.PI / 2)
       item = new THREE.Mesh(geom , material)
@@ -178,26 +196,57 @@ define (require) ->
       @container.add(item)
       @items.push(item)
 
-      # mirroring
-      item2Container = new THREE.Object3D()
+      if horizontalSymmetry
+        # mirroring
+        item2Container = new THREE.Object3D()
 
-      @container.add(item2Container)
-      item2 = new THREE.Mesh(geom , material)
-      item2.position.x = position.x
-      item2.position.y = position.y
-      item2.position.z = position.z
-      # mirror rotation
-      item2.rotation.setFromQuaternion(quaternion)
-      #item2.rotation.setFromQuaternion(new THREE.Quaternion(-quaternion.x, quaternion.y, quaternion.z, -quaternion.w))
-      #item2.rotation = new THREE.Quaternion(quaternion.x, -quaternion.y, -quaternion.z, quaternion.w)
-      #item2.rotation.set(rotation.x, rotation.y * -1, rotation.z * -1)
-      #item2.rotation.set(rotation.x, rotation.y, rotation.z * -1)
-      item2.scale.copy(scale)
-      item2.updateMatrix()
-      #@container.add(item2)
-      item2Container.add(item2)
-      item2Container.scale.x = -1
-      @items.push(item2Container)
+        @container.add(item2Container)
+        item2 = new THREE.Mesh(geom , material)
+        item2.position.x = position.x
+        item2.position.y = position.y
+        item2.position.z = position.z
+        # mirror rotation
+        item2.rotation.setFromQuaternion(quaternion)
+        item2.scale.copy(scale)
+        item2.updateMatrix()
+        item2Container.add(item2)
+        item2Container.scale.x = -1
+        @items.push(item2Container)
+
+        if verticalSymmetry
+          # mirroring
+          item2Container = new THREE.Object3D()
+
+          @container.add(item2Container)
+          item2 = new THREE.Mesh(geom , material)
+          item2.position.x = position.x
+          item2.position.y = position.y
+          item2.position.z = position.z
+          # mirror rotation
+          item2.rotation.setFromQuaternion(quaternion)
+          item2.scale.copy(scale)
+          item2.updateMatrix()
+          item2Container.add(item2)
+          item2Container.scale.x = -1
+          item2Container.scale.y = -1
+          @items.push(item2Container)
+
+      if verticalSymmetry
+        # mirroring
+        item2Container = new THREE.Object3D()
+
+        @container.add(item2Container)
+        item2 = new THREE.Mesh(geom , material)
+        item2.position.x = position.x
+        item2.position.y = position.y
+        item2.position.z = position.z
+        # mirror rotation
+        item2.rotation.setFromQuaternion(quaternion)
+        item2.scale.copy(scale)
+        item2.updateMatrix()
+        item2Container.add(item2)
+        item2Container.scale.y = -1
+        @items.push(item2Container)
 
     getMaterial: (color) ->
       uniforms = {

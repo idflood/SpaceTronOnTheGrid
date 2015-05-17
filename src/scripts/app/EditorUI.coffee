@@ -39,7 +39,6 @@ define (require) ->
         # Trigger window resize in order to resize the 3d render.
         window.dispatchEvent(new Event('resize'))
       )
-      #window.app.scene.add( plane )
 
       getRaycaster = () =>
         camera = window.activeCamera
