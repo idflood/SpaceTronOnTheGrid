@@ -66,9 +66,10 @@ define (require) ->
       @sceneManager = new SceneManager(@tweenTime, @data, @scene, @camera, @factory)
 
       @time = Date.now() * 0.0001
-      container = document.createElement( 'div' )
+      $container = $('<div class="experiment"></div>')
+      container = $container.get(0)
       @containerWebgl = container # Save for use in EditorUI for object picking.
-      document.body.appendChild( container )
+      $('body').append($container)
 
       @renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } )
       @renderer.setPixelRatio( window.devicePixelRatio )
@@ -98,11 +99,15 @@ define (require) ->
     onTimerSeeked: (time) =>
       @audio.seek(time / 1000)
 
+    play: () =>
+      @tweenTime.timer.play()
+      $('body').addClass('is-playing')
+
     onAudioLoaded: () =>
       console.log "audio loaded"
       $('body').addClass('is-audio-loaded')
       if @autoplay
-        @tweenTime.timer.play()
+        @play()
 
 
     getScreenSize: () ->
