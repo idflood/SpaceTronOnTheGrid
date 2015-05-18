@@ -8,38 +8,46 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
     <link rel="stylesheet" href="assets/styles/screen.css">
-
-    <!-- dev only -->
-    <link rel="stylesheet" href="assets/styles/editor.css">
-    <link rel="stylesheet" href="src/fonts/icomoon/style.css">
-    <link rel="stylesheet" href="src/scripts/vendors/TweenTime/dist/styles/editor.css">
-    <!-- /dev only -->
-
     <link href='http://fonts.googleapis.com/css?family=Oswald:400,300' rel='stylesheet' type='text/css'>
     <script src="src/scripts/vendors/modernizr.js"></script>
   </head>
-  <body class="is-loaded">
-    <div class="loading-screen"></div>
+  <body>
+    <div class="intro">
+      <div class="intro__header">
+        <h1>Space Tron On The Grid</h1>
+        <h2>A WebGL audio experiment</h2>
+      </div>
+      <div class="loader">
+        <p>Loading</p>
+        <div class="progress"><div class="progress__inner"></div></div>
+      </div>
+    </div>
+    <footer class="footer">
+      <p>Visuals: David Mignot | Music: Brian Bonz</p>
+    </footer>
     <script src="src/scripts/bower_components/jquery/dist/jquery.js"></script>
     <script src="src/scripts/bower_components/three.js/three.min.js"></script>
     <script src="src/scripts/bower_components/js-signals/dist/signals.js"></script>
     <script src="src/scripts/bower_components/lodash/dist/lodash.js"></script>
-    <script src="src/scripts/bower_components/d3/d3.js"></script>
     <script src="src/scripts/bower_components/gsap/src/uncompressed/TweenMax.js"></script>
     <script src="src/scripts/vendors/TweenTime/dist/scripts/TweenTime.Core.js"></script>
 
-    <script src="src/scripts/bower_components/draggable-number.js/dist/draggable-number.js"></script>
     <script src="assets/scripts/App.js"></script>
 
-    <script src="src/scripts/vendors/TweenTime/dist/scripts/TweenTime.Editor.js"></script>
-
-    <script src="assets/scripts/Editor.js"></script>
-
     <script>
-      window.app = new App();
+      window.app = new App({
+        autoplay: false,
+        time: 0
+      });
       window.tweenTime = app.tweenTime;
 
-      var editor = new EditorUI();
+      setTimeout(function() {
+        $('body').addClass('is-loaded');
+      }, 100);
+
+      $('.intro__header').click(function(e) {
+        app.play();
+      });
     </script>
     <script>
         var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
