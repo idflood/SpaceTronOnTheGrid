@@ -1,10 +1,10 @@
 {
   "settings": {
-    "time": 39516.31200000923,
+    "time": 0,
     "duration": 240,
     "domain": [
       0,
-      61047
+      48000
     ]
   },
   "data": [
@@ -92,7 +92,7 @@
         "bassSensibility": 5,
         "midSensibility": 0.8,
         "highSensibility": 5,
-        "autoAnimate": 0
+        "autoAnimate": 0.05
       }
     },
     {
@@ -168,7 +168,7 @@
       "values": {
         "x": 0,
         "y": 0,
-        "z": -997.7166049384512,
+        "z": 700,
         "target_x": 0,
         "target_y": 0,
         "target_z": -10000,
@@ -188,7 +188,7 @@
         {
           "name": "numItems",
           "label": "num items",
-          "val": 46,
+          "val": 44,
           "triggerRebuild": true,
           "keys": [],
           "group": "global"
@@ -277,7 +277,7 @@
         {
           "name": "rotationZ",
           "label": "z",
-          "val": 0,
+          "val": 0.199,
           "min": 0,
           "max": 2,
           "group": "rotation",
@@ -307,7 +307,7 @@
         {
           "name": "rotationRandZ",
           "label": "rand z",
-          "val": 1,
+          "val": 0,
           "min": 0,
           "max": 1,
           "group": "rotation",
@@ -357,7 +357,7 @@
         {
           "name": "lineHeight",
           "label": "line height",
-          "val": 0.401,
+          "val": 0.522,
           "triggerRebuild": true,
           "group": "line",
           "keys": []
@@ -412,7 +412,7 @@
         }
       ],
       "values": {
-        "numItems": 46,
+        "numItems": 44,
         "seed": 85,
         "depth": 4.6,
         "spread": 302.7,
@@ -423,16 +423,16 @@
         "spreadY": 8.5,
         "rotationX": 0,
         "rotationY": 0,
-        "rotationZ": 0,
+        "rotationZ": 0.199,
         "rotationRandX": 0,
         "rotationRandY": 0,
-        "rotationRandZ": 1,
+        "rotationRandZ": 0,
         "circles": 0,
         "materialAnimated": 0.3,
         "squares": 0,
         "lineWidth": 0.7,
         "lineWidthRand": 0,
-        "lineHeight": 0.401,
+        "lineHeight": 0.522,
         "lineHeightRand": 0,
         "horizontalSymmetry": 1,
         "verticalSymmetry": 0.04,
@@ -726,7 +726,7 @@
         {
           "name": "seed",
           "label": "seed",
-          "val": 66042,
+          "val": 98042,
           "triggerRebuild": true,
           "keys": [],
           "group": "global"
@@ -765,7 +765,7 @@
         {
           "name": "y",
           "label": "y",
-          "val": 0,
+          "val": -5,
           "keys": [],
           "group": "position"
         },
@@ -807,7 +807,7 @@
         {
           "name": "rotationZ",
           "label": "z",
-          "val": 0.3,
+          "val": 0.201,
           "min": 0,
           "max": 2,
           "group": "rotation",
@@ -837,7 +837,7 @@
         {
           "name": "rotationRandZ",
           "label": "rand z",
-          "val": 0.05,
+          "val": 0,
           "min": 0,
           "max": 1,
           "group": "rotation",
@@ -943,20 +943,20 @@
       ],
       "values": {
         "numItems": 29,
-        "seed": 66042,
+        "seed": 98042,
         "depth": 12,
         "spread": 450,
         "maxChilds": 3,
         "x": 0,
-        "y": 0,
+        "y": -5,
         "z": -640,
         "spreadY": 0,
         "rotationX": 0,
         "rotationY": 0,
-        "rotationZ": 0.3,
+        "rotationZ": 0.201,
         "rotationRandX": 0,
         "rotationRandY": 0,
-        "rotationRandZ": 0.05,
+        "rotationRandZ": 0,
         "circles": 0,
         "materialAnimated": 0.4,
         "squares": 0,

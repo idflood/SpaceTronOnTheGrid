@@ -56,12 +56,64 @@ canvas
 
   +transform(translate(-50%, -50%))
   +transition(all 0.8s)
+  +perspective(640px)
+  +transform-origin(50%, 50%)
 
   .is-playing &
     +transition-delay(0.3s)
     visibility: hidden
     opacity: 0
 
+  h1, h2
+    .is-audio-loaded &
+      cursor: pointer
+
+
+
+.intro__title,
+.intro__subtitle
+  +transition(all 1.4s cubic-bezier(0.215, 0.610, 0.355, 1.000) 0.8s) // ease out
+  +translate3d(0, 0, -130px)
+  padding: 0 20px
+  opacity: 0
+
+  .is-loaded &
+    +translate3d(0,0,0)
+    opacity: 1
+
+  .is-playing &
+    // in out: cubic-bezier(0.770, 0.000, 0.175, 1.000)
+    +transition-duration(0.8s)
+    +transition-timing-function(cubic-bezier(0.550, 0.055, 0.675, 0.190)) // in-out
+    +translate3d(0,0,360px)
+    +transition-delay(0s)
+    opacity: 0
+
+.intro__subtitle
+  +translate3d(0, 0, -100px)
+  +transition-delay(1s)
+
+  .is-playing &
+    +translate3d(0,0,220px)
+    +transition-delay(0s)
+
+.intro__start
+  +transition(all 1.4s cubic-bezier(0.215, 0.610, 0.355, 1.000) 0.6s) // ease out
+  +translate3d(0, 0, -20px)
+  opacity: 0
+  visibility: hidden
+
+  .is-audio-loaded &
+    +translate3d(0, 0, 0)
+    opacity: 1
+    visibility: visible
+
+  .is-playing &
+    +transition-duration(0.8s)
+    +transition-timing-function(cubic-bezier(0.550, 0.055, 0.675, 0.190)) // in-out
+    +translate3d(0,0,180px)
+    +transition-delay(0s)
+    opacity: 0
 
 .footer
   position: absolute
@@ -72,7 +124,7 @@ canvas
   padding: 20px
   text-align: center
 
-  +transition(all 0.8s linear 2.4s)
+  +transition(all 1.8s linear 1.4s)
   opacity: 0
 
   .is-loaded &
@@ -91,10 +143,39 @@ canvas
     opacity: 1
 
 .loader
-  +transition(all 0.4s)
+  +transition(all 0.4s linear 1.8s)
+  position: relative
+  opacity: 0
+
+  .is-loaded &
+    opacity: 1
   .is-audio-loaded &
+    +transition-delay(0s)
     opacity: 0
     visibility: hidden
+
+  &:after
+    +box-sizing(border-box)
+    content: ""
+    display: block
+    width: 20px
+    height: 20px
+    background: #fff
+    position: absolute
+    top: 0
+    left: 50%
+    margin-top: 78px
+    margin-left: -10px
+
+    +animation(rotateplane 1.8s infinite ease-in-out)
+
++keyframes(rotateplane)
+  0%
+    transform: perspective(240px) rotateY(0deg)
+  50%
+    transform: perspective(240px) rotateY(-180.1deg)
+  100%
+    transform: perspective(240px) rotateY(-360deg)
 
 .progress
   display: inline-block
@@ -108,3 +189,57 @@ canvas
     top: 0
     height: 1px
     background: #fff
+
+.button
+  +inline-block
+  position: relative
+  padding: 4px 10px
+  color: #eee
+  background: rgba(255,255,255,0.07)
+  font-size: 18px
+  letter-spacing: 0.5px
+  text-decoration: none
+  text-transform: uppercase
+
+  &:after
+    +transition(right 0.2s cubic-bezier(0.770, 0.000, 0.175, 1.000))
+    content: ""
+    display: block
+    position: absolute
+    left: 0
+    right: 100%
+    bottom: 0
+    height: 1px
+    background: #fff
+
+  &, &:active, &:visited
+    color: #fff
+
+  &:hover, &:focus
+    color: #ddd
+    background: rgba(255,255,255,0.12)
+    outline: 0
+
+    &:after
+      right: 0
+
+.outro
+  position: absolute
+  z-index: 280
+  top: 50%
+  left: 50%
+  padding: 20px
+  width: 340px
+  max-width: 100%
+  text-align: center
+  background: rgba(0,0,0,0.9)
+
+  +transform(translate(-50%, -50%))
+  +transition(all 0.2s)
+
+  visibility: hidden
+  opacity: 0
+
+  .is-stopped &
+    opacity: 1
+    visibility: visible

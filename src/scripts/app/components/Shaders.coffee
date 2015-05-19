@@ -40,14 +40,19 @@ define (require) ->
         @shaders.push(mat)
         @shadersBlue.push(mat)
 
-    update: () ->
+    update: (force = 0) ->
       for shader in @shaders
         shader.uniforms.percent.value = Math.max(0, shader.uniforms.percent.value - shader.speed * 0.03)
+
+
         # Only bump value if it is not already animating.
-        if shader.uniforms.percent.value < 0.01
+        if shader.uniforms.percent.value < 0.02
+          # Can force from intro (hover button)
+          if force && Math.random() < force
+            shader.uniforms.percent.value = 2
           # only bump values once in a while. Without this
           # every shaders would animate on the first boum.
-          if Math.random() < 0.02
+          else if Math.random() < 0.02
             bassSensibility = 0
             midSensibility = 0
             highSensibility = 0
@@ -64,6 +69,8 @@ define (require) ->
               shader.uniforms.percent.value = 2
             if globalValues && Math.random() < globalValues.autoAnimate
               shader.uniforms.percent.value = 2
+
+
       #console.log @lineMaterial1.uniforms.percent.value
 
     getMaterialLine: (animated, color) ->

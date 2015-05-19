@@ -33,7 +33,7 @@ void main() {
   gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.0, 0.0, 0.0), center * 0.5);
 
   // Add film grain.
-  vec3 g = vec3( random( gl_FragCoord.xy / resolution.xy * time )) * nIntensity;
+  vec3 g = vec3( random( (gl_FragCoord.xy / resolution.xy) * time )) * nIntensity;
 
   vec3 color = blend(gl_FragColor.rgb, g);
   float luminance = luma(gl_FragColor.rgb);

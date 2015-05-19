@@ -32,7 +32,7 @@ define (require) ->
       @effectFXAA = new THREE.ShaderPass( THREE.FXAAShader )
       @effectFXAA.uniforms[ 'resolution' ].value.set(1 / (size.width * dpr), 1 / (size.height * dpr))
 
-      @bloom = new THREE.BloomPass(0.8, 25, 4)
+      @bloom = new THREE.BloomPass(0.9, 25, 4)
 
       @glitchPass = new THREE.GlitchPass2()
       @glitchPass.intensity = 0.3;
@@ -40,7 +40,7 @@ define (require) ->
 
 
       resolution = new THREE.Vector2(size.width * dpr, size.height * dpr)
-      @customPass = new THREE.CustomPostPass(0.15, resolution)
+      @customPass = new THREE.CustomPostPass(0.55, resolution)
       @customPass.renderToScreen = true
 
       @composer = new THREE.EffectComposer( @renderer, @renderTarget )

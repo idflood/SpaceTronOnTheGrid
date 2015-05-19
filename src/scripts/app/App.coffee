@@ -91,6 +91,7 @@ define (require) ->
       @animate()
 
     onTimerStatusChanged: (is_playing) =>
+      $('body').toggleClass('is-stopped', !is_playing)
       if is_playing
         @audio.play()
       else

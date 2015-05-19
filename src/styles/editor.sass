@@ -30,6 +30,9 @@
   .is-audio-loaded &
     display: none
 
+.properties-editor
+  z-index: 200
+
 +keyframes(rotateplane)
   0%
     transform: perspective(140px) rotateX(0deg) rotateY(0deg)
@@ -37,4 +40,3 @@
     transform: perspective(140px) rotateX(-180.1deg) rotateY(0deg)
   100%
     transform: perspective(140px) rotateX(-180deg) rotateY(-179.9deg)
-
