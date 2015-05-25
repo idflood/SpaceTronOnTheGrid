@@ -23,8 +23,20 @@
 // ex: instead of "#footer .nav" it's better to have ".nav-small" or ".nav.small"
 @import modules/all
 
+html
+  height: 100%
+
+html, body
+  min-height: 100%
+
 body
-  background: #000
+  background: #0e0e0e
+
+  &.is-not-supported
+    background-image: image-url('background.jpg')
+    background-repeat: no-repeat
+    background-position: 50% 50%
+    background-size: cover
 
 .intro,
 .intro__header,
@@ -163,6 +175,9 @@ canvas
     opacity: 0
     visibility: hidden
 
+  .is-not-supported &
+    display: none
+
   &:after
     +box-sizing(border-box)
     content: ""
@@ -185,6 +200,18 @@ canvas
     transform: perspective(240px) rotateY(-180.1deg)
   100%
     transform: perspective(240px) rotateY(-360deg)
+
+.message-support
+  +transition(all 0.4s linear 1.8s)
+  display: none
+  margin-top: 40px
+  opacity: 0
+
+  .is-not-supported &
+    display: block
+
+  .is-loaded &
+    opacity: 1
 
 .progress
   display: inline-block
