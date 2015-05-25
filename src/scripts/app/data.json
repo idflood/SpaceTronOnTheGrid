@@ -1,10 +1,10 @@
 {
   "settings": {
-    "time": 240000,
+    "time": 231826.4140000241,
     "duration": 240,
     "domain": [
-      0,
-      240000
+      34285,
+      239999
     ]
   },
   "data": [
@@ -23,22 +23,22 @@
           "keys": [
             {
               "time": 130.80899999999997,
-              "val": 5,
+              "val": 130,
               "ease": "Quad.easeOut"
             },
             {
               "time": 138.7439999999998,
-              "val": 0.8,
+              "val": 100,
               "ease": "Quad.easeOut"
             },
             {
               "time": 144.14699999999996,
-              "val": 0.4,
+              "val": 80,
               "ease": "Quad.easeOut"
             },
             {
               "time": 177.71099999999998,
-              "val": 0.6,
+              "val": 120,
               "ease": "Quad.easeOut"
             }
           ]
@@ -46,13 +46,13 @@
         {
           "name": "midSensibility",
           "label": "midSensibility",
-          "val": 0.8,
+          "val": 100,
           "keys": []
         },
         {
           "name": "highSensibility",
           "label": "highSensibility",
-          "val": 5,
+          "val": 120,
           "keys": []
         },
         {
@@ -89,10 +89,10 @@
         }
       ],
       "values": {
-        "bassSensibility": 0.6,
-        "midSensibility": 0.8,
-        "highSensibility": 5,
-        "autoAnimate": 1
+        "bassSensibility": 120,
+        "midSensibility": 100,
+        "highSensibility": 120,
+        "autoAnimate": 0.18845102253916685
       }
     },
     {
@@ -168,7 +168,7 @@
       "values": {
         "x": 0,
         "y": 0,
-        "z": -3850,
+        "z": -3845.259110193444,
         "target_x": 0,
         "target_y": 0,
         "target_z": -10000,

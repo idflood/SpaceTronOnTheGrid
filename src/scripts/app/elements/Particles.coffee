@@ -1,8 +1,6 @@
 define (require) ->
   _ = require 'lodash'
   THREE = require 'Three'
-
-  Audio = require 'app/components/Audio'
   Colors = require 'app/components/Colors'
 
   class Particles
@@ -59,7 +57,7 @@ define (require) ->
     update: (seconds, values = false, force = false) ->
       #@container.rotation.z += @speed / 100
 
-      volume = Audio.instance.mid
+      volume = window.audio.data.filters.mid.timeDomainRMS
       current = @el.scale.x
       if volume > 0.2 && Math.random() < 0.1
         current += volume * 10

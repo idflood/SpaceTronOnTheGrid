@@ -6,9 +6,6 @@ define (require) ->
 
   Colors = require 'app/components/Colors'
 
-  # should not be a dependency.
-  Audio = require 'app/components/Audio'
-
   ShaderVertex = require 'app/shaders/BasicNoise.vert'
   ShaderFragement = require 'app/shaders/BasicNoise.frag'
 
@@ -120,12 +117,6 @@ define (require) ->
       return material
 
     update: (seconds, progression) ->
-      #if Audio.instance.high > 0.002
-      #  @speed += Audio.instance.high
-      #console.log Audio.instance.high
-
-      #if Math.random() > 0.9 && Audio.instance.high > 0.09
-      #  @velocity.add(@direction.clone().multiplyScalar(Audio.instance.high * 12 * @weight))
       @container.position.add(@velocity)
 
       @velocity = @velocity.multiplyScalar(0.94)
@@ -133,7 +124,7 @@ define (require) ->
       timeDiff = Date.now() - @start
       for material in @materials
         material.uniforms['time'].value = 0.00025 * ( timeDiff )
-        material.uniforms['strength'].value = window.audio.mid
+        material.uniforms['strength'].value = window.audio.data.filters.mid.timeDomainRMS
 
       scale = @animatedProperties.scale * @values.size * 0.1
       @container.scale.set(scale * (1 + @values.randScaleX), scale * (1 + @values.randScaleY), scale)

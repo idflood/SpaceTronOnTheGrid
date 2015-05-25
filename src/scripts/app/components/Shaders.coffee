@@ -1,6 +1,5 @@
 define (require) ->
   THREE = require 'Three'
-  Audio = require 'app/components/Audio'
   Global = require 'app/elements/Global'
 
   ShaderVertex = require 'app/shaders/Basic.vert'
@@ -64,8 +63,9 @@ define (require) ->
               midSensibility = globalValues.midSensibility
               highSensibility = globalValues.highSensibility
 
+            audioData = window.audio.data.filters
 
-            if window.audio.bass > bassSensibility || window.audio.mid > midSensibility || window.audio.high > highSensibility
+            if audioData.bass.timeDomainRMS > bassSensibility || audioData.mid.timeDomainRMS > midSensibility || audioData.high.timeDomainRMS > highSensibility
               shader.uniforms.percent.value = 2
             if globalValues && Math.random() < globalValues.autoAnimate
               shader.uniforms.percent.value = 2

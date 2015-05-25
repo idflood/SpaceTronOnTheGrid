@@ -4,7 +4,6 @@ define (require) ->
   RNG = require 'exports?RNG!rng'
   ElementBase = require 'app/elements/ElementBase'
 
-  Audio = require 'app/components/Audio'
   Colors = require 'app/components/Colors'
   Shaders = require 'app/components/Shaders'
 
@@ -325,7 +324,7 @@ define (require) ->
         if prop.triggerRebuild && @valueChanged(key, values)
           needs_rebuild = true
 
-      volume = Audio.instance.mid
+      volume = window.audio.data.filters.mid.timeDomainRMS
 
       if force || @valueChanged("x", values) || @valueChanged("y", values) || @valueChanged("z", values)
         @container.position.set(values.x, values.y, values.z)

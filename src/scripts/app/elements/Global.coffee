@@ -4,9 +4,9 @@ define (require) ->
 
   class Global
     @properties:
-      bassSensibility: {name: 'bassSensibility', label: 'bassSensibility x', val: 5, min: 0, max: 5}
-      midSensibility: {name: 'midSensibility', label: 'midSensibility', val: 0.8, min: 0, max: 5}
-      highSensibility: {name: 'highSensibility', label: 'highSensibility', val: 5, min: 0, max: 5}
+      bassSensibility: {name: 'bassSensibility', label: 'bassSensibility x', val: 120, min: 0, max: 200}
+      midSensibility: {name: 'midSensibility', label: 'midSensibility', val: 100, min: 0, max: 200}
+      highSensibility: {name: 'highSensibility', label: 'highSensibility', val: 120, min: 0, max: 200}
       autoAnimate: {name: 'autoAnimate', label: 'autoAnimate', val: 0, min: 0, max: 1}
 
     constructor: (@values = {}, time = 0) ->

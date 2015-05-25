@@ -11,12 +11,13 @@ define (require) ->
   THREE = require 'Three'
 
   TweenTime = require 'TweenTime'
+  Acoustic = require 'bower_components/acoustic.js/dist/acoustic.min.js'
+
 
   Shaders = require 'app/components/Shaders'
   Background = require 'app/components/Background'
   PostFX = require 'app/components/PostFX'
   SceneManager = require 'app/components/SceneManager'
-  Audio = require 'app/components/Audio'
   ElementFactory = require 'app/components/ElementFactory'
   DataNormalizer = require 'app/components/DataNormalizer'
 
@@ -38,7 +39,11 @@ define (require) ->
       @shaders = new Shaders()
 
       audio_url = 'assets/08 - Space Tron On The Grid.mp3'
-      @audio = new Audio(audio_url, @onAudioLoaded)
+      #@audio = new Audio(audio_url, @onAudioLoaded)
+      @audio = new Acoustic(audio_url, {
+        onCanPlay: @onAudioLoaded
+      })
+      window.audio = @audio
       @factory = new ElementFactory()
 
       # Convert loaded data
@@ -110,7 +115,6 @@ define (require) ->
       if @autoplay
         @play()
 
-
     getScreenSize: () ->
       SCREEN_WIDTH = window.innerWidth
       SCREEN_HEIGHT = window.innerHeight
@@ -122,7 +126,6 @@ define (require) ->
         SCREEN_HEIGHT -= timelineheight
         SCREEN_WIDTH -= propertieswidth
 
-      #console.log {width: SCREEN_WIDTH, height: SCREEN_HEIGHT}
       return {width: SCREEN_WIDTH, height: SCREEN_HEIGHT}
 
     updateCameraAspect: (camera, size = false) =>
