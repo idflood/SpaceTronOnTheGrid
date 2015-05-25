@@ -15,6 +15,7 @@ varying vec2 v_rgbM;
 
 uniform sampler2D tDiffuse;
 uniform vec2 resolution;
+uniform vec2 resolution2;
 uniform float nIntensity;
 uniform float time;
 
@@ -30,10 +31,11 @@ void main() {
   float center = smoothstep(0.0, 1.0, length(vUv-0.5));
 
   // Add vignetting.
-  gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.0, 0.0, 0.0), center * 0.5);
+  gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.0, 0.0, 0.0), center * 0.6);
 
   // Add film grain.
-  vec3 g = vec3( random( (gl_FragCoord.xy / resolution.xy) * time )) * nIntensity;
+  //vec3 g = vec3( random( (gl_FragCoord.xy / resolution.xy) * time )) * nIntensity;
+  vec3 g = vec3( random( (gl_FragCoord.xy / resolution2.xy) * time )) * nIntensity;
 
   vec3 color = blend(gl_FragColor.rgb, g);
   float luminance = luma(gl_FragColor.rgb);

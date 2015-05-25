@@ -30,7 +30,8 @@ define (require) ->
 
 
       resolution = new THREE.Vector2(size.width * dpr, size.height * dpr)
-      @customPass = new THREE.CustomPostPass(0.55, resolution)
+      resolution2 = new THREE.Vector2(size.width, size.height)
+      @customPass = new THREE.CustomPostPass(0.55, resolution, resolution2)
       @customPass.renderToScreen = true
 
       @composer = new THREE.EffectComposer( @renderer, @renderTarget )
@@ -44,6 +45,7 @@ define (require) ->
       @renderTarget = new THREE.WebGLRenderTarget(SCREEN_WIDTH * dpr, SCREEN_HEIGHT * dpr, @renderTargetParameters)
       @composer.reset(@renderTarget)
       @customPass.uniforms['resolution'].value.set(SCREEN_WIDTH * dpr, SCREEN_HEIGHT * dpr)
+      @customPass.uniforms['resolution2'].value.set(SCREEN_WIDTH, SCREEN_HEIGHT)
 
     render: (delta) ->
       @renderer.clear()

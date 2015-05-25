@@ -2,6 +2,7 @@ THREE.CustomPostShader = {
   uniforms: {
     "tDiffuse": {type: "t", value: null},
     "resolution": {type: "v2", value: new THREE.Vector2(1 / 1024, 1 / 512)},
+    "resolution2": {type: "v2", value: new THREE.Vector2(1 / 1024, 1 / 512)},
     "time": {type: "f", value: 0},
     "nIntensity": {type: "f", value: 0.05},
   },
@@ -9,7 +10,7 @@ THREE.CustomPostShader = {
   fragmentShader: require('./CustomPostPass.frag'),
 };
 
-THREE.CustomPostPass = function (noiseIntensity, resolution) {
+THREE.CustomPostPass = function (noiseIntensity, resolution, resolution2) {
   var shader = THREE.CustomPostShader;
 
   this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
