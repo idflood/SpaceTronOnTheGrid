@@ -36,6 +36,15 @@ module.exports = (grunt) ->
         ],
         dest: 'assets/scripts/vendors.min.js'
 
+    htmlmin:
+      dist:
+        options:
+          removeComments: true,
+          collapseWhitespace: true,
+          minifyJS: true
+        files:
+          'index.html': 'src/index.html'
+
     uglify:
       dist:
         files:
@@ -45,6 +54,10 @@ module.exports = (grunt) ->
       main: require('./webpack.config.js')
 
     watch:
+      html:
+        files: ["src/index.html"]
+        tasks: ["htmlmin"]
+
       sass:
         files: ["src/styles/**"]
         tasks: ["compass:dev"]
@@ -124,6 +137,6 @@ module.exports = (grunt) ->
   require('jit-grunt')(grunt)
 
   grunt.registerTask "init", ["compass:clean", "compass:dev"]
-  grunt.registerTask "default", ['browserSync', "compass:clean", "compass:dev", "webpack", "watch"]
+  grunt.registerTask "default", ['browserSync', 'htmlmin', "compass:clean", "compass:dev", "webpack", "watch"]
   grunt.registerTask "buildVendors", ['concat', 'uglify']
-  grunt.registerTask "build", ["clean", "compass:clean", "copy", "imagemin", "compass:build", "webpack", 'buildVendors', "notify:build"]
+  grunt.registerTask "build", ["clean", 'htmlmin', "compass:clean", "copy", "imagemin", "compass:build", "webpack", 'buildVendors', "notify:build"]

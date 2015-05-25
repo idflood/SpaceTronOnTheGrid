@@ -29,6 +29,7 @@
     "glsl-random": "0.0.5",
     "glsl-blend-soft-light": "~1.0.5",
     "glsl-luma": "~1.0.1",
-    "grunt-contrib-concat": "~0.5.1"
+    "grunt-contrib-concat": "~0.5.1",
+    "grunt-contrib-htmlmin": "~0.4.0"
   }
 }
