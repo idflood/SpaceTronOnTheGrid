@@ -1,0 +1,22 @@
+.footer
+  +perspective(640px)
+  position: absolute
+  left: 0
+  right: 0
+  bottom: 0
+  z-index: 80
+  padding: 20px
+  text-align: center
+
+  +transition(all 1.8s linear 1.4s)
+  opacity: 0
+
+  .is-loaded &
+    opacity: 1
+
+  .is-playing &
+    +transition-delay(0s)
+    +transition-duration(0.3s)
+
+    opacity: 0
+    visibility: hidden
