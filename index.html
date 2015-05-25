@@ -10,6 +10,13 @@
     <link rel="stylesheet" href="assets/styles/screen.css">
     <link href='http://fonts.googleapis.com/css?family=Oswald:400,300' rel='stylesheet' type='text/css'>
     <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-132118-5', 'auto');
+      ga('send', 'pageview');
+
       /* Modernizr 2.8.3 (Custom Build) | MIT & BSD
       * Build: http://modernizr.com/download/#-audio-webgl-shiv-cssclasses-audio_webaudio_api
       */
@@ -30,19 +37,19 @@
         <div class="progress"><div class="progress__inner"></div></div>
       </div>
       <div class="intro__start">
-        <a href="#" class="button" onClick="_gaq.push(['_trackEvent', 'Experiment', 'Start']);">Start</a>
+        <a href="#" class="button" onClick="ga('send', 'event', 'Experiment', 'Start');">Start</a>
       </div>
     </div>
 
     <div class="outro">
       <div class="outro__restart">
-        <a href="#" onClick="_gaq.push(['_trackEvent', 'Experiment', 'Restart']);" class="button">Restart</a>
+        <a href="#" onClick="ga('send', 'event', 'Experiment', 'Restart');" class="button">Restart</a>
       </div>
     </div>
 
     <footer class="footer">
-      <p>Visuals: <a href="http://www.idflood.com" onClick="_gaq.push(['_trackEvent', 'External', 'idflood.com']);" target="_blank">David Mignot</a> | Music: <a href="http://brianbonz.com/" target="_blank" onClick="_gaq.push(['_trackEvent', 'Experiment', 'brianbonz.com']);">Brian Bonz</a> | <a href="http://six3collective.com/collections/brian-bonz/products/misophonia" target="_blank" onClick="_gaq.push(['_trackEvent', 'Experiment', 'Buy']);">Buy the album</a></p>
-      <p><a href="https://github.com/idflood/SpaceTronOnTheGrid" onClick="_gaq.push(['_trackEvent', 'External', 'github']);" target="_blank">Code</a> | <a href="index_dev.html" onClick="_gaq.push(['_trackEvent', 'External', 'editor']);">Editor</a> | A <a href="http://www.stimul.ch" onClick="_gaq.push(['_trackEvent', 'External', 'editor']);">stimul.ch</a> project</p>
+      <p>Visuals: <a href="http://www.idflood.com" onClick="ga('send', 'event', 'External', 'idflood.com');" target="_blank">David Mignot</a> | Music: <a href="http://brianbonz.com/" target="_blank" onClick="ga('send', 'event', 'Experiment', 'brianbonz.com');">Brian Bonz</a> | <a href="http://six3collective.com/collections/brian-bonz/products/misophonia" target="_blank" onClick="ga('send', 'event', 'Experiment', 'Buy');">Buy the album</a></p>
+      <p><a href="https://github.com/idflood/SpaceTronOnTheGrid" onClick="ga('send', 'event', 'External', 'github');" target="_blank">Code</a> | <a href="index_dev.html" onClick="ga('send', 'event', 'External', 'editor');">Editor</a> | A <a href="http://www.stimul.ch" onClick="ga('send', 'event', 'External', 'editor');">stimul.ch</a> project</p>
     </footer>
     <script src="assets/scripts/vendors.min.js"></script>
 
@@ -87,14 +94,6 @@
           $('body').addClass('is-loaded');
         }, 100);
       }
-
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-132118-5', 'auto');
-      ga('send', 'pageview');
     </script>
     <!-- Development by stimul.ch -->
   </body>
