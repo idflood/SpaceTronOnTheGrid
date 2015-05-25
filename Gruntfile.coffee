@@ -24,6 +24,23 @@ module.exports = (grunt) ->
           imagesDir: "assets/images"
           fontsDir: "assets/fonts"
 
+    concat:
+      dist:
+        src: [
+          'src/scripts/bower_components/jquery/dist/jquery.js',
+          'src/scripts/bower_components/three.js/three.js',
+          'src/scripts/bower_components/js-signals/dist/signals.js',
+          'src/scripts/bower_components/lodash/dist/lodash.js',
+          'src/scripts/bower_components/gsap/src/uncompressed/TweenMax.js',
+          'src/scripts/vendors/TweenTime/dist/scripts/TweenTime.Core.js'
+        ],
+        dest: 'assets/scripts/vendors.min.js'
+
+    uglify:
+      dist:
+        files:
+          'assets/scripts/vendors.min.js': ['assets/scripts/vendors.min.js']
+
     webpack:
       main: require('./webpack.config.js')
 
@@ -108,4 +125,5 @@ module.exports = (grunt) ->
 
   grunt.registerTask "init", ["compass:clean", "compass:dev"]
   grunt.registerTask "default", ['browserSync', "compass:clean", "compass:dev", "webpack", "watch"]
-  grunt.registerTask "build", ["clean", "compass:clean", "copy", "imagemin", "compass:build", "webpack", "notify:build"]
+  grunt.registerTask "buildVendors", ['concat', 'uglify']
+  grunt.registerTask "build", ["clean", "compass:clean", "copy", "imagemin", "compass:build", "webpack", "notify:build", 'buildVendors']
