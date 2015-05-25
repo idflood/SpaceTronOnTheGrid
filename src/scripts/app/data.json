@@ -1,10 +1,10 @@
 {
   "settings": {
-    "time": 231826.4140000241,
+    "time": 240000,
     "duration": 240,
     "domain": [
-      34285,
-      239999
+      0,
+      240000
     ]
   },
   "data": [
@@ -92,7 +92,7 @@
         "bassSensibility": 120,
         "midSensibility": 100,
         "highSensibility": 120,
-        "autoAnimate": 0.18845102253916685
+        "autoAnimate": 1
       }
     },
     {
@@ -168,7 +168,7 @@
       "values": {
         "x": 0,
         "y": 0,
-        "z": -3845.259110193444,
+        "z": -3850,
         "target_x": 0,
         "target_y": 0,
         "target_z": -10000,
@@ -1292,7 +1292,7 @@
         {
           "name": "seed",
           "label": "seed",
-          "val": 9142,
+          "val": 10342,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -1429,7 +1429,7 @@
         {
           "name": "lineWidth",
           "label": "line width",
-          "val": 0.9,
+          "val": 0.82,
           "triggerRebuild": true,
           "group": "line",
           "keys": []
@@ -1437,7 +1437,7 @@
         {
           "name": "lineWidthRand",
           "label": "line width randomness",
-          "val": 2.5,
+          "val": 0,
           "triggerRebuild": true,
           "group": "line",
           "keys": []
@@ -1517,7 +1517,7 @@
       ],
       "values": {
         "numItems": 80,
-        "seed": 9142,
+        "seed": 10342,
         "depth": 3.5,
         "spread": -140,
         "spreadY": 60,
@@ -1533,8 +1533,8 @@
         "rotationRandZ": 0,
         "circles": 0,
         "squares": 0,
-        "lineWidth": 0.9,
-        "lineWidthRand": 2.5,
+        "lineWidth": 0.82,
+        "lineWidthRand": 0,
         "materialAnimated": 1,
         "lineHeight": 0.41,
         "lineHeightRand": 4.1,
@@ -1826,7 +1826,7 @@
       "label": "Chaos 8",
       "type": "Chaos",
       "start": 60.202,
-      "end": 107.71,
+      "end": 120.469,
       "collapsed": false,
       "properties": [
         {
@@ -1840,7 +1840,7 @@
         {
           "name": "seed",
           "label": "seed",
-          "val": 3842,
+          "val": 3742,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -2065,7 +2065,7 @@
       ],
       "values": {
         "numItems": 64,
-        "seed": 3842,
+        "seed": 3742,
         "depth": 12,
         "spread": -291,
         "spreadY": 167,
@@ -2100,7 +2100,7 @@
       "label": "Chaos 9",
       "type": "Chaos",
       "start": 73.495,
-      "end": 130.643,
+      "end": 133.68,
       "collapsed": false,
       "properties": [
         {
@@ -2114,7 +2114,7 @@
         {
           "name": "seed",
           "label": "seed",
-          "val": 32042,
+          "val": 49042,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -2243,7 +2243,7 @@
         {
           "name": "squares",
           "label": "squares",
-          "val": 0.6,
+          "val": 0.3,
           "triggerRebuild": true,
           "group": "geometry",
           "keys": []
@@ -2311,7 +2311,7 @@
         {
           "name": "materialRed",
           "label": "percent red",
-          "val": 0.1,
+          "val": 0.26,
           "min": 0,
           "max": 1,
           "triggerRebuild": true,
@@ -2339,7 +2339,7 @@
       ],
       "values": {
         "numItems": 50,
-        "seed": 32042,
+        "seed": 49042,
         "depth": 6.7,
         "spread": 235,
         "spreadY": 96,
@@ -2354,7 +2354,7 @@
         "rotationRandY": 0,
         "rotationRandZ": 0,
         "circles": 0,
-        "squares": 0.6,
+        "squares": 0.3,
         "lineWidth": 1,
         "lineWidthRand": 0,
         "lineHeight": 1,
@@ -2362,7 +2362,7 @@
         "materialAnimated": 0.96,
         "horizontalSymmetry": 1,
         "verticalSymmetry": 0,
-        "materialRed": 0.1,
+        "materialRed": 0.26,
         "materialBlue": 0.53,
         "tri": 0
       },
@@ -2374,7 +2374,7 @@
       "label": "Chaos 10",
       "type": "Chaos",
       "start": 102.377,
-      "end": 141.892,
+      "end": 146.55,
       "collapsed": false,
       "properties": [
         {
@@ -2648,7 +2648,7 @@
       "label": "Chaos 11",
       "type": "Chaos",
       "start": 112.889,
-      "end": 152.972,
+      "end": 167.554,
       "collapsed": false,
       "properties": [
         {
@@ -2662,7 +2662,7 @@
         {
           "name": "seed",
           "label": "seed",
-          "val": 44402,
+          "val": 62402,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -2887,7 +2887,7 @@
       ],
       "values": {
         "numItems": 64,
-        "seed": 44402,
+        "seed": 62402,
         "depth": 12,
         "spread": 300,
         "spreadY": 300,
@@ -2928,7 +2928,7 @@
         {
           "name": "numItems",
           "label": "num items",
-          "val": 80,
+          "val": 100,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -2936,7 +2936,7 @@
         {
           "name": "seed",
           "label": "seed",
-          "val": 656,
+          "val": 3826,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -2944,7 +2944,7 @@
         {
           "name": "depth",
           "label": "depth",
-          "val": 6,
+          "val": 5,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -3153,16 +3153,16 @@
         {
           "name": "tri",
           "label": "tri",
-          "val": 0.2,
+          "val": 0.1,
           "triggerRebuild": true,
           "group": "geometry",
           "keys": []
         }
       ],
       "values": {
-        "numItems": 80,
-        "seed": 656,
-        "depth": 6,
+        "numItems": 100,
+        "seed": 3826,
+        "depth": 5,
         "spread": 220,
         "spreadY": 108,
         "maxChilds": 8,
@@ -3186,7 +3186,7 @@
         "materialAnimated": 0.95,
         "materialRed": 0.2,
         "materialBlue": 0.3,
-        "tri": 0.2
+        "tri": 0.1
       },
       "isDirtyObject": false
     },
