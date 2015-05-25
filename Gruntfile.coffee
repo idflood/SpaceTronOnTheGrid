@@ -126,4 +126,4 @@ module.exports = (grunt) ->
   grunt.registerTask "init", ["compass:clean", "compass:dev"]
   grunt.registerTask "default", ['browserSync', "compass:clean", "compass:dev", "webpack", "watch"]
   grunt.registerTask "buildVendors", ['concat', 'uglify']
-  grunt.registerTask "build", ["clean", "compass:clean", "copy", "imagemin", "compass:build", "webpack", "notify:build", 'buildVendors']
+  grunt.registerTask "build", ["clean", "compass:clean", "copy", "imagemin", "compass:build", "webpack", 'buildVendors', "notify:build"]
