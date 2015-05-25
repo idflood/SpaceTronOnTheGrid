@@ -6,14 +6,11 @@ define (require) ->
   require 'vendors/three.js-extras/postprocessing/BloomPass'
   require 'vendors/three.js-extras/postprocessing/ShaderPass'
   require 'vendors/three.js-extras/postprocessing/RenderPass'
-  require 'app/postprocessing/GlitchPass2'
 
   require 'app/postprocessing/CustomPostPass'
 
   require 'vendors/three.js-extras/shaders/CopyShader'
-  require 'vendors/three.js-extras/shaders/FXAAShader'
   require 'vendors/three.js-extras/shaders/ConvolutionShader'
-  require 'app/shaders/DigitalGlitch2'
 
   class PostFX
     constructor: (@scene, @camera, @renderer, size) ->
@@ -29,14 +26,7 @@ define (require) ->
       @renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false }
       @renderTarget = new THREE.WebGLRenderTarget(size.width * dpr, size.height * dpr, @renderTargetParameters)
 
-      @effectFXAA = new THREE.ShaderPass( THREE.FXAAShader )
-      @effectFXAA.uniforms[ 'resolution' ].value.set(1 / (size.width * dpr), 1 / (size.height * dpr))
-
       @bloom = new THREE.BloomPass(0.9, 25, 4)
-
-      @glitchPass = new THREE.GlitchPass2()
-      @glitchPass.intensity = 0.3;
-      @glitchPass.uniforms.tScratch.value = THREE.ImageUtils.loadTexture( "src/images/lensflare_dirt.jpg" )
 
 
       resolution = new THREE.Vector2(size.width * dpr, size.height * dpr)
@@ -46,17 +36,13 @@ define (require) ->
       @composer = new THREE.EffectComposer( @renderer, @renderTarget )
       @composer.setSize(size.width * dpr, size.height * dpr)
       @composer.addPass( renderModel )
-      #@composer.addPass( @effectFXAA )
       @composer.addPass( @bloom )
-      #@composer.addPass( @glitchPass )
       @composer.addPass(@customPass)
 
     resize: (SCREEN_WIDTH, SCREEN_HEIGHT) ->
       dpr = if window.devicePixelRatio? then window.devicePixelRatio else 1
-      #@composer.setSize(SCREEN_WIDTH * dpr, SCREEN_HEIGHT * dpr)
       @renderTarget = new THREE.WebGLRenderTarget(SCREEN_WIDTH * dpr, SCREEN_HEIGHT * dpr, @renderTargetParameters)
       @composer.reset(@renderTarget)
-      @effectFXAA.uniforms['resolution'].value.set(1 / (SCREEN_WIDTH * dpr), 1 / (SCREEN_HEIGHT * dpr))
       @customPass.uniforms['resolution'].value.set(SCREEN_WIDTH * dpr, SCREEN_HEIGHT * dpr)
 
     render: (delta) ->
