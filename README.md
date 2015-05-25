@@ -1,3 +1,7 @@
-### Data structure
-/attribute = added in Orchestrator.coffee
-main_data [{type, start, end, properties, /object, /values, /timeline, /isDirty}]
+# Space Tron On The Grid
+
+[![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
+
+A WebGL audio experiment
+
+http://spacetrononthegrid.com/
