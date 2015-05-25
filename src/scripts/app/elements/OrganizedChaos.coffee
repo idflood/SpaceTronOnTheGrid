@@ -14,16 +14,18 @@ define (require) ->
 
 
   class OrganizedChaos extends ElementBase
-    @lineGeom = new THREE.PlaneBufferGeometry( 100, 1)
+    @lineGeom = new THREE.PlaneGeometry( 100, 1)
     @circleGeom = new THREE.CircleGeometry( 10, 30, 0, Math.PI * 2 )
-    @ringGeom = new THREE.RingGeometry( 10 - 1, 10 + 1, 30, 1, 0, Math.PI * 2 )
     @ringGeom2 = new CircleGeometry2( 10, 30, 0, Math.PI * 2 )
+
+    @triGeom = new CircleGeometry2( 10, 3, 0, Math.PI * 2 )
 
     @squareGeom = new CircleGeometry2( 10, 4, 0, Math.PI * 2 )
 
     @TYPE_LINE = 0
     @TYPE_SQUARE = 1
     @TYPE_CIRCLE = 2
+    @TYPE_TRI = 3
 
     @properties:
       numItems: {name: 'numItems', label: 'num items', val: 10, triggerRebuild: true, group: "global"}
@@ -45,6 +47,7 @@ define (require) ->
       rotationRandZ: {name: 'rotationRandZ', label: 'rand z', val: 1, min: 0, max: 1, group: "rotation", triggerRebuild: true}
       circles: {name: 'circles', label: 'circles', val: 0, triggerRebuild: true, group: "geometry"}
       squares: {name: 'squares', label: 'squares', val: 0, triggerRebuild: true, group: "geometry"}
+      tri: {name: 'tri', label: 'tri', val: 0, triggerRebuild: true, group: "geometry"}
       lineWidth: {name: 'lineWidth', label: 'line width', val: 1, triggerRebuild: true, group: "line"}
       lineWidthRand: {name: 'lineWidthRand', label: 'line width randomness', val: 0, triggerRebuild: true, group: "line"}
       lineHeight: {name: 'lineHeight', label: 'line height', val: 1, triggerRebuild: true, group: "line"}
@@ -90,6 +93,9 @@ define (require) ->
       if itemType < @values.circles + @values.squares
         return OrganizedChaos.TYPE_SQUARE
 
+      if itemType < @values.circles + @values.squares + @values.tri
+        return OrganizedChaos.TYPE_TRI
+
       return OrganizedChaos.TYPE_LINE
 
     getItemColor: (rng) ->
@@ -121,10 +127,6 @@ define (require) ->
       rngColor = new RNG(@values.seed + "color")
       rngShaderAnim = new RNG(@values.seed + "shaderAnim")
 
-      #material = new THREE.MeshPhongMaterial({ ambient: 0x030303, color: 0xdddddd, specular: 0xffffff, shininess: 10, shading: THREE.FlatShading, side: THREE.DoubleSide })
-      #material = new THREE.MeshBasicMaterial({color: 0xdddddd, shading: THREE.FlatShading, side: THREE.DoubleSide})
-      #material.blending = THREE.AdditiveBlending
-
       spread = @values.spread
       spread_half = spread / 2
 
@@ -149,6 +151,8 @@ define (require) ->
         rotationZ = (rngRotationZ.random(0, 1000) / 1000 * Math.PI) * @values.rotationRandZ + @values.rotationZ * Math.PI
         rotation = new THREE.Vector3(rotationX, rotationY, rotationZ)
         scale = new THREE.Vector3(scale, scale, scale)
+
+        geomMerge = new THREE.Geometry()
 
         horizontalSymmetry = false
         verticalSymmetry = false
@@ -178,88 +182,103 @@ define (require) ->
         if itemType == OrganizedChaos.TYPE_CIRCLE
           geom = OrganizedChaos.ringGeom2
 
+        if itemType == OrganizedChaos.TYPE_TRI
+          geom = OrganizedChaos.triGeom
+
         else if itemType == OrganizedChaos.TYPE_SQUARE
           geom = OrganizedChaos.squareGeom
           rnd = 0.5 + rngScaleSquare.random(0, 100) / 100
           scale.multiplyScalar(rnd)
 
 
-        @addItem(geom, material, i, scale, position, rotation, horizontalSymmetry, verticalSymmetry)
+        @addItem(geomMerge, geom, material, i, scale, position, rotation, horizontalSymmetry, verticalSymmetry)
 
         if num_childs > 1
           spacing = 30 + rngSpacing.random(0, 100) * 0.4
           offset = position.clone().normalize().multiplyScalar(spacing)
           offset.z = 0
 
-
           for ii in [0..num_childs - 1]
             pos2 = position.clone().add(offset.multiplyScalar(ii + 1))
-            @addItem(geom, material, i, scale, pos2, rotation, horizontalSymmetry, verticalSymmetry)
+            @addItem(geomMerge, geom, material, i, scale, pos2, rotation, horizontalSymmetry, verticalSymmetry)
 
-    addItem: (geom, material, i, scale, position, rotation, horizontalSymmetry, verticalSymmetry) ->
+        itemMesh = new THREE.Mesh(geomMerge , material)
+        itemMesh.matrixAutoUpdate = false
+        @container.add(itemMesh)
+        @items.push(itemMesh)
+
+
+    addItem: (geomMerge, geom, material, i, scale, position, rotation, horizontalSymmetry, verticalSymmetry) ->
       quaternion = new THREE.Quaternion()
       quaternion.setFromAxisAngle(new THREE.Vector3(rotation.x, rotation.y, rotation.z), Math.PI / 2)
-      item = new THREE.Mesh(geom , material)
+      item = new THREE.Object3D()
       item.position.x = position.x
       item.position.y = position.y
       item.position.z = position.z
       item.rotation.setFromQuaternion(quaternion)
       item.scale.copy(scale)
+
       item.updateMatrix()
-      @container.add(item)
-      @items.push(item)
+      geomMerge.merge( geom, item.matrix )
 
       if horizontalSymmetry
         # mirroring
         item2Container = new THREE.Object3D()
 
-        @container.add(item2Container)
-        item2 = new THREE.Mesh(geom , material)
+        item2 = new THREE.Object3D()
         item2.position.x = position.x
         item2.position.y = position.y
         item2.position.z = position.z
         # mirror rotation
         item2.rotation.setFromQuaternion(quaternion)
         item2.scale.copy(scale)
-        item2.updateMatrix()
+
         item2Container.add(item2)
         item2Container.scale.x = -1
-        @items.push(item2Container)
+        item2Container.updateMatrix()
+
+        item2.updateMatrix()
+        geomMerge.merge(geom, item2Container.matrix.multiply(item2.matrix))
 
         if verticalSymmetry
           # mirroring
           item2Container = new THREE.Object3D()
 
-          @container.add(item2Container)
-          item2 = new THREE.Mesh(geom , material)
+          item2 = new THREE.Object3D()
           item2.position.x = position.x
           item2.position.y = position.y
           item2.position.z = position.z
           # mirror rotation
           item2.rotation.setFromQuaternion(quaternion)
           item2.scale.copy(scale)
-          item2.updateMatrix()
           item2Container.add(item2)
           item2Container.scale.x = -1
           item2Container.scale.y = -1
-          @items.push(item2Container)
+
+          item2Container.updateMatrix()
+          item2.updateMatrix()
+          geomMerge.merge(geom, item2Container.matrix.multiply(item2.matrix))
 
       if verticalSymmetry
         # mirroring
         item2Container = new THREE.Object3D()
 
         @container.add(item2Container)
-        item2 = new THREE.Mesh(geom , material)
+        item2 = new THREE.Object3D()
         item2.position.x = position.x
         item2.position.y = position.y
         item2.position.z = position.z
         # mirror rotation
         item2.rotation.setFromQuaternion(quaternion)
         item2.scale.copy(scale)
-        item2.updateMatrix()
         item2Container.add(item2)
         item2Container.scale.y = -1
-        @items.push(item2Container)
+
+        item2Container.updateMatrix()
+        item2.updateMatrix()
+        geomMerge.merge(geom, item2Container.matrix.multiply(item2.matrix))
+
+      return geomMerge
 
     getMaterial: (color) ->
       uniforms = {

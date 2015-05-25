@@ -1,10 +1,10 @@
 {
   "settings": {
-    "time": 0,
+    "time": 240000,
     "duration": 240,
     "domain": [
       0,
-      48000
+      240000
     ]
   },
   "data": [
@@ -89,10 +89,10 @@
         }
       ],
       "values": {
-        "bassSensibility": 5,
+        "bassSensibility": 0.6,
         "midSensibility": 0.8,
         "highSensibility": 5,
-        "autoAnimate": 0.05
+        "autoAnimate": 1
       }
     },
     {
@@ -111,8 +111,8 @@
               "ease": "Quart.easeInOut"
             },
             {
-              "time": 1.7860000000000016,
-              "val": 290,
+              "time": 1.1000000000000016,
+              "val": 370,
               "ease": "Quart.easeInOut"
             },
             {
@@ -168,7 +168,7 @@
       "values": {
         "x": 0,
         "y": 0,
-        "z": 700,
+        "z": -3850,
         "target_x": 0,
         "target_y": 0,
         "target_z": -10000,
@@ -181,14 +181,14 @@
       "id": "item2",
       "label": "Chaos 2",
       "type": "Chaos",
-      "start": 1.435,
-      "end": 41.33200000000003,
+      "start": 12.588,
+      "end": 55.836,
       "collapsed": false,
       "properties": [
         {
           "name": "numItems",
           "label": "num items",
-          "val": 44,
+          "val": 57,
           "triggerRebuild": true,
           "keys": [],
           "group": "global"
@@ -242,14 +242,14 @@
         {
           "name": "z",
           "label": "z",
-          "val": -318,
+          "val": -908,
           "keys": [],
           "group": "position"
         },
         {
           "name": "spreadY",
           "label": "spreadY",
-          "val": 8.5,
+          "val": 177.5,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -325,7 +325,7 @@
         {
           "name": "materialAnimated",
           "label": "percent animated",
-          "val": 0.3,
+          "val": 0.31,
           "triggerRebuild": true,
           "group": "material",
           "keys": []
@@ -357,7 +357,7 @@
         {
           "name": "lineHeight",
           "label": "line height",
-          "val": 0.522,
+          "val": 0.642,
           "triggerRebuild": true,
           "group": "line",
           "keys": []
@@ -365,7 +365,7 @@
         {
           "name": "lineHeightRand",
           "label": "line height randomness",
-          "val": 0,
+          "val": 1,
           "triggerRebuild": true,
           "group": "line",
           "keys": []
@@ -409,18 +409,26 @@
           "triggerRebuild": true,
           "group": "material",
           "keys": []
+        },
+        {
+          "name": "tri",
+          "label": "tri",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
         }
       ],
       "values": {
-        "numItems": 44,
+        "numItems": 57,
         "seed": 85,
         "depth": 4.6,
         "spread": 302.7,
         "maxChilds": 2,
         "x": 0,
         "y": 0,
-        "z": -318,
-        "spreadY": 8.5,
+        "z": -908,
+        "spreadY": 177.5,
         "rotationX": 0,
         "rotationY": 0,
         "rotationZ": 0.199,
@@ -428,16 +436,17 @@
         "rotationRandY": 0,
         "rotationRandZ": 0,
         "circles": 0,
-        "materialAnimated": 0.3,
+        "materialAnimated": 0.31,
         "squares": 0,
         "lineWidth": 0.7,
         "lineWidthRand": 0,
-        "lineHeight": 0.522,
-        "lineHeightRand": 0,
+        "lineHeight": 0.642,
+        "lineHeightRand": 1,
         "horizontalSymmetry": 1,
         "verticalSymmetry": 0.04,
         "materialRed": 0,
-        "materialBlue": 0
+        "materialBlue": 0,
+        "tri": 0
       },
       "isDirtyObject": false
     },
@@ -453,7 +462,7 @@
         {
           "name": "numItems",
           "label": "num items",
-          "val": 1,
+          "val": 4,
           "triggerRebuild": true,
           "keys": [],
           "group": "global"
@@ -461,7 +470,7 @@
         {
           "name": "seed",
           "label": "seed",
-          "val": 81042,
+          "val": 93042,
           "triggerRebuild": true,
           "keys": [],
           "group": "global"
@@ -477,7 +486,7 @@
         {
           "name": "spread",
           "label": "spread",
-          "val": 20,
+          "val": 210,
           "triggerRebuild": true,
           "keys": [],
           "group": "global"
@@ -485,7 +494,7 @@
         {
           "name": "maxChilds",
           "label": "maxChilds",
-          "val": 4,
+          "val": 5,
           "triggerRebuild": true,
           "keys": [],
           "group": "global"
@@ -493,14 +502,14 @@
         {
           "name": "x",
           "label": "x",
-          "val": 0,
+          "val": 10.1,
           "keys": [],
           "group": "position"
         },
         {
           "name": "y",
           "label": "y",
-          "val": 0,
+          "val": -105,
           "keys": [],
           "group": "position"
         },
@@ -542,7 +551,7 @@
         {
           "name": "rotationZ",
           "label": "z",
-          "val": 0.42,
+          "val": 0.201,
           "min": 0,
           "max": 2,
           "group": "rotation",
@@ -590,7 +599,7 @@
         {
           "name": "materialAnimated",
           "label": "percent animated",
-          "val": 0,
+          "val": 0.5,
           "triggerRebuild": true,
           "group": "material",
           "keys": []
@@ -622,7 +631,7 @@
         {
           "name": "lineHeight",
           "label": "line height",
-          "val": 75.3,
+          "val": 305.3,
           "triggerRebuild": true,
           "group": "line",
           "keys": []
@@ -638,7 +647,7 @@
         {
           "name": "horizontalSymmetry",
           "label": "horizontalSymmetry",
-          "val": 1,
+          "val": 0,
           "min": 0,
           "max": 1,
           "triggerRebuild": true,
@@ -674,35 +683,44 @@
           "triggerRebuild": true,
           "group": "material",
           "keys": []
+        },
+        {
+          "name": "tri",
+          "label": "tri",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
         }
       ],
       "values": {
-        "numItems": 1,
-        "seed": 81042,
+        "numItems": 4,
+        "seed": 93042,
         "depth": 22,
-        "spread": 20,
-        "maxChilds": 4,
-        "x": 0,
-        "y": 0,
+        "spread": 210,
+        "maxChilds": 5,
+        "x": 10.1,
+        "y": -105,
         "z": -80,
         "spreadY": 0,
         "rotationX": 0,
         "rotationY": 0,
-        "rotationZ": 0.42,
+        "rotationZ": 0.201,
         "rotationRandX": 0,
         "rotationRandY": 0,
         "rotationRandZ": 0,
         "circles": 0,
-        "materialAnimated": 0,
+        "materialAnimated": 0.5,
         "squares": 0,
         "lineWidth": -13.9,
         "lineWidthRand": 0,
-        "lineHeight": 75.3,
+        "lineHeight": 305.3,
         "lineHeightRand": 0,
-        "horizontalSymmetry": 1,
+        "horizontalSymmetry": 0,
         "verticalSymmetry": 0,
         "materialRed": 0,
-        "materialBlue": 0
+        "materialBlue": 0,
+        "tri": 0
       },
       "isDirtyObject": false
     },
@@ -711,8 +729,8 @@
       "id": "item4",
       "label": "Chaos 4",
       "type": "Chaos",
-      "start": 11.944,
-      "end": 39.27300000000001,
+      "start": 0.983,
+      "end": 32.432,
       "collapsed": false,
       "properties": [
         {
@@ -772,7 +790,7 @@
         {
           "name": "z",
           "label": "z",
-          "val": -640,
+          "val": -390,
           "keys": [],
           "group": "position"
         },
@@ -939,6 +957,14 @@
           "triggerRebuild": true,
           "group": "material",
           "keys": []
+        },
+        {
+          "name": "tri",
+          "label": "tri",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
         }
       ],
       "values": {
@@ -949,7 +975,7 @@
         "maxChilds": 3,
         "x": 0,
         "y": -5,
-        "z": -640,
+        "z": -390,
         "spreadY": 0,
         "rotationX": 0,
         "rotationY": 0,
@@ -967,7 +993,8 @@
         "horizontalSymmetry": 1,
         "verticalSymmetry": 0,
         "materialRed": 0,
-        "materialBlue": 0
+        "materialBlue": 0,
+        "tri": 0
       },
       "isDirtyObject": false
     },
@@ -976,7 +1003,7 @@
       "id": "item5",
       "label": "Chaos 5",
       "type": "Chaos",
-      "start": 17.74,
+      "start": 17.118,
       "end": 52.301,
       "collapsed": false,
       "properties": [
@@ -1204,6 +1231,14 @@
           "triggerRebuild": true,
           "group": "material",
           "keys": []
+        },
+        {
+          "name": "tri",
+          "label": "tri",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
         }
       ],
       "values": {
@@ -1232,7 +1267,8 @@
         "horizontalSymmetry": 1,
         "verticalSymmetry": 0,
         "materialRed": 0,
-        "materialBlue": 0
+        "materialBlue": 0,
+        "tri": 0
       },
       "isDirtyObject": false
     },
@@ -1241,7 +1277,7 @@
       "id": "item6",
       "label": "Chaos 6",
       "type": "Chaos",
-      "start": 27.607,
+      "start": 26.024,
       "end": 87.155,
       "collapsed": false,
       "properties": [
@@ -1469,6 +1505,14 @@
           "triggerRebuild": true,
           "group": "material",
           "keys": []
+        },
+        {
+          "name": "tri",
+          "label": "tri",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
         }
       ],
       "values": {
@@ -1497,7 +1541,8 @@
         "horizontalSymmetry": 1,
         "verticalSymmetry": 0,
         "materialRed": 0,
-        "materialBlue": 0
+        "materialBlue": 0,
+        "tri": 0
       },
       "isDirtyObject": false
     },
@@ -1506,7 +1551,7 @@
       "id": "item7",
       "label": "Chaos 7",
       "type": "Chaos",
-      "start": 21.222,
+      "start": 20.035,
       "end": 72.32999999999998,
       "collapsed": false,
       "properties": [
@@ -1575,7 +1620,7 @@
         {
           "name": "z",
           "label": "z",
-          "val": -1010,
+          "val": -1150,
           "group": "position",
           "keys": []
         },
@@ -1734,6 +1779,14 @@
           "triggerRebuild": true,
           "group": "material",
           "keys": []
+        },
+        {
+          "name": "tri",
+          "label": "tri",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
         }
       ],
       "values": {
@@ -1745,7 +1798,7 @@
         "maxChilds": 8,
         "x": 0,
         "y": -17,
-        "z": -1010,
+        "z": -1150,
         "rotationX": 0,
         "rotationY": 0.1,
         "rotationZ": 1.4,
@@ -1762,7 +1815,8 @@
         "horizontalSymmetry": 1,
         "verticalSymmetry": 0,
         "materialRed": 0,
-        "materialBlue": 0
+        "materialBlue": 0,
+        "tri": 0
       },
       "isDirtyObject": false
     },
@@ -1999,6 +2053,14 @@
           "triggerRebuild": true,
           "group": "material",
           "keys": []
+        },
+        {
+          "name": "tri",
+          "label": "tri",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
         }
       ],
       "values": {
@@ -2027,7 +2089,8 @@
         "horizontalSymmetry": 1,
         "verticalSymmetry": 0,
         "materialRed": 0,
-        "materialBlue": 0
+        "materialBlue": 0,
+        "tri": 0
       },
       "isDirtyObject": false
     },
@@ -2036,7 +2099,7 @@
       "id": "item9",
       "label": "Chaos 9",
       "type": "Chaos",
-      "start": 73.107,
+      "start": 73.495,
       "end": 130.643,
       "collapsed": false,
       "properties": [
@@ -2248,7 +2311,7 @@
         {
           "name": "materialRed",
           "label": "percent red",
-          "val": 0,
+          "val": 0.1,
           "min": 0,
           "max": 1,
           "triggerRebuild": true,
@@ -2263,6 +2326,14 @@
           "max": 1,
           "triggerRebuild": true,
           "group": "material",
+          "keys": []
+        },
+        {
+          "name": "tri",
+          "label": "tri",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
           "keys": []
         }
       ],
@@ -2291,8 +2362,9 @@
         "materialAnimated": 0.96,
         "horizontalSymmetry": 1,
         "verticalSymmetry": 0,
-        "materialRed": 0,
-        "materialBlue": 0.53
+        "materialRed": 0.1,
+        "materialBlue": 0.53,
+        "tri": 0
       },
       "isDirtyObject": false
     },
@@ -2529,6 +2601,14 @@
           "triggerRebuild": true,
           "group": "material",
           "keys": []
+        },
+        {
+          "name": "tri",
+          "label": "tri",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
         }
       ],
       "values": {
@@ -2557,7 +2637,8 @@
         "horizontalSymmetry": 1,
         "verticalSymmetry": 0,
         "materialRed": 0,
-        "materialBlue": 0.2
+        "materialBlue": 0.2,
+        "tri": 0
       },
       "isDirtyObject": false
     },
@@ -2794,6 +2875,14 @@
           "triggerRebuild": true,
           "group": "material",
           "keys": []
+        },
+        {
+          "name": "tri",
+          "label": "tri",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
         }
       ],
       "values": {
@@ -2822,7 +2911,8 @@
         "horizontalSymmetry": 1,
         "verticalSymmetry": 0,
         "materialRed": 0,
-        "materialBlue": 0.3
+        "materialBlue": 0.3,
+        "tri": 0
       },
       "isDirtyObject": false
     },
@@ -2831,7 +2921,7 @@
       "id": "item12",
       "label": "Chaos 12",
       "type": "Chaos",
-      "start": 122.274,
+      "start": 120.719,
       "end": 212.46800000000002,
       "collapsed": false,
       "properties": [
@@ -2846,7 +2936,7 @@
         {
           "name": "seed",
           "label": "seed",
-          "val": 516,
+          "val": 656,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -2870,7 +2960,7 @@
         {
           "name": "spreadY",
           "label": "spreadY",
-          "val": 50,
+          "val": 108,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -2878,7 +2968,7 @@
         {
           "name": "maxChilds",
           "label": "maxChilds",
-          "val": 12,
+          "val": 8,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -2886,7 +2976,7 @@
         {
           "name": "horizontalSymmetry",
           "label": "horizontalSymmetry",
-          "val": 0.8,
+          "val": 0.793,
           "min": 0,
           "max": 1,
           "triggerRebuild": true,
@@ -2896,7 +2986,7 @@
         {
           "name": "verticalSymmetry",
           "label": "verticalSymmetry",
-          "val": 0.6,
+          "val": 0.3,
           "min": 0,
           "max": 1,
           "triggerRebuild": true,
@@ -2967,7 +3057,7 @@
         {
           "name": "rotationRandY",
           "label": "rand y",
-          "val": 1,
+          "val": 0.9,
           "min": 0,
           "max": 1,
           "group": "rotation",
@@ -2977,7 +3067,7 @@
         {
           "name": "rotationRandZ",
           "label": "rand z",
-          "val": 0.03,
+          "val": 0.2,
           "min": 0,
           "max": 1,
           "group": "rotation",
@@ -3059,17 +3149,25 @@
           "triggerRebuild": true,
           "group": "material",
           "keys": []
+        },
+        {
+          "name": "tri",
+          "label": "tri",
+          "val": 0.2,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
         }
       ],
       "values": {
         "numItems": 80,
-        "seed": 516,
+        "seed": 656,
         "depth": 6,
         "spread": 220,
-        "spreadY": 50,
-        "maxChilds": 12,
-        "horizontalSymmetry": 0.8,
-        "verticalSymmetry": 0.6,
+        "spreadY": 108,
+        "maxChilds": 8,
+        "horizontalSymmetry": 0.793,
+        "verticalSymmetry": 0.3,
         "x": 0,
         "y": 0,
         "z": -3300,
@@ -3077,8 +3175,8 @@
         "rotationY": 0,
         "rotationZ": 0,
         "rotationRandX": 0,
-        "rotationRandY": 1,
-        "rotationRandZ": 0.03,
+        "rotationRandY": 0.9,
+        "rotationRandZ": 0.2,
         "circles": 0,
         "squares": 0,
         "lineWidth": 1,
@@ -3087,7 +3185,8 @@
         "lineHeightRand": 1,
         "materialAnimated": 0.95,
         "materialRed": 0.2,
-        "materialBlue": 0.3
+        "materialBlue": 0.3,
+        "tri": 0.2
       },
       "isDirtyObject": false
     },
@@ -3103,7 +3202,7 @@
         {
           "name": "numItems",
           "label": "num items",
-          "val": 60,
+          "val": 63,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -3111,7 +3210,7 @@
         {
           "name": "seed",
           "label": "seed",
-          "val": 3914,
+          "val": 6614,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -3119,7 +3218,7 @@
         {
           "name": "depth",
           "label": "depth",
-          "val": 4.2,
+          "val": 3.8,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -3135,7 +3234,7 @@
         {
           "name": "spreadY",
           "label": "spreadY",
-          "val": 27,
+          "val": 167,
           "triggerRebuild": true,
           "group": "global",
           "keys": []
@@ -3161,7 +3260,7 @@
         {
           "name": "verticalSymmetry",
           "label": "verticalSymmetry",
-          "val": 0.6,
+          "val": 0.8,
           "min": 0,
           "max": 1,
           "triggerRebuild": true,
@@ -3202,7 +3301,7 @@
         {
           "name": "rotationY",
           "label": "y",
-          "val": 0,
+          "val": -0.1,
           "min": -2,
           "max": 2,
           "group": "rotation",
@@ -3212,7 +3311,7 @@
         {
           "name": "rotationZ",
           "label": "z",
-          "val": 0,
+          "val": 0.5,
           "min": -2,
           "max": 2,
           "group": "rotation",
@@ -3222,7 +3321,7 @@
         {
           "name": "rotationRandX",
           "label": "rand x",
-          "val": 0.76,
+          "val": 0,
           "min": 0,
           "max": 1,
           "group": "rotation",
@@ -3232,7 +3331,7 @@
         {
           "name": "rotationRandY",
           "label": "rand y",
-          "val": 0.6,
+          "val": 0,
           "min": 0,
           "max": 1,
           "group": "rotation",
@@ -3242,7 +3341,7 @@
         {
           "name": "rotationRandZ",
           "label": "rand z",
-          "val": 0,
+          "val": 0.2,
           "min": 0,
           "max": 1,
           "group": "rotation",
@@ -3324,26 +3423,34 @@
           "triggerRebuild": true,
           "group": "material",
           "keys": []
+        },
+        {
+          "name": "tri",
+          "label": "tri",
+          "val": 0.1,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
         }
       ],
       "values": {
-        "numItems": 60,
-        "seed": 3914,
-        "depth": 4.2,
+        "numItems": 63,
+        "seed": 6614,
+        "depth": 3.8,
         "spread": 121,
-        "spreadY": 27,
+        "spreadY": 167,
         "maxChilds": 16,
         "horizontalSymmetry": 0.3,
-        "verticalSymmetry": 0.6,
+        "verticalSymmetry": 0.8,
         "x": 0,
         "y": 0,
         "z": -3900,
         "rotationX": 0,
-        "rotationY": 0,
-        "rotationZ": 0,
-        "rotationRandX": 0.76,
-        "rotationRandY": 0.6,
-        "rotationRandZ": 0,
+        "rotationY": -0.1,
+        "rotationZ": 0.5,
+        "rotationRandX": 0,
+        "rotationRandY": 0,
+        "rotationRandZ": 0.2,
         "circles": 0,
         "squares": 0,
         "lineWidth": 0,
@@ -3352,7 +3459,8 @@
         "lineHeightRand": 1.2,
         "materialAnimated": 1,
         "materialRed": 0.3,
-        "materialBlue": 0.3
+        "materialBlue": 0.3,
+        "tri": 0.1
       },
       "isDirtyObject": false
     },
@@ -3589,6 +3697,14 @@
           "triggerRebuild": true,
           "group": "material",
           "keys": []
+        },
+        {
+          "name": "tri",
+          "label": "tri",
+          "val": 0,
+          "triggerRebuild": true,
+          "group": "geometry",
+          "keys": []
         }
       ],
       "values": {
@@ -3617,7 +3733,8 @@
         "lineHeightRand": 1,
         "materialRed": 0.3,
         "materialBlue": 0,
-        "materialAnimated": 0.9
+        "materialAnimated": 0.9,
+        "tri": 0
       },
       "isDirtyObject": false
     }

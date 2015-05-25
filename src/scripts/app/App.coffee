@@ -37,7 +37,7 @@ define (require) ->
 
       @shaders = new Shaders()
 
-      audio_url = './assets/08 - Space Tron On The Grid.mp3'
+      audio_url = 'assets/08 - Space Tron On The Grid.mp3'
       @audio = new Audio(audio_url, @onAudioLoaded)
       @factory = new ElementFactory()
 

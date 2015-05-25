@@ -7,7 +7,7 @@ define (require) ->
 
     constructor: (mp3Url, @onLoadedCallback) ->
       window.audio = this
-      muted = true
+      muted = false
       @fftSize = 512
       @filters = {}
       @playing = false
@@ -17,41 +17,43 @@ define (require) ->
       @bass = 0
       @mid = 0
       @high = 0
+      @audio = false # audio html node
 
-      @context = false
-      if typeof AudioContext != "undefined"
-        @context = new AudioContext()
-      else if typeof webkitAudioContext != "undefined"
-        @context = new webkitAudioContext()
+      @context = new (window.AudioContext || window.webkitAudioContext)()
+      #if typeof AudioContext != "undefined"
+      #  @context = new AudioContext()
+      #else if typeof webkitAudioContext != "undefined"
+      #  @context = new webkitAudioContext()
 
       # create analyser
       @analyser = @context.createAnalyser()
       @analyser.fftSize = @fftSize
 
-      @source = @context.createBufferSource()
+      #@source = @context.createBufferSource()
+      @source = @load(mp3Url)
 
       # create bass/mid/treble filters
       parameters =
         bass:
-          type: 0 #lowpass
+          type: "lowpass" #lowpass
           frequency: 120
           Q: 1.2
-          gain: 2.0
+          gain: 12.0
         mid:
-          type: 2 #bandpass
+          type: "bandpass" #bandpass
           frequency: 400
           Q: 1.2
-          gain: 4.0
+          gain: 15.0
         treble:
-          type: 1 #highpass
+          type: "highpass" #highpass
           frequency: 2000
           Q: 1.2
-          gain: 3.0
+          gain: 12.0
       _.each parameters, (spec, key) =>
         filter = @context.createBiquadFilter()
         filter.key = key
         filter.type = spec.type
-        filter.frequency = spec.frequency
+        filter.frequency.value = spec.frequency
         filter.Q.value = spec.Q
 
         # create analyser for filtered signal
@@ -96,10 +98,14 @@ define (require) ->
 
       # connect secondary filters + analysers + gain
       _.each @filters, (filter) =>
-        @source.connect(filter.delayNode)
-        filter.delayNode.connect(filter)
-        filter.connect(filter.gainNode)
-        filter.gainNode.connect(filter.analyser)
+        #@source.connect(filter.delayNode)
+        #filter.delayNode.connect(filter)
+        #filter.connect(filter.gainNode)
+        @source.connect(filter.gainNode)
+        #filter.gainNode.connect(filter.analyser)
+
+        filter.gainNode.connect(filter)
+        filter.connect(filter.analyser)
 
       # create buffers for time/freq data
       @samples = @analyser.frequencyBinCount
@@ -111,7 +117,7 @@ define (require) ->
           mid: new Uint8Array(256)
           treble: new Uint8Array(256)
 
-      @load(mp3Url)
+      #@load(mp3Url)
 
       # i know, ....
       Audio.instance = this
@@ -123,6 +129,7 @@ define (require) ->
       @analyser.getByteTimeDomainData(@data.time)
 
       _.each @filters, (filter) =>
+        filter.analyser.fftSize = @fftSize
         filter.analyser.getByteTimeDomainData(@data.filter[filter.key])
 
       # calculate rms
@@ -133,67 +140,45 @@ define (require) ->
       @bass = bins[1]
       @mid = bins[2]
       @high = bins[3]
+      #console.log @mid
       #if Math.random() < 0.04
       #  console.log(@bass, @mid, @high)
 
-      @now = @context.currentTime - @timeDelay
+      @now = @audio.currentTime - @timeDelay
 
     seek: (seconds) =>
       @now = seconds
-      #@context.currentTime = @now
-
-      if @source.buffer
-        #@source.noteOn(0)
-        if @playing
-          @pause()
-          @play()
-          #@source.stop(0)
-          #@source.start(0, @now, @buffer.duration - @now)
-
+      # Set current time on audio only if playing
+      if @audio && @audio.paused == false
+        @audio.currentTime = @now
 
     load: (url) =>
-      request = new XMLHttpRequest()
-      request.open("GET", url, true)
-      request.responseType = "arraybuffer"
+      @audio = document.createElement("audio")
+      @audio.src = url
 
-      request.onload = () =>
-        #@buffer = @context.createBuffer(request.response, false)
-        @context.decodeAudioData request.response, (buff) =>
-          @buffer = buff
-          @source.buffer = @buffer
-          @source.loop = false
-          if @onLoadedCallback then @onLoadedCallback()
-          #@play()
+      document.body.appendChild(@audio)
+      @audio.addEventListener "canplay", () =>
+        console.log "on can play"
+        if @onLoadedCallback then @onLoadedCallback()
 
-      request.send()
+      source = @context.createMediaElementSource(@audio)
+      source.loop = false
 
-    createSound: () =>
-      src = @context.createBufferSource()
-      if @buffer
-        src.buffer = @buffer
-      src.connect(@analyser)
-      _.each @filters, (filter) =>
-        src.connect(filter.delayNode)
-      return src
+      return source
 
     pause: () =>
-      if @source
-        if @playing
-          @source.stop(0)
-        @source.disconnect(0)
-        @source = false
+      if @audio then @audio.pause()
       @playing = false
 
     play: () =>
       @playing = true
-      @timeDelay = @context.currentTime - @now
-      #console.log @now
-      if !@source
-        @source = @createSound()
-      if @source.buffer
-        #@source.noteOn(0)
-        @source.start(0, @now, @buffer.duration - @now)
+      #@timeDelay = @context.currentTime - @now
 
+      if @audio
+
+        @audio.play()
+        @audio.currentTime = @now
+        #@audio.currentTime = @buffer.duration - @now
 
     rms: (data) =>
       size = data.length
