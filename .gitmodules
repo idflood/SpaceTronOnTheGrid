@@ -1,0 +1,3 @@
+[submodule "src/scripts/vendors/TweenTime"]
+  path = src/scripts/vendors/TweenTime
+  url = https://github.com/idflood/TweenTime.git
