@@ -26,6 +26,12 @@
 body
   background: #000
 
+.intro,
+.intro__header,
+.footer
+  +perspective(640px)
+  +transform-origin(50%, 50%)
+
 canvas
   background: transparent
 
@@ -50,14 +56,12 @@ canvas
   top: 50%
   left: 50%
   padding: 20px
-  width: 340px
+  width: 400px
   max-width: 100%
   text-align: center
 
   +transform(translate(-50%, -50%))
   +transition(all 0.8s)
-  +perspective(640px)
-  +transform-origin(50%, 50%)
 
   .is-playing &
     +transition-delay(0.3s)
@@ -74,6 +78,7 @@ canvas
 .intro__subtitle
   +transition(all 1.4s cubic-bezier(0.215, 0.610, 0.355, 1.000) 0.8s) // ease out
   +translate3d(0, 0, -130px)
+
   padding: 0 20px
   opacity: 0
 
@@ -100,6 +105,7 @@ canvas
 .intro__start
   +transition(all 1.4s cubic-bezier(0.215, 0.610, 0.355, 1.000) 0.6s) // ease out
   +translate3d(0, 0, -20px)
+  +perspective(640px)
   opacity: 0
   visibility: hidden
 
@@ -116,6 +122,7 @@ canvas
     opacity: 0
 
 .footer
+  +perspective(640px)
   position: absolute
   left: 0
   right: 0
@@ -132,6 +139,8 @@ canvas
 
   .is-playing &
     +transition-delay(0s)
+    +transition-duration(0.3s)
+
     opacity: 0
     visibility: hidden
 
