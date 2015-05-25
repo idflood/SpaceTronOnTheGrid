@@ -1,0 +1,39 @@
+body
+  overflow: hidden
+  font-weight: 300
+  color: $font-color
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+
+// Set default heading color.
+h1, h2, h3, h4, h5, h6
+  margin: auto
+  line-height: 1.4em
+  color: $header-color
+
+h1
+  font-size: 42px
+  font-weight: 300
+
+h2
+  font-size: 16px
+  font-weight: 300
+  min-height: 1.5em
+
+p
+  margin: 0
+
+// Set default links color.
+a
+  +link-colors($link-color, $link-hover-color, $link-active-color, $link-visited-color, $link-focus-color)
+
+// utils
+.hidden
+  position: absolute !important
+  clip: rect(1px 1px 1px 1px) /* IE6, IE7 */
+  clip: rect(1px, 1px, 1px, 1px)
+  padding: 0 !important
+  border: 0 !important
+  height: 1px !important
+  width: 1px !important
+  overflow: hidden

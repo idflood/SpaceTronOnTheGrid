@@ -1,0 +1,56 @@
+@import "compass/css3"
+@import "compass/utilities"
+
+// BASE
+//
+// Resets, default link colors, default font sizes, ...
+// Mainly elements selectors.
+@import base/all
+
+// MODULES
+// ex: Main nav, Search box, slideshow, News header, ...
+// A module is independent of its context and should work within any layout container or other module.
+// Should contains (only) classes
+// If a specific context requires changes to a module you rather create a submodule that describes the context, instead changing styles based on the parent (e.g. .content-box-narrow instead of #sidebar .content-box).
+// ex: instead of "#footer .nav" it's better to have ".nav-small" or ".nav.small"
+@import modules/all
+
+html
+  height: 100%
+
+html, body
+  min-height: 100%
+  overflow: hidden
+
+body
+  background: #0e0e0e
+
+  &.is-not-supported
+    background-image: image-url('background.jpg')
+    background-repeat: no-repeat
+    background-position: 50% 50%
+    background-size: cover
+
+.intro,
+.intro__header,
+.footer
+  +perspective(640px)
+  +transform-origin(50%, 50%)
+
+canvas
+  background: transparent
+
+.experiment
+  +transition(opacity 2.2s linear 0.2s)
+  opacity: 0
+
+  .is-loaded &
+    opacity: 1
+
+.experiment
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  z-index: 20

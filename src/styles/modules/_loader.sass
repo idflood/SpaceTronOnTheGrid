@@ -1,0 +1,37 @@
+.loader
+  +transition(all 0.4s linear 1.8s)
+  position: relative
+  opacity: 0
+
+  .is-loaded &
+    opacity: 1
+  .is-audio-loaded &
+    +transition-delay(0s)
+    opacity: 0
+    visibility: hidden
+
+  .is-not-supported &
+    display: none
+
+  &:after
+    +box-sizing(border-box)
+    content: ""
+    display: block
+    width: 20px
+    height: 20px
+    background: #fff
+    position: absolute
+    top: 0
+    left: 50%
+    margin-top: 78px
+    margin-left: -10px
+
+    +animation(rotateplane 1.8s infinite ease-in-out)
+
++keyframes(rotateplane)
+  0%
+    transform: perspective(240px) rotateY(0deg)
+  50%
+    transform: perspective(240px) rotateY(-180.1deg)
+  100%
+    transform: perspective(240px) rotateY(-360deg)

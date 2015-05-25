@@ -1,0 +1,42 @@
+@import "compass/css3"
+@import "compass/utilities"
+
+.loading-screen
+  display: none
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  z-index: 9500
+  background: #111
+
+  //http://tobiasahlin.com/spinkit/
+  &:before
+    +box-sizing(border-box)
+    content: ""
+    display: block
+    width: 30px
+    height: 30px
+    background: #fff
+    position: absolute
+    top: 50%
+    left: 50%
+    margin-top: -15px
+    margin-left: -15px
+
+    +animation(rotateplane 1.8s infinite ease-in-out)
+
+  .is-audio-loaded &
+    display: none
+
+.properties-editor
+  z-index: 200
+
++keyframes(rotateplane)
+  0%
+    transform: perspective(140px) rotateX(0deg) rotateY(0deg)
+  50%
+    transform: perspective(140px) rotateX(-180.1deg) rotateY(0deg)
+  100%
+    transform: perspective(140px) rotateX(-180deg) rotateY(-179.9deg)

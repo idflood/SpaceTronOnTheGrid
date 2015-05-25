@@ -1,0 +1,11 @@
+.message-support
+  +transition(all 0.4s linear 1.8s)
+  display: none
+  margin-top: 40px
+  opacity: 0
+
+  .is-not-supported &
+    display: block
+
+  .is-loaded &
+    opacity: 1

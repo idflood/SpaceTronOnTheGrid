@@ -1,0 +1,32 @@
+.button
+  +inline-block
+  position: relative
+  padding: 4px 10px
+  color: #eee
+  background: rgba(255,255,255,0.07)
+  font-size: 18px
+  letter-spacing: 0.5px
+  text-decoration: none
+  text-transform: uppercase
+
+  &:after
+    +transition(right 0.2s cubic-bezier(0.770, 0.000, 0.175, 1.000))
+    content: ""
+    display: block
+    position: absolute
+    left: 0
+    right: 100%
+    bottom: 0
+    height: 1px
+    background: #fff
+
+  &, &:active, &:visited
+    color: #fff
+
+  &:hover, &:focus
+    color: #ddd
+    background: rgba(255,255,255,0.12)
+    outline: 0
+
+    &:after
+      right: 0

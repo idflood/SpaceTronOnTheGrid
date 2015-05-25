@@ -1,0 +1,77 @@
+.intro
+  position: absolute
+  z-index: 100
+  top: 50%
+  left: 50%
+  padding: 20px
+  width: 400px
+  max-width: 100%
+  text-align: center
+
+  +transform(translate(-50%, -50%))
+  +transition(all 0.8s)
+
+  .is-playing &
+    +transition-delay(0.3s)
+    visibility: hidden
+    opacity: 0
+
+  h1, h2
+    .is-audio-loaded &
+      cursor: pointer
+
+
+
+.intro__title,
+.intro__subtitle
+  +transition(all 1.4s cubic-bezier(0.215, 0.610, 0.355, 1.000) 0.8s) // ease out
+  +translate3d(0, 0, -130px)
+
+  padding: 0 20px
+  opacity: 0
+
+  .is-loaded &
+    +translate3d(0,0,0)
+    opacity: 1
+
+  .is-playing &
+    // in out: cubic-bezier(0.770, 0.000, 0.175, 1.000)
+    +transition-duration(0.8s)
+    +transition-timing-function(cubic-bezier(0.550, 0.055, 0.675, 0.190)) // in-out
+    +translate3d(0,0,360px)
+    +transition-delay(0s)
+    opacity: 0
+
+.intro__subtitle
+  +translate3d(0, 0, -100px)
+  +transition-delay(1s)
+
+  .is-playing &
+    +translate3d(0,0,220px)
+    +transition-delay(0s)
+
+.intro__start
+  +transition(all 1.4s cubic-bezier(0.215, 0.610, 0.355, 1.000) 0.6s) // ease out
+  +translate3d(0, 0, -20px)
+  +perspective(640px)
+  opacity: 0
+  visibility: hidden
+
+  .is-audio-loaded &
+    +translate3d(0, 0, 0)
+    opacity: 1
+    visibility: visible
+
+  .is-playing &
+    +transition-duration(0.8s)
+    +transition-timing-function(cubic-bezier(0.550, 0.055, 0.675, 0.190)) // in-out
+    +translate3d(0,0,180px)
+    +transition-delay(0s)
+    opacity: 0
+
+.intro__header
+  +transition(all 0.8s)
+  .js &
+    opacity: 0
+  .is-loaded &
+    opacity: 1

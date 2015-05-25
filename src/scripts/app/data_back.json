@@ -1,0 +1,763 @@
+{
+  "settings": {
+    "time": 0,
+    "duration": 240,
+    "domain": [
+      0,
+      20000
+    ]
+  },
+  "data": [
+    {
+      "id": "item1",
+      "type": "Circles",
+      "label": "Test circles",
+      "start": 0,
+      "end": 2,
+      "collapsed": true,
+      "properties": [
+        {
+          "name": "progression",
+          "val": 0,
+          "keys": [
+            {
+              "time": 0,
+              "val": 0
+            },
+            {
+              "time": 1.3379999999999999,
+              "val": 1
+            },
+            {
+              "time": 2,
+              "val": 2
+            }
+          ]
+        },
+        {
+          "keys": [],
+          "name": "numItems",
+          "val": 2
+        },
+        {
+          "keys": [],
+          "name": "seed",
+          "val": 8464
+        },
+        {
+          "keys": [],
+          "name": "randX",
+          "val": 84
+        },
+        {
+          "keys": [],
+          "name": "randY",
+          "val": 84
+        },
+        {
+          "keys": [],
+          "name": "circleRadius",
+          "val": 20
+        },
+        {
+          "keys": [],
+          "name": "circleRadiusMax",
+          "val": 20
+        },
+        {
+          "keys": [],
+          "name": "x",
+          "val": 0
+        },
+        {
+          "keys": [],
+          "name": "y",
+          "val": 0
+        },
+        {
+          "keys": [],
+          "name": "z",
+          "val": 0
+        },
+        {
+          "keys": [],
+          "name": "depth",
+          "val": 0
+        },
+        {
+          "keys": [],
+          "name": "percent_color",
+          "val": 0
+        },
+        {
+          "name": "randZ",
+          "label": "random z",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "randRotZ",
+          "label": "random rotation z",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "randScaleX",
+          "label": "random scale x",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "randScaleY",
+          "label": "random scale y",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotX",
+          "label": "rotation x",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "rotY",
+          "label": "rotation y",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "rotZ",
+          "label": "rotation z",
+          "val": 0,
+          "keys": []
+        }
+      ],
+      "values": {
+        "progression": 0,
+        "numItems": 2,
+        "seed": 8464,
+        "randX": 84,
+        "randY": 84,
+        "circleRadius": 20,
+        "circleRadiusMax": 20,
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "depth": 0,
+        "percent_color": 0,
+        "randZ": 0,
+        "randRotZ": 0,
+        "randScaleX": 0,
+        "randScaleY": 0,
+        "rotX": 0,
+        "rotY": 0,
+        "rotZ": 0
+      }
+    },
+    {
+      "id": "item2",
+      "type": "Circles",
+      "label": "Circles 2",
+      "start": 0.793,
+      "end": 4.800000000000006,
+      "collapsed": true,
+      "properties": [
+        {
+          "name": "progression",
+          "val": 0,
+          "keys": [
+            {
+              "time": 1.021,
+              "val": 0
+            },
+            {
+              "time": 1.9579999999999993,
+              "val": 1
+            },
+            {
+              "time": 2.2789999999999995,
+              "val": 1
+            },
+            {
+              "time": 4.435000000000008,
+              "val": 0
+            }
+          ]
+        },
+        {
+          "keys": [],
+          "name": "numItems",
+          "val": 5
+        },
+        {
+          "keys": [],
+          "name": "seed",
+          "val": -456453
+        },
+        {
+          "keys": [],
+          "name": "randX",
+          "val": 265
+        },
+        {
+          "keys": [],
+          "name": "randY",
+          "val": 265
+        },
+        {
+          "keys": [],
+          "name": "circleRadius",
+          "val": 3
+        },
+        {
+          "keys": [],
+          "name": "circleRadiusMax",
+          "val": 50
+        },
+        {
+          "keys": [],
+          "name": "x",
+          "val": 0
+        },
+        {
+          "keys": [],
+          "name": "y",
+          "val": 0
+        },
+        {
+          "keys": [],
+          "name": "z",
+          "val": 70
+        },
+        {
+          "keys": [],
+          "name": "depth",
+          "val": 0
+        },
+        {
+          "keys": [],
+          "name": "percent_color",
+          "val": 0
+        },
+        {
+          "name": "randZ",
+          "label": "random z",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "randRotZ",
+          "label": "random rotation z",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "randScaleX",
+          "label": "random scale x",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "randScaleY",
+          "label": "random scale y",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotX",
+          "label": "rotation x",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "rotY",
+          "label": "rotation y",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "rotZ",
+          "label": "rotation z",
+          "val": 0,
+          "keys": []
+        }
+      ],
+      "values": {
+        "progression": 0,
+        "numItems": 5,
+        "seed": -456453,
+        "randX": 265,
+        "randY": 265,
+        "circleRadius": 3,
+        "circleRadiusMax": 50,
+        "x": 0,
+        "y": 0,
+        "z": 70,
+        "depth": 0,
+        "percent_color": 0,
+        "randZ": 0,
+        "randRotZ": 0,
+        "randScaleX": 0,
+        "randScaleY": 0,
+        "rotX": 0,
+        "rotY": 0,
+        "rotZ": 0
+      }
+    },
+    {
+      "id": "item3",
+      "type": "Circles",
+      "label": "Circles 3",
+      "start": 4.514,
+      "end": 12.172,
+      "collapsed": true,
+      "properties": [
+        {
+          "name": "progression",
+          "val": 0,
+          "keys": [
+            {
+              "time": 4.7250000000000005,
+              "val": 0
+            },
+            {
+              "time": 5.614999999999998,
+              "val": 0.5
+            },
+            {
+              "time": 11.668999999999995,
+              "val": 0
+            }
+          ]
+        },
+        {
+          "name": "x",
+          "val": 100,
+          "keys": [
+            {
+              "time": 4.795000000000001,
+              "val": 100
+            }
+          ]
+        },
+        {
+          "name": "y",
+          "val": 0,
+          "keys": [
+            {
+              "time": 5.110000000000001,
+              "val": 0
+            }
+          ]
+        },
+        {
+          "name": "z",
+          "val": 120,
+          "keys": []
+        },
+        {
+          "keys": [],
+          "name": "numItems",
+          "val": 5
+        },
+        {
+          "keys": [],
+          "name": "seed",
+          "val": 12002
+        },
+        {
+          "keys": [],
+          "name": "randX",
+          "val": 80
+        },
+        {
+          "keys": [],
+          "name": "randY",
+          "val": 80
+        },
+        {
+          "keys": [],
+          "name": "circleRadius",
+          "val": 20
+        },
+        {
+          "keys": [],
+          "name": "circleRadiusMax",
+          "val": 20
+        },
+        {
+          "keys": [],
+          "name": "depth",
+          "val": 0
+        },
+        {
+          "keys": [],
+          "name": "percent_color",
+          "val": 0
+        },
+        {
+          "name": "randZ",
+          "label": "random z",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "randRotZ",
+          "label": "random rotation z",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "randScaleX",
+          "label": "random scale x",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "randScaleY",
+          "label": "random scale y",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotX",
+          "label": "rotation x",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "rotY",
+          "label": "rotation y",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "rotZ",
+          "label": "rotation z",
+          "val": 0,
+          "keys": []
+        }
+      ],
+      "values": {
+        "progression": 0,
+        "x": 100,
+        "y": 0,
+        "z": 120,
+        "numItems": 5,
+        "seed": 12002,
+        "randX": 80,
+        "randY": 80,
+        "circleRadius": 20,
+        "circleRadiusMax": 20,
+        "depth": 0,
+        "percent_color": 0,
+        "randZ": 0,
+        "randRotZ": 0,
+        "randScaleX": 0,
+        "randScaleY": 0,
+        "rotX": 0,
+        "rotY": 0,
+        "rotZ": 0
+      }
+    },
+    {
+      "id": "item4",
+      "type": "Circles",
+      "label": "Circles 4",
+      "start": 5.235,
+      "end": 11.328,
+      "collapsed": false,
+      "properties": [
+        {
+          "keys": [],
+          "name": "numItems",
+          "val": 5
+        },
+        {
+          "keys": [],
+          "name": "seed",
+          "val": 1325
+        },
+        {
+          "keys": [],
+          "name": "randX",
+          "val": 150
+        },
+        {
+          "keys": [],
+          "name": "randY",
+          "val": 150
+        },
+        {
+          "keys": [],
+          "name": "circleRadius",
+          "val": 10
+        },
+        {
+          "keys": [],
+          "name": "circleRadiusMax",
+          "val": 20
+        },
+        {
+          "keys": [
+            {
+              "time": 5.235,
+              "val": 0
+            },
+            {
+              "time": 6.085000000000001,
+              "val": 1
+            },
+            {
+              "time": 11.049000000000001,
+              "val": 0
+            }
+          ],
+          "name": "progression",
+          "val": 0
+        },
+        {
+          "keys": [],
+          "name": "x",
+          "val": -100
+        },
+        {
+          "keys": [],
+          "name": "y",
+          "val": 0
+        },
+        {
+          "keys": [],
+          "name": "z",
+          "val": 0
+        },
+        {
+          "keys": [],
+          "name": "depth",
+          "val": 0
+        },
+        {
+          "keys": [],
+          "name": "percent_color",
+          "val": 0.4
+        },
+        {
+          "name": "randZ",
+          "label": "random z",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "randRotZ",
+          "label": "random rotation z",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "randScaleX",
+          "label": "random scale x",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "randScaleY",
+          "label": "random scale y",
+          "val": 0,
+          "triggerRebuild": true,
+          "keys": []
+        },
+        {
+          "name": "rotX",
+          "label": "rotation x",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "rotY",
+          "label": "rotation y",
+          "val": 0,
+          "keys": []
+        },
+        {
+          "name": "rotZ",
+          "label": "rotation z",
+          "val": 0,
+          "keys": []
+        }
+      ],
+      "values": {
+        "numItems": 5,
+        "seed": 1325,
+        "randX": 150,
+        "randY": 150,
+        "circleRadius": 10,
+        "circleRadiusMax": 20,
+        "progression": 0,
+        "x": -100,
+        "y": 0,
+        "z": 0,
+        "depth": 0,
+        "percent_color": 0.4,
+        "randZ": 0,
+        "randRotZ": 0,
+        "randScaleX": 0,
+        "randScaleY": 0,
+        "rotX": 0,
+        "rotY": 0,
+        "rotZ": 0
+      }
+    },
+    {
+      "id": "item5",
+      "type": "Camera",
+      "label": "Camera 5",
+      "start": 0,
+      "end": 10.136,
+      "collapsed": false,
+      "properties": [
+        {
+          "keys": [
+            {
+              "time": 0,
+              "val": 200
+            },
+            {
+              "time": 10.098,
+              "val": 20
+            }
+          ],
+          "name": "x",
+          "val": 200
+        },
+        {
+          "keys": [],
+          "name": "y",
+          "val": 0
+        },
+        {
+          "keys": [
+            {
+              "time": 0,
+              "val": 600
+            },
+            {
+              "time": 10.098,
+              "val": 350
+            }
+          ],
+          "name": "z",
+          "val": 600
+        },
+        {
+          "keys": [
+            {
+              "time": 0,
+              "val": 60
+            },
+            {
+              "time": 10.098,
+              "val": 37
+            }
+          ],
+          "name": "target_x",
+          "val": 60
+        },
+        {
+          "keys": [],
+          "name": "target_y",
+          "val": 0
+        },
+        {
+          "keys": [],
+          "name": "target_z",
+          "val": 0
+        },
+        {
+          "name": "fov",
+          "label": "fov",
+          "val": 45,
+          "keys": []
+        }
+      ],
+      "values": {
+        "x": 200,
+        "y": 0,
+        "z": 600,
+        "target_x": 60,
+        "target_y": 0,
+        "target_z": 0,
+        "fov": 45
+      }
+    },
+    {
+      "id": "item6",
+      "type": "Camera",
+      "label": "Camera 6",
+      "start": 10.13,
+      "end": 14.156,
+      "collapsed": false,
+      "properties": [
+        {
+          "keys": [],
+          "name": "x",
+          "val": -20
+        },
+        {
+          "keys": [],
+          "name": "y",
+          "val": 100
+        },
+        {
+          "keys": [],
+          "name": "z",
+          "val": 300
+        },
+        {
+          "keys": [],
+          "name": "target_x",
+          "val": 0
+        },
+        {
+          "keys": [],
+          "name": "target_y",
+          "val": 0
+        },
+        {
+          "keys": [],
+          "name": "target_z",
+          "val": 0
+        },
+        {
+          "name": "fov",
+          "label": "fov",
+          "val": 45,
+          "keys": []
+        }
+      ],
+      "values": {
+        "x": -20,
+        "y": 100,
+        "z": 300,
+        "target_x": 0,
+        "target_y": 0,
+        "target_z": 0,
+        "fov": 45
+      }
+    }
+  ]
+}
