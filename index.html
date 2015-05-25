@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!--[if IE 9]>         <html class="no-js lt-ie10"> <![endif]-->
+<!--[if IE 9]> <html class="no-js lt-ie10"> <![endif]-->
 <!--[if gt IE 9]><!--> <html class="no-js"> <!--<![endif]-->
   <head>
     <meta charset="utf-8">
@@ -30,17 +30,19 @@
         <div class="progress"><div class="progress__inner"></div></div>
       </div>
       <div class="intro__start">
-        <a href="#" class="button">Start</a>
+        <a href="#" class="button" onClick="_gaq.push(['_trackEvent', 'Experiment', 'Start']);">Start</a>
       </div>
     </div>
 
     <div class="outro">
       <div class="outro__restart">
-        <a href="#" class="button">Restart</a>
+        <a href="#" onClick="_gaq.push(['_trackEvent', 'Experiment', 'Restart']);" class="button">Restart</a>
       </div>
     </div>
+
     <footer class="footer">
-      <p>Visuals: David Mignot | Music: Brian Bonz</p>
+      <p>Visuals: <a href="http://www.idflood.com" onClick="_gaq.push(['_trackEvent', 'External', 'idflood.com']);" target="_blank">David Mignot</a> | Music: <a href="http://brianbonz.com/" target="_blank" onClick="_gaq.push(['_trackEvent', 'Experiment', 'brianbonz.com']);">Brian Bonz</a> | <a href="http://six3collective.com/collections/brian-bonz/products/misophonia" target="_blank" onClick="_gaq.push(['_trackEvent', 'Experiment', 'Buy']);">Buy the album</a></p>
+      <p><a href="https://github.com/idflood/SpaceTronOnTheGrid" onClick="_gaq.push(['_trackEvent', 'External', 'github']);" target="_blank">Code</a> | <a href="index_dev.html" onClick="_gaq.push(['_trackEvent', 'External', 'editor']);">Editor</a> | A <a href="http://www.stimul.ch" onClick="_gaq.push(['_trackEvent', 'External', 'editor']);">stimul.ch</a> project</p>
     </footer>
     <script src="assets/scripts/vendors.min.js"></script>
 

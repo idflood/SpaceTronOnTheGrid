@@ -13,7 +13,6 @@ define (require) ->
 
   class OrganizedChaos extends ElementBase
     @lineGeom = new THREE.PlaneGeometry( 100, 1)
-    @circleGeom = new THREE.CircleGeometry( 10, 30, 0, Math.PI * 2 )
     @ringGeom2 = new CircleGeometry2( 10, 30, 0, Math.PI * 2 )
 
     @triGeom = new CircleGeometry2( 10, 3, 0, Math.PI * 2 )

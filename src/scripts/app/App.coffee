@@ -1,18 +1,7 @@
-# green: 567c6d
-# yellow: e2cb7b
-# brownish: cbad7b
-# red: af1925
-# pink: ddb3b4
-# purple: 715160
-# blue: 406872
-
-
 define (require) ->
   THREE = require 'Three'
-
   TweenTime = require 'TweenTime'
   Acoustic = require 'bower_components/acoustic.js/dist/acoustic.min.js'
-
 
   Shaders = require 'app/components/Shaders'
   PostFX = require 'app/components/PostFX'
@@ -21,10 +10,6 @@ define (require) ->
   DataNormalizer = require 'app/components/DataNormalizer'
 
   dataJson = require 'raw!app/data.json'
-
-  #Circles = require 'app/elements/Circles'
-
-  OrganizedChaos = require 'app/elements/OrganizedChaos'
 
   window.App = class App
     constructor: (options = {}) ->
@@ -37,7 +22,6 @@ define (require) ->
       @shaders = new Shaders()
 
       audio_url = 'assets/08 - Space Tron On The Grid.mp3'
-      #@audio = new Audio(audio_url, @onAudioLoaded)
       @audio = new Acoustic(audio_url, {
         onCanPlay: @onAudioLoaded
       })
@@ -65,7 +49,6 @@ define (require) ->
 
       @scene = new THREE.Scene()
       @scene.fog = new THREE.FogExp2( 0x111111, 0.0045 )
-      #@orchestrator = new Orchestrator(@timer, @data, @scene, @camera)
       @sceneManager = new SceneManager(@tweenTime, @data, @scene, @camera, @factory)
 
       @time = Date.now() * 0.0001
@@ -108,7 +91,6 @@ define (require) ->
       $('body').addClass('is-playing')
 
     onAudioLoaded: () =>
-      console.log "audio loaded"
       $('body').addClass('is-audio-loaded')
       if @autoplay
         @play()
@@ -151,7 +133,6 @@ define (require) ->
       newTime = Date.now() * 0.0001
       delta = newTime - @time
 
-      if @chaos then @chaos.update()
       @camera.lookAt( @scene.position )
       @postfx.render(delta)
 
