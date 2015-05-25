@@ -4,7 +4,6 @@ define (require) ->
   RNG = require 'exports?RNG!rng'
   ElementBase = require 'app/elements/ElementBase'
 
-  Colors = require 'app/components/Colors'
   Shaders = require 'app/components/Shaders'
 
   CircleGeometry2 = require 'app/geometries/CircleGeometry2'

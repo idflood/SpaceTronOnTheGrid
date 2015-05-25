@@ -1,12 +1,6 @@
 define (require) ->
   Camera = require 'app/elements/Camera'
   Global = require 'app/elements/Global'
-  Circles = require 'app/elements/Circles'
-  Boxes = require 'app/elements/Boxes'
-  Lines = require 'app/elements/Lines'
-
-  SingleObject = require 'app/elements/SingleObject'
-  Circle = require 'app/elements/Circle'
   OrganizedChaos = require 'app/elements/OrganizedChaos'
 
   extend = (object, properties) ->
@@ -21,20 +15,10 @@ define (require) ->
     @elements:
       Chaos:
         classObject: OrganizedChaos
-      Circles:
-        classObject: Circles
-      Boxes:
-        classObject: Boxes
-      Lines:
-        classObject: Lines
       Camera:
         classObject: Camera
       Global:
         classObject: Global
-      Box:
-        classObject: SingleObject
-      Circle:
-        classObject: Circle
 
     getTypeClass: (itemType) =>
       ElementFactory.elements[itemType].classObject

@@ -15,7 +15,6 @@ define (require) ->
 
 
   Shaders = require 'app/components/Shaders'
-  Background = require 'app/components/Background'
   PostFX = require 'app/components/PostFX'
   SceneManager = require 'app/components/SceneManager'
   ElementFactory = require 'app/components/ElementFactory'
@@ -25,7 +24,6 @@ define (require) ->
 
   #Circles = require 'app/elements/Circles'
 
-  Particles = require 'app/elements/Particles'
   OrganizedChaos = require 'app/elements/OrganizedChaos'
 
   window.App = class App
@@ -153,7 +151,6 @@ define (require) ->
       newTime = Date.now() * 0.0001
       delta = newTime - @time
 
-      if @particles then @particles.update()
       if @chaos then @chaos.update()
       @camera.lookAt( @scene.position )
       @postfx.render(delta)
