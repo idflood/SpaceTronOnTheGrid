@@ -82,6 +82,7 @@ define (require) ->
         @audio.play()
       else
         @audio.pause()
+        if window.ga then ga('send', 'event', 'Experiment', 'end', false, true)
 
     onTimerSeeked: (time) =>
       @audio.seek(time / 1000)
